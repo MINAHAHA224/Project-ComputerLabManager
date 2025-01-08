@@ -1,6 +1,8 @@
 package com.example.computerweb.services.Impl;
 
+import com.example.computerweb.DTO.UserLoginDTO;
 import com.example.computerweb.DTO.UserRegisterDTO;
+import com.example.computerweb.components.JwtTokenUtil;
 import com.example.computerweb.models.Role;
 import com.example.computerweb.models.User;
 import com.example.computerweb.repositories.RoleRepository;
@@ -22,6 +24,7 @@ public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtil jwtTokenUtil;
     @Transactional
     @Override
     public ResponseEntity<String> handleRergister(UserRegisterDTO userRegisterDTO) {
@@ -40,7 +43,6 @@ public class UserServiceImpl implements IUserService {
             String passWord = passwordEncoder.encode(userRegisterDTO.getPassWord());
             user.setPassWord(passWord);
             Optional<Role> roles = this.roleRepository.findById(userRegisterDTO.getRole());
-            boolean check = roles.isPresent();
             if (roles.isPresent() ){
                 user.setRole(roles.get());
             }
@@ -54,5 +56,35 @@ public class UserServiceImpl implements IUserService {
             return ResponseEntity.badRequest().body("save register failed");
 
         }
+    }
+
+    @Override
+    public boolean checkEamilExist(String email) {
+        Optional<User> user = this.userRepository.findUserByEmail(email);
+        return user.isPresent();
+    }
+
+    @Override
+    public ResponseEntity<String> handleLogin(UserLoginDTO userLoginDTO) {
+        Optional<User> existsEmail = this.userRepository.findUserByEmail(userLoginDTO.getEmail());
+        if(existsEmail.isPresent() ){
+            User userCurrent  = existsEmail.get();
+            String passEncode = passwordEncoder.encode(userLoginDTO.getPassWord());
+            if ( userCurrent.getPassword().equals(passEncode)){
+                try {
+                    String token = this.jwtTokenUtil.generateToken(userCurrent);
+                    return  ResponseEntity.ok().body(token);
+                } catch (Exception e ){
+                    e.printStackTrace();
+                    System.out.println("--ER : Lỗi không tạo được token " + e.getMessage());
+                }
+
+            }else {
+                return ResponseEntity.badRequest().body("Mật khẩu không chính xác");
+            }
+        }
+
+       return ResponseEntity.badRequest().body("Email đã tồn tại hoặc đã được đăng kí");
+
     }
 }

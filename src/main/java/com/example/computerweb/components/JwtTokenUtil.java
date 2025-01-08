@@ -2,6 +2,7 @@ package com.example.computerweb.components;
 
 import com.example.computerweb.customexceptions.InvalidParamException;
 import com.example.computerweb.models.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -14,6 +15,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 @Component
 @RequiredArgsConstructor
@@ -46,4 +48,7 @@ public class JwtTokenUtil {
         //Keys.hmacShaKeyFor(Decoders.BASE64.decode("TaqlmGv1iEDMRiFp/pHuID1+T84IABfuA0xXh4GhiUI="));
         return Keys.hmacShaKeyFor(bytes);
     }
+
+
+
 }
