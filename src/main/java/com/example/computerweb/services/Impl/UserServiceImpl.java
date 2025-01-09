@@ -11,6 +11,8 @@ import com.example.computerweb.services.IUserService;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
@@ -24,14 +26,13 @@ public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     @Transactional
     @Override
     public ResponseEntity<String> handleRergister(UserRegisterDTO userRegisterDTO) {
         try {
-            System.out.println("111");
 
-            System.out.println("222");
 
             User user = User.builder()
                     .fullName(userRegisterDTO.getFullName())
@@ -69,10 +70,18 @@ public class UserServiceImpl implements IUserService {
         Optional<User> existsEmail = this.userRepository.findUserByEmail(userLoginDTO.getEmail());
         if(existsEmail.isPresent() ){
             User userCurrent  = existsEmail.get();
-            String passEncode = passwordEncoder.encode(userLoginDTO.getPassWord());
-            if ( userCurrent.getPassword().equals(passEncode)){
+            if ( passwordEncoder.matches(userLoginDTO.getPassWord() , userCurrent.getPassword())){
                 try {
-                    String token = this.jwtTokenUtil.generateToken(userCurrent);
+                    String testEmail = userLoginDTO.getEmail();
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                            userLoginDTO.getEmail(),
+                            userLoginDTO.getPassWord(),
+                            userCurrent.getAuthorities()
+                    );
+
+                    authenticationManager.authenticate(authenticationToken);
+
+                    String token = "token" + ":" + this.jwtTokenUtil.generateToken(userCurrent);
                     return  ResponseEntity.ok().body(token);
                 } catch (Exception e ){
                     e.printStackTrace();
@@ -80,11 +89,11 @@ public class UserServiceImpl implements IUserService {
                 }
 
             }else {
-                return ResponseEntity.badRequest().body("Mật khẩu không chính xác");
+                return ResponseEntity.badRequest().body("Email or Password incorrect");
             }
         }
 
-       return ResponseEntity.badRequest().body("Email đã tồn tại hoặc đã được đăng kí");
+       return ResponseEntity.badRequest().body("Email already exists or has been registered ");
 
     }
 }

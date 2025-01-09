@@ -1,6 +1,8 @@
 package com.example.computerweb.DTO;
 
+import com.example.computerweb.Validation.login.LoginChecked;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -8,13 +10,14 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @Data
+@LoginChecked
 public class UserLoginDTO {
 
-    @NotBlank(message = "Email không được để trống")
+
     @JsonProperty("email")
     private String email;
 
-    @NotBlank(message = "Mật khẩu không được để trống")
+
     @JsonProperty("passWord")
     private String passWord;
 }

@@ -5,6 +5,7 @@ import com.example.computerweb.DTO.UserRegisterDTO;
 import com.example.computerweb.services.IUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,6 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("${api.prefix}/users")
 public class UserController {
+
+    // Error code : 400 of Controller
     private final IUserService userService;
 
     @PostMapping("/register")
@@ -46,8 +49,20 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> createLogin (@Valid @RequestBody UserLoginDTO userLoginDTO ){
+    public ResponseEntity<?> createLogin (@Valid @RequestBody UserLoginDTO userLoginDTO , BindingResult bindingResult ){
 
+            List<FieldError> errors = bindingResult.getFieldErrors();
+
+            HashMap<String , String > errorMessage = new HashMap<>();
+            for ( FieldError  error  : errors ){
+                System.out.println(">>>> " + error.getField() + "------" + error.getDefaultMessage());
+                errorMessage.put( error.getField() , error.getDefaultMessage());
+            }
+
+            boolean  testError = bindingResult.hasErrors();
+        if (bindingResult.hasErrors() ){
+            return  ResponseEntity.badRequest().body(errorMessage);
+        }
 
       ResponseEntity<String> handleLogin = this.userService.handleLogin(userLoginDTO);
       if (handleLogin.getStatusCode() == HttpStatus.OK ){

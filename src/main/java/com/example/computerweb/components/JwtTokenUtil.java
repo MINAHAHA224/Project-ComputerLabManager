@@ -9,6 +9,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -49,6 +50,38 @@ public class JwtTokenUtil {
         return Keys.hmacShaKeyFor(bytes);
     }
 
+    public Claims extractAllClaims ( String token ){
 
+        return Jwts.parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJwt(token)
+                .getBody();
+
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    public String extractEmailToken (String token){
+        return extractClaim(token, Claims::getSubject );
+    }
+
+    public boolean isTokenExpired ( String token ){
+
+        return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
+
+    public boolean validateToken ( String token , UserDetails userDetails){
+
+        String emailOfToken = extractClaim(token , Claims::getSubject);
+        if (emailOfToken.equals(userDetails.getUsername()) && !isTokenExpired(token) )
+        {
+            return true;
+        }
+       return false;
+    }
 
 }

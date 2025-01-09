@@ -1,4 +1,4 @@
-package com.example.computerweb.Validation;
+package com.example.computerweb.Validation.register;
 
 import com.example.computerweb.DTO.UserRegisterDTO;
 import com.example.computerweb.models.User;
@@ -20,7 +20,7 @@ public class RegisterValidator implements ConstraintValidator<RegisterChecked , 
 
         try {
             if (userRegisterDTO.getFullName() == null || userRegisterDTO.getFullName().isEmpty()) {
-                constraintValidatorContext.buildConstraintViolationWithTemplate("Bạn cần điền đầy đủ Họ và Tên.")
+                constraintValidatorContext.buildConstraintViolationWithTemplate("You need to fill in your full name.")
                         .addPropertyNode("fullName")
                         .addConstraintViolation()
                         .disableDefaultConstraintViolation();
@@ -28,7 +28,7 @@ public class RegisterValidator implements ConstraintValidator<RegisterChecked , 
             }
 
             if (userRegisterDTO.getEmail() == null || userRegisterDTO.getEmail().isEmpty()) {
-                constraintValidatorContext.buildConstraintViolationWithTemplate("Email không được để trống.")
+                constraintValidatorContext.buildConstraintViolationWithTemplate("Email cannot be blank.")
                         .addPropertyNode("email")
                         .addConstraintViolation()
                         .disableDefaultConstraintViolation();
@@ -37,7 +37,7 @@ public class RegisterValidator implements ConstraintValidator<RegisterChecked , 
             if (userRegisterDTO.getEmail() != null && !userRegisterDTO.getEmail().isEmpty()) {
                 Optional<User> user = this.userRepository.findUserByEmail(userRegisterDTO.getEmail());
                 if (user.isPresent()) {
-                    constraintValidatorContext.buildConstraintViolationWithTemplate("Email đã tồn tại hoặc đã được đăng kí.")
+                    constraintValidatorContext.buildConstraintViolationWithTemplate("Email already exists or has been registered.")
                             .addPropertyNode("email")
                             .addConstraintViolation()
                             .disableDefaultConstraintViolation();
@@ -46,7 +46,7 @@ public class RegisterValidator implements ConstraintValidator<RegisterChecked , 
             }
             // password
             if (userRegisterDTO.getPassWord() == null || userRegisterDTO.getPassWord().isEmpty()) {
-                constraintValidatorContext.buildConstraintViolationWithTemplate("Mật khẩu không được để trống.")
+                constraintValidatorContext.buildConstraintViolationWithTemplate("Password cannot be blank.")
                         .addPropertyNode("passWord")
                         .addConstraintViolation()
                         .disableDefaultConstraintViolation();
@@ -54,11 +54,11 @@ public class RegisterValidator implements ConstraintValidator<RegisterChecked , 
             }
 
             if (userRegisterDTO.getPassWord() != null  && !userRegisterDTO.getPassWord().isEmpty()) {
-
+                // pass : A1b$2dEf
                 // Kiểm tra mật khẩu có ít nhất 6 ký tự, một chữ cái thường, một chữ cái in hoa và một ký tự đặc biệt
-                String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$";
+                String regex = "^.{6,}$";
                 if (!userRegisterDTO.getPassWord().matches(regex)) {
-                    constraintValidatorContext.buildConstraintViolationWithTemplate("Mật khẩu phải chứa đủ điều kiên.")
+                    constraintValidatorContext.buildConstraintViolationWithTemplate("Password must contain sufficient conditions.")
                             .addPropertyNode("passWord")
                             .addConstraintViolation()
                             .disableDefaultConstraintViolation();

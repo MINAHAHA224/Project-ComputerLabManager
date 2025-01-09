@@ -1,14 +1,9 @@
 package com.example.computerweb.DTO;
 
 
-import com.example.computerweb.Validation.RegisterChecked;
-import com.example.computerweb.models.Role;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.example.computerweb.Validation.register.RegisterChecked;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Date;
 
 @Data
 @Getter
