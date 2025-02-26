@@ -1,7 +1,7 @@
 package com.example.computerweb.filters;
 
 import com.example.computerweb.components.JwtTokenUtil;
-import com.example.computerweb.models.User;
+import com.example.computerweb.models.entity.UserEntity;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,14 +25,16 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class JwtTokenFilter
+        extends OncePerRequestFilter {
 
     // Error code : 401  of  OncePerRequestFilter
-    private final JwtTokenUtil jwtTokenUtil;
-    private final UserDetailsService userDetailsService;
 
-    @Value("${api.prefix}")
-    private String apiPrefix;
+    private final  JwtTokenUtil jwtTokenUtil;
+
+    private final  UserDetailsService userDetailsService;
+
+
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -55,11 +57,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
             // lấy token
             final String token = authHeader.substring(7);
+            //log.info("Token: {}", token);
             // check subject của claims trong token
             final String emailOfToken = this.jwtTokenUtil.extractEmailToken(token);
 
-             if(emailOfToken != null && SecurityContextHolder.getContext().getAuthentication() != null ){
-                 User userDetail = (User) this.userDetailsService.loadUserByUsername(emailOfToken);
+             if(emailOfToken != null && SecurityContextHolder.getContext().getAuthentication() == null ){
+                 UserEntity userDetail = (UserEntity) this.userDetailsService.loadUserByUsername(emailOfToken);
                  if(jwtTokenUtil.validateToken(token ,userDetail )){
 
                      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -104,16 +107,25 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 //                return true;
 //            }
 //        }
+        String requestURI = request.getServletPath();
+        if (requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/swagger-resources") ||
+                requestURI.startsWith("/webjars")) {
+            return true;
+        }
 
         final List<Pair<String, String>> bybassTokens = Arrays.asList(
-                Pair.of(String.format("%s/users/login", apiPrefix), "POST"),
-                Pair.of(String.format("%s/users/register", apiPrefix), "POST")
+                Pair.of("/access/login" , "POST"),
+                Pair.of("/access/register", "POST")
                 );
 
         for ( Pair<String , String > bybassToken : bybassTokens){
 
             String actionApi = request.getServletPath();
             String methodApi = request.getMethod();
+            boolean testAction = bybassToken.getFirst().equals(actionApi);
+            boolean testMethod= bybassToken.getSecond().equals(methodApi);
             if ( bybassToken.getFirst().equals(actionApi) && bybassToken.getSecond().equals(methodApi)){
                 return true;
             }

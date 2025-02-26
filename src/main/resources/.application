@@ -1,0 +1,31 @@
+server:
+  port:
+    8080
+#spring:
+#  datasource:
+#    url: jdbc:sqlserver://localhost:1433;databaseName=LICHTH_PHONGMAY
+#
+#    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#    username: sa
+#    password: 123456
+#  messages:
+#    encoding: UTF-8
+#  jpa:
+#    show-sql: true
+#    hibernate:
+#      ddl-auto: none
+#    properties:
+#      hibernate:
+#      dialect: org.hibernate.dialect.MySQL8Dialect
+#      format_sql: true
+#  servlet:
+#    multipart:
+#      max-file-size: 10MB
+#      max-request-size: 10MB
+#
+
+api:
+  prefix: /api
+jwt:
+  expiration: 2592000 #30 days = 30 * 24 * 60 * 60
+  secretKey: TaqlmGv1iEDMRiFp/pHuID1+T84IABfuA0xXh4GhiUI=

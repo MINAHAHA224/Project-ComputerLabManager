@@ -1,7 +1,7 @@
 package com.example.computerweb.components;
 
 import com.example.computerweb.customexceptions.InvalidParamException;
-import com.example.computerweb.models.User;
+import com.example.computerweb.models.entity.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,7 +26,7 @@ public class JwtTokenUtil {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    public String generateToken(User user) throws Exception {
+    public String generateToken(UserEntity user) throws Exception {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email" , user.getEmail());
         try {
@@ -55,13 +55,13 @@ public class JwtTokenUtil {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
 
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = extractAllClaims(token);
+        Claims claims = this.extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 

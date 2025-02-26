@@ -1,52 +1,76 @@
-package com.example.computerweb.models;
+package com.example.computerweb.models.entity;
 
+import com.example.computerweb.models.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.util.*;
 
-@Entity
-@Table(name = "users")
 @Getter
-@Setter
-@NoArgsConstructor
+@Entity
+@ToString
 @AllArgsConstructor
+@NoArgsConstructor
+@Setter
 @Builder
-public class User extends BaseEntity implements UserDetails {
+@Table(name = "NguoiDung")
+public class UserEntity extends AbstractEntity implements UserDetails , Serializable {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "UserID")
     private Long id ;
 
-    @Column(name = "fullname")
-    private String fullName;
+    @Column(name = "Ho")
+    private String firstName;
 
-    @Column(name = "email")
+    @Column(name = "Ten")
+    private String lastName;
+
+    @Column(name = "GioiTinh")
+    private Gender gender;
+
+    @Column(name = "NgaySinh")
+    @Temporal(TemporalType.DATE)//ngày (yyyy-MM-dd) (không lưu thời gian)
+    private Date dateOfBirth ;
+
+    @Column(name = "SoDienThoai")
+    private String phone ;
+
+    @Column(name = "Email")
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "MatKhau")
     private String passWord;
 
-    @Column(name = "is_active")
-    private boolean active;
+    @Column(name = "CCCD")
+    private String infomationCode;
 
-    @Column(name = "date_of_birth")
-    private String dateOfBirth ;
+    @Column(name = "ChuyenNganh")
+    private String major;
 
     @ManyToOne
-    @JoinColumn(name = "role_id")
-    private Role role;
+    @JoinColumn(name = "QuyenID_FK")
+    private RoleEntity role;
+
+    @OneToMany(mappedBy = "user")
+    private List<CalendarEntity> calendarEntities;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        authorityList.add( new SimpleGrantedAuthority("ROLE_" + getRole().getName().toUpperCase()));
+        authorityList.add( new SimpleGrantedAuthority("ROLE_" + getRole().getNameRole().toUpperCase()));
         return authorityList;
 
        // return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + getRole().getName().toUpperCase()));
     }
+
 
     @Override
     public String getPassword() {

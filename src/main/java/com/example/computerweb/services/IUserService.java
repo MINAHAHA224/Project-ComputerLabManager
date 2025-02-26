@@ -1,17 +1,23 @@
 package com.example.computerweb.services;
 
 
-import com.example.computerweb.DTO.UserLoginDTO;
-import com.example.computerweb.DTO.UserRegisterDTO;
-import com.example.computerweb.models.User;
-import com.example.computerweb.services.Impl.UserServiceImpl;
+import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
+import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
-public interface IUserService  {
+import java.util.Map;
 
-    ResponseEntity<String> handleRergister (UserRegisterDTO userRegisterDTO);
+@Service
+public interface IUserService {
+
+    ResponseEntity<String> handleRergister (UserRegisterDto userRegisterDTO);
 
     boolean checkEamilExist (String email);
 
-    ResponseEntity<String> handleLogin (UserLoginDTO userLoginDTO);
+    boolean checkPhoneExist ( String phone);
+
+    ResponseEntity<String> handleLogin (UserLoginDto userLoginDTO);
+
+    Map<String, String> handleGetAllUserByRole ();
 }

@@ -1,21 +1,17 @@
 package com.example.computerweb.Validation.login;
 
-import com.example.computerweb.DTO.UserLoginDTO;
-import com.example.computerweb.models.User;
+import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
 import com.example.computerweb.services.IUserService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
-import java.util.regex.Pattern;
-
 @RequiredArgsConstructor
-public class LoginValidator implements ConstraintValidator<LoginChecked , UserLoginDTO> {
+public class LoginValidator implements ConstraintValidator<LoginChecked , UserLoginDto> {
 
     private final IUserService userService;
     @Override
-    public boolean isValid(UserLoginDTO userLoginDTO, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(UserLoginDto userLoginDTO, ConstraintValidatorContext constraintValidatorContext) {
 
         boolean valid = true;
             if ( userLoginDTO.getEmail() == null || userLoginDTO.getEmail().isEmpty()){
