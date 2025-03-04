@@ -8,6 +8,10 @@ import java.util.List;
 public interface RoomRepositoryCustom {
 
     void saveLTH_Phong (Long calendarId,List<Long> roomId);
+
+    void updateLTH_Phong ( Long calendarId,List<Long> roomId);
+
+    void updateLTH_PhongOnlyOne ( Long calendarId,Long roomId);
     void deleteLTH_Phong (Long calendarId);
     List<Long> getIdRoomsByCalendarIdOnLTH_Phong (Long calendarId);
 }

@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface IUserRepository extends JpaRepository<UserEntity, Long> , UserRepositoryCustom {
 
     UserEntity findUserEntityById (Long id);
+
+
     Optional<UserEntity> findUserEntityByEmail(String email);
 
     Optional<UserEntity> findUserEntityByPhone(String phone);

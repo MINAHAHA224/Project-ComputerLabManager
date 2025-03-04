@@ -12,8 +12,9 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 public class CalendarResponseDto {
+    private CalendarManagementDto userCurrent;
 
-    private Map<String , Map<String ,String>> data;
+   private CalendarResponseFields dataBase;
 
-    private CalendarManagementDto calendarManagementDto;
+
 }

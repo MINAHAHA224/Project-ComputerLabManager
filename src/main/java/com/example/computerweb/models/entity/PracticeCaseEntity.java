@@ -30,4 +30,12 @@ public class PracticeCaseEntity {
 
     @OneToMany(mappedBy = "practiceCase")
     private List<CalendarEntity> calendarEntities;
+
+//    @OneToMany(mappedBy = "practiceCaseOld")
+//    private List<TicketRequestEntity> ticketRequestEntitiesOld;
+//
+//    @OneToMany(mappedBy = "practiceCaseNew")
+//    private List<TicketRequestEntity> ticketRequestEntitiesNew;
+
+
 }

@@ -2,6 +2,7 @@ package com.example.computerweb.services.impl;
 
 import com.example.computerweb.DTO.dto.CalendarManagementDto;
 import com.example.computerweb.DTO.dto.CalendarResponseDto;
+import com.example.computerweb.DTO.dto.CalendarResponseFields;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestDto;
 import com.example.computerweb.models.entity.*;
 import com.example.computerweb.models.enums.PurposeUse;
@@ -43,56 +44,72 @@ private  final ISubjectRepository iSubjectRepository;
     }
 
     @Override
-    public Map<String, Map<String ,String>> handleGetDataForCreatePage() {
+    public CalendarResponseFields handleGetDataForCreatePage() {
         //purposeUse
         Map<String , String> purposeUse = PurposeUse.getPurposeUse();
         //teachers
         RoleEntity roleEntity = this.iRoleRepository.findById(1).get();
         List<UserEntity> users = this.iUserRepository.findAllByRole(roleEntity);
-        Map<String, String> teachers = new HashMap<>();
+        Map<String, String> teachers = new TreeMap<>();
         for ( UserEntity user : users ){
             teachers.put(user.getId().toString() , user.getFirstName() +" "+user.getLastName());
         }
         // rooms
         List<RoomEntity> roomEntities = this.iRoomRepository.findAll();
-        Map<String , String> rooms = new HashMap<>();
+        Map<String , Map<String,String>> rooms = new TreeMap<>();
         for ( RoomEntity roomEntity : roomEntities ){
-            rooms.put(roomEntity.getId().toString(), roomEntity.getNameRoom() +" - (" +roomEntity.getNumberOfComputers().toString() +" slot)" );
+            Map<String,String> roomDetails = new TreeMap<>();
+            roomDetails.put("name" ,roomEntity.getNameRoom() );
+            roomDetails.put("quantity" , roomEntity.getNumberOfComputers().toString());
+            rooms.put(roomEntity.getId().toString(),roomDetails);
         }
         // classrooms
         List<ClassroomEntity> classroomEntities = this.iClassroomRepository.findAll();
-        Map<String , String> classrooms = new HashMap<>();
+        Map<String , Map<String,String>> classrooms = new TreeMap<>();
         for ( ClassroomEntity classroomEntity : classroomEntities ){
-            classrooms.put(classroomEntity.getId().toString(), classroomEntity.getNameClassroom() +" - (" +classroomEntity.getNumberOfStudents().toString() +" student)" );
+            Map<String,String> classroomDetails = new TreeMap<>();
+            classroomDetails.put("name" , classroomEntity.getNameClassroom());
+            classroomDetails.put("quantity" ,classroomEntity.getNumberOfStudents().toString() );
+            classrooms.put(classroomEntity.getId().toString(),classroomDetails );
         }
         // practiceCases
         DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
         List<PracticeCaseEntity> practiceCaseEntities = this.iPracticeCaseRepository.findAll();
-        Map<String , String> practiceCases = new HashMap<>();
+        Map<String , Map<String,String>> practiceCases = new TreeMap<>();
         for ( PracticeCaseEntity practiceCaseEntity : practiceCaseEntities ){
-            practiceCases.put(practiceCaseEntity.getId().toString(), practiceCaseEntity.getNamePracticeCase() +" - (" +practiceCaseEntity.getTimeStart().format(dateTimeFormat) +" - " + practiceCaseEntity.getTimeEnd().format(dateTimeFormat) +")" );
+            Map<String,String>  practiceCaseDetails = new TreeMap<>();
+            practiceCaseDetails.put("name" ,practiceCaseEntity.getNamePracticeCase() );
+            practiceCaseDetails.put("timeStart" ,practiceCaseEntity.getTimeStart().format(dateTimeFormat) );
+            practiceCaseDetails.put("timeEnd" ,practiceCaseEntity.getTimeEnd().format(dateTimeFormat) );
+            practiceCases.put(practiceCaseEntity.getId().toString(), practiceCaseDetails );
         }
         // subjects
         List<SubjectEntity> subjectEntities = this.iSubjectRepository.findAll();
-        Map<String , String> subjects = new HashMap<>();
+        Map<String , Map<String,String>> subjects = new TreeMap<>();
         for ( SubjectEntity subjectEntity : subjectEntities ){
-            subjects.put(subjectEntity.getId().toString(), subjectEntity.getNameSubject() +" - (" +subjectEntity.getSoTTH().toString() +" credit)" );
+            Map<String,String> subjectDetails = new TreeMap<>();
+            subjectDetails.put("name" ,subjectEntity.getNameSubject() );
+            subjectDetails.put("credit" ,subjectEntity.getSoTTH().toString() );
+            subjects.put(subjectEntity.getId().toString(), subjectDetails );
         }
 
-        Map<String , Map<String , String >> datas = new TreeMap<>();
-        datas.put("purposeUses" ,purposeUse);
-        datas.put("teachers" ,teachers);
-        datas.put("rooms" ,rooms);
-        datas.put("classrooms" ,classrooms);
-        datas.put("practiceCases" ,practiceCases);
-        datas.put("subjects" ,subjects);
-
-        return datas;
+        Map<String , Map<String , String >> field = new TreeMap<>();
+        field.put("purposeUses" ,purposeUse);
+        field.put("teachers" ,teachers);
+        Map<String , Map<String , Map<String,String> >> fields = new TreeMap<>();
+        fields.put("rooms" ,rooms);
+        fields.put("classrooms" ,classrooms);
+        fields.put("practiceCases" ,practiceCases);
+        fields.put("subjects" ,subjects);
+        CalendarResponseFields calendarResponseFields = new CalendarResponseFields();
+        calendarResponseFields.setField(field);
+        calendarResponseFields.setFields(fields);
+        return calendarResponseFields;
     }
 
     @Override
     public CalendarResponseDto handleGetDataForUpdatePage(Long calendarId) {
-        Map<String, Map<String ,String>> data = handleGetDataForCreatePage();
+        CalendarResponseFields data = handleGetDataForCreatePage();
         String roomId = this.iRoomRepository.getIdRoomsByCalendarIdOnLTH_Phong(calendarId).stream()
                 .map(id -> String.valueOf(id))
                 .collect(Collectors.joining(","));
@@ -105,9 +122,10 @@ private  final ISubjectRepository iSubjectRepository;
         calendarManagementDto.setPracticeCase(calendarEntity.getPracticeCase().getId().toString());
         calendarManagementDto.setSubject(calendarEntity.getSubject().getId().toString());
         calendarManagementDto.setRoom(roomId);
+        calendarManagementDto.setId(calendarEntity.getId().toString());
         CalendarResponseDto calendarResponseDto = new CalendarResponseDto();
-        calendarResponseDto.setData(data);
-        calendarResponseDto.setCalendarManagementDto(calendarManagementDto);
+        calendarResponseDto.setDataBase(data);
+        calendarResponseDto.setUserCurrent(calendarManagementDto);
 
         return calendarResponseDto;
     }

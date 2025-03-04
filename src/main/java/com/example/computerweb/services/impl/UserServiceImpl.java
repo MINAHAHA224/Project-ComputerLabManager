@@ -1,27 +1,29 @@
 package com.example.computerweb.services.impl;
 
+import com.example.computerweb.DTO.dto.ProfileResponseDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.components.JwtTokenUtil;
 import com.example.computerweb.models.entity.RoleEntity;
 import com.example.computerweb.models.entity.UserEntity;
+import com.example.computerweb.models.enums.Gender;
 import com.example.computerweb.repositories.IRoleRepository;
 import com.example.computerweb.repositories.IUserRepository;
 import com.example.computerweb.services.IUserService;
 import com.example.computerweb.utils.DateUtils;
+import com.example.computerweb.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +51,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public ResponseEntity<String> handleRergister(UserRegisterDto userRegisterDTO) {
         try {
-
+            Gender test = userRegisterDTO.getGender();
             UserEntity user = UserEntity.builder()
                     .firstName(userRegisterDTO.getFirstName())
                     .lastName(userRegisterDTO.getLastName())
@@ -98,7 +100,7 @@ public class UserServiceImpl implements IUserService {
 
                     authenticationManager.authenticate(authenticationToken);
 
-                    String token = "token" + ":" + this.jwtTokenUtil.generateToken(userCurrent);
+                    String token =  this.jwtTokenUtil.generateToken(userCurrent);
                     return  ResponseEntity.ok().body(token);
                 } catch (Exception e ){
                     e.printStackTrace();
@@ -112,6 +114,41 @@ public class UserServiceImpl implements IUserService {
 
        return ResponseEntity.badRequest().body("Email or Password incorrect");
 
+    }
+
+    @Override
+    public Map<String, String> handleGetDataUserCurrent() {
+
+        Map<String,String> userCurrent = new TreeMap<>();
+
+        String emailUser = SecurityUtils.getPrincipal();
+      UserEntity  userEntity = this.iuserRepository.findUserEntityByEmail(emailUser).get();
+        userCurrent.put("userName" , userEntity.getFirstName()+ " " + userEntity.getLastName()) ;
+        userCurrent.put("role" , userEntity.getRole().getContentRole());
+        return userCurrent;
+    }
+
+    @Override
+    public ProfileResponseDto handleGetDataProfile() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        UserEntity userCurrent = this.iuserRepository.findUserEntityByEmail(SecurityUtils.getPrincipal()).get();
+        ProfileResponseDto profileResponseDto = new ProfileResponseDto();
+        profileResponseDto.setId(userCurrent.getId().toString());
+        profileResponseDto.setEmail(userCurrent.getEmail());
+        profileResponseDto.setFirstName(userCurrent.getFirstName());
+        profileResponseDto.setLastName(userCurrent.getLastName());
+        profileResponseDto.setMajor(userCurrent.getMajor());
+        profileResponseDto.setGender(userCurrent.getGender().toString());
+        profileResponseDto.setDateOfBirth(dateFormat.format(userCurrent.getDateOfBirth()));
+        profileResponseDto.setPhone(userCurrent.getPhone());
+        profileResponseDto.setInformationCode(userCurrent.getInfomationCode());
+        profileResponseDto.setAddress(userCurrent.getAddress());
+        profileResponseDto.setEmailPersonal(userCurrent.getEmailPersonal());
+        profileResponseDto.setProvince(userCurrent.getProvince());
+        profileResponseDto.setDistrict(userCurrent.getDistrict());
+        profileResponseDto.setWard(userCurrent.getWard());
+
+        return profileResponseDto;
     }
 
     @Override

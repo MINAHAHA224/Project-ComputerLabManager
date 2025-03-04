@@ -21,5 +21,6 @@ public class CalendarManagementDto implements Serializable {
     private String practiceCase;
     private String time;
     private String note;
+    private String id;
 
 }

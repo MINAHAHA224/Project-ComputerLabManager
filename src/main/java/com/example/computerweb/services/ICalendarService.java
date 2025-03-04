@@ -2,6 +2,7 @@ package com.example.computerweb.services;
 
 import com.example.computerweb.DTO.dto.CalendarManagementDto;
 import com.example.computerweb.DTO.dto.CalendarResponseDto;
+import com.example.computerweb.DTO.dto.CalendarResponseFields;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestDto;
 import com.example.computerweb.models.entity.CalendarEntity;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import java.util.Map;
 public interface ICalendarService {
     List<CalendarManagementDto> handleGetAllDataCalendar ();
 
-    Map<String, Map<String ,String>> handleGetDataForCreatePage ();
+    CalendarResponseFields handleGetDataForCreatePage ();
     CalendarResponseDto handleGetDataForUpdatePage (Long calendarId);
 
     void handleCreateCalendar (CalendarRequestDto calendarRequestDto);

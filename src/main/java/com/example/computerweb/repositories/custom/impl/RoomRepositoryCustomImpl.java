@@ -35,6 +35,30 @@ public class RoomRepositoryCustomImpl implements RoomRepositoryCustom {
     }
 
     @Override
+    @Transactional
+    public void updateLTH_Phong(Long calendarId, List<Long> roomId) {
+        try {
+            for ( Long room : roomId ){
+                String sql = "UPDATE LTH_Phong SET LTH_Phong.PhongID_FK ="+room+"  WHERE LTH_Phong.LichID_FK =" +calendarId;
+                Query query = entityManager.createNativeQuery(sql);
+                query.executeUpdate();
+            }
+
+        }catch (Exception e){
+            System.out.println("---->ER : update loop roomId " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateLTH_PhongOnlyOne(Long calendarId, Long roomId) {
+        String sql = "UPDATE LTH_Phong SET LTH_Phong.PhongID_FK ="+roomId+"  WHERE LTH_Phong.LichID_FK =" +calendarId;
+        Query query = entityManager.createNativeQuery(sql);
+        query.executeUpdate();
+    }
+
+    @Override
+    @Transactional
     public void deleteLTH_Phong(Long calendarId) {
         try {
             String sql = "DELETE FROM LTH_Phong WHERE LTH_Phong.LichID_FK = " + calendarId;
@@ -59,6 +83,7 @@ public class RoomRepositoryCustomImpl implements RoomRepositoryCustom {
         }
         return  roomId;
     }
+
 
 
 }

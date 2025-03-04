@@ -30,4 +30,7 @@ public class SubjectEntity {
 
     @OneToMany(mappedBy = "subject")
     private List<CalendarEntity> calendarEntities;
+
+    @OneToMany(mappedBy = "subject")
+    private List<TicketRequestEntity> ticketRequestEntities;
 }

@@ -54,6 +54,24 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     @Column(name = "ChuyenNganh")
     private String major;
 
+    @Column(name = "Diachi")
+    private String address;
+
+    @Column(name = "EmailCN")
+    private String emailPersonal;
+
+    @Column(name = "TinhThanh")
+    private String province;
+
+    @Column(name = "QuanHuyen")
+    private String district;
+
+    @Column(name = "PhuongXa")
+    private String ward;
+
+    @Column(name = "AnhDD")
+    private String avatar;
+
     @ManyToOne
     @JoinColumn(name = "QuyenID_FK")
     private RoleEntity role;
@@ -61,6 +79,11 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     @OneToMany(mappedBy = "user")
     private List<CalendarEntity> calendarEntities;
 
+    @OneToMany(mappedBy = "user")
+    private List<NotificationEntity> notificationEntities;
+
+    @OneToMany(mappedBy = "user")
+    private List<TicketRequestEntity> ticketRequestEntities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

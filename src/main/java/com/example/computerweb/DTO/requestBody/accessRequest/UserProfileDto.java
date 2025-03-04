@@ -1,6 +1,5 @@
 package com.example.computerweb.DTO.requestBody.accessRequest;
 
-
 import com.example.computerweb.Validation.EmailValidation.EmailChecked;
 import com.example.computerweb.Validation.EnumPatternValidation.EnumPattern;
 import com.example.computerweb.Validation.PasswordValidation.PasswordChecked;
@@ -12,22 +11,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.annotation.Validated;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 
-
-@Builder
-@ToString
-@Validated
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
-public class UserRegisterDto implements Serializable {
+@NoArgsConstructor
+@ToString
+public class UserProfileDto {
+
+    @JsonProperty("id")
+    private Long id;
 
     @NotBlank(message = "firstName must be not blank")
-    @JsonProperty("firstName")
     @Schema(type = "string" , example = "Cao Duy")
+    @JsonProperty("firstName")
     private String firstName;
 
     @NotBlank(message = "lastName must be not blank")
@@ -45,59 +44,25 @@ public class UserRegisterDto implements Serializable {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Schema(type = "string", format = "date", example = "2025-02-19")
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate  dateOfBirth;
+    private LocalDate dateOfBirth;
 
 
     @JsonProperty("gender")
-   @EnumPattern(name = "gender" , regexp = "NAM|NU")
-    @Schema(type = "string", example = "NAM|NU")
+    @Schema(type = "string" , example = "NAM|NU")
+    @EnumPattern(name = "gender" , regexp = "NAM|NU")
     private Gender gender;
 
 
-    @JsonProperty("email")
-    @Schema(type = "string" , example = "ct@ptithcm.edu.vn")
-    @EmailChecked
-    private String email;
+    @JsonProperty("informationCode")
+    @Schema(type = "string" , example = "123456789012")
+    private String informationCode ;
 
 
-    @JsonProperty("passWord")
-    @Schema(type = "string" , example = "Abc123")
-    @PasswordChecked
-    private String password;
+    @JsonProperty("major")
+    @Schema(type = "string" , example = "CNTT")
+    private String major ;
 
-    @JsonProperty("roleId")
-    @Schema(type = "Long", example = "1")
-    private Long roleId;
 
-    public String getFirstName() {
-        return firstName;
-    }
 
-    public String getLastName() {
-        return lastName;
-    }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public LocalDate  getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Long getRoleId() {
-        return roleId;
-    }
 }

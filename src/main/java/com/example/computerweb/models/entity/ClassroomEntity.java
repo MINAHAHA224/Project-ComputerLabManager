@@ -32,4 +32,7 @@ public class ClassroomEntity {
 
     @OneToMany(mappedBy = "classroom")
     private List<CalendarEntity> calendarEntities;
+
+    @OneToMany(mappedBy = "classroomEntity")
+    private List<TicketRequestEntity> ticketRequestEntities;
 }

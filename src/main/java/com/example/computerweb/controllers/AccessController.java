@@ -1,9 +1,11 @@
 package com.example.computerweb.controllers;
 
+import com.example.computerweb.DTO.dto.ProfileResponseDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
+import com.example.computerweb.DTO.requestBody.accessRequest.UserProfileDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.services.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,9 +17,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @Slf4j
-@Tag(name="Access User")
+@Tag(name="Access user for GVU|CSVC|GV")
 @RequiredArgsConstructor
 @RequestMapping("/access")
 public class AccessController {
@@ -38,10 +43,12 @@ public class AccessController {
 
     @Operation(summary = "login User" , description = "API Login user")
     @PostMapping("/login")
-    public ResponseData<String> createLogin (@Valid @RequestBody UserLoginDto userLoginDTO ){
+    public ResponseData<?> createLogin (@Valid @RequestBody UserLoginDto userLoginDTO ){
       ResponseEntity<String> handleLogin = this.iUserService.handleLogin(userLoginDTO);
       if (handleLogin.getStatusCode() == HttpStatus.OK ){
-          return new ResponseSuccess<>(HttpStatus.OK.value(), "Login Success" ,handleLogin.getBody() );
+          Map<String,String> token = new HashMap<>();
+          token.put("token" , handleLogin.getBody());
+          return new ResponseSuccess<>(HttpStatus.OK.value(), "Login Success" ,token );
 
       }
       else {
@@ -49,5 +56,8 @@ public class AccessController {
       }
 
     }
+
+
+
 
 }

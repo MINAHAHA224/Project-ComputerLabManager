@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface IPracticeCaseRepository  extends JpaRepository<PracticeCaseEntity , Long> {
     PracticeCaseEntity findPracticeCaseEntityById ( Long id);
+
+
 }

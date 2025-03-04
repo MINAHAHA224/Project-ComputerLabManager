@@ -1,6 +1,7 @@
 package com.example.computerweb.services;
 
 
+import com.example.computerweb.DTO.dto.ProfileResponseDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,10 @@ public interface IUserService {
     boolean checkPhoneExist ( String phone);
 
     ResponseEntity<String> handleLogin (UserLoginDto userLoginDTO);
+
+    Map<String,String> handleGetDataUserCurrent ();
+
+    ProfileResponseDto handleGetDataProfile ();
 
     Map<String, String> handleGetAllUserByRole ();
 }

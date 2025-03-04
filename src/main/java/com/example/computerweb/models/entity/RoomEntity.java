@@ -3,6 +3,8 @@ package com.example.computerweb.models.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -21,4 +23,7 @@ public class RoomEntity {
 
     @Column(name = "SoLuongMay")
     private Long numberOfComputers;
+
+//    @OneToMany(mappedBy = "roomEntity")
+//    private List<TicketRequestEntity> ticketRequestEntities ;
 }
