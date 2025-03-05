@@ -1,11 +1,9 @@
 package com.example.computerweb.controllers;
 
-import com.example.computerweb.DTO.dto.ProfileResponseDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
-import com.example.computerweb.DTO.requestBody.accessRequest.UserProfileDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.services.IUserService;
 import io.swagger.v3.oas.annotations.Operation;

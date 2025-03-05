@@ -3,33 +3,46 @@ package com.example.computerweb.DTO.dto;
 import com.example.computerweb.models.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Date;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
-public class ProfileResponseDto {
+public class UserManagementDto {
 
 
     private String id ;
-    private String email;
+
     private String firstName;
+
     private String lastName;
+
     private String gender;
-    private String major;
+
     private String dateOfBirth ;
 
+    private String phone ;
+
+    private String email;
+
+    private String passWord;
 
     private String informationCode;
-    private String phone ;
-    private String emailPersonal;
-    private String province;
-    private String district;
-    private String ward;
+
+    private String major;
+
     private String address;
 
+    private String emailPersonal;
+
+    private String province;
+
+    private String district;
+
+    private String ward;
+
+    private String avatar;
 }

@@ -1,7 +1,9 @@
 package com.example.computerweb.services.impl;
 
 import com.example.computerweb.DTO.dto.ProfileResponseDto;
+import com.example.computerweb.DTO.dto.UserManagementDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
+import com.example.computerweb.DTO.requestBody.userRequest.UserProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.components.JwtTokenUtil;
 import com.example.computerweb.models.entity.RoleEntity;
@@ -17,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,6 +118,29 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    @Transactional
+    public ResponseEntity<String> handleUpdateFieldProfile(UserProfileRequestDto userProfileDto) {
+        try {
+            UserEntity userEntity = this.iuserRepository.findUserEntityById(userProfileDto.getId());
+            userEntity.setPhone(userProfileDto.getPhone());
+            userEntity.setEmailPersonal(userProfileDto.getEmailPersonal());
+            userEntity.setProvince(userProfileDto.getProvince());
+            userEntity.setDistrict(userProfileDto.getDistrict());
+            userEntity.setWard(userProfileDto.getWard());
+            userEntity.setAddress(userProfileDto.getAddress());
+            userEntity.setInfomationCode(userProfileDto.getInformationCode());
+            this.iuserRepository.save(userEntity);
+
+            return ResponseEntity.ok().body("Update profile success");
+        }catch (Exception e){
+            System.out.println("--ER error save field profile :" + e.getMessage());
+            e.printStackTrace();
+        }
+
+     return ResponseEntity.badRequest().body("Update profile failed");
+    }
+
+    @Override
     public Map<String, String> handleGetDataUserCurrent() {
 
         Map<String,String> userCurrent = new TreeMap<>();
@@ -149,6 +173,35 @@ public class UserServiceImpl implements IUserService {
         profileResponseDto.setWard(userCurrent.getWard());
 
         return profileResponseDto;
+    }
+
+    @Override
+    public List<UserManagementDto> handleGetAllDataUser() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        List<UserManagementDto> userManagementDtos = new ArrayList<>();
+        List<UserEntity> userEntities = this.iuserRepository.findAll();
+        for ( UserEntity userEntity : userEntities){
+            UserManagementDto userManagementDto = new UserManagementDto();
+            userManagementDto.setId(userEntity.getId().toString());
+            userManagementDto.setFirstName(userEntity.getFirstName());
+            userManagementDto.setLastName(userEntity.getLastName());
+            userManagementDto.setGender(userEntity.getGender().toString());
+            userManagementDto.setDateOfBirth(dateFormat.format(userEntity.getDateOfBirth()));
+            userManagementDto.setPhone(userEntity.getPhone());
+            userManagementDto.setEmail(userEntity.getEmail());
+            userManagementDto.setInformationCode(userEntity.getInfomationCode());
+            userManagementDto.setMajor(userEntity.getMajor());
+            userManagementDto.setAddress(userEntity.getAddress());
+            userManagementDto.setEmailPersonal(userEntity.getEmailPersonal());
+            userManagementDto.setProvince(userEntity.getProvince());
+            userManagementDto.setDistrict(userEntity.getDistrict());
+            userManagementDto.setWard(userEntity.getWard());
+
+            userManagementDtos.add(userManagementDto);
+
+        }
+
+        return userManagementDtos;
     }
 
     @Override
