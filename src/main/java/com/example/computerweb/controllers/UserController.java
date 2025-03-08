@@ -50,4 +50,11 @@ public class UserController {
 
         return null;
     }
+
+    @GetMapping("/userManagement/export")
+    public  ResponseData<?> getExportUserDate ( ){
+
+
+        return null;
+    }
 }
