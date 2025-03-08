@@ -3,6 +3,7 @@ package com.example.computerweb.services.impl;
 import com.example.computerweb.DTO.dto.ProfileResponseDto;
 import com.example.computerweb.DTO.dto.UserManagementDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
+import com.example.computerweb.DTO.requestBody.userRequest.UserMngProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.userRequest.UserProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.components.JwtTokenUtil;
@@ -202,6 +203,36 @@ public class UserServiceImpl implements IUserService {
         }
 
         return userManagementDtos;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> handleSaveProfileMng(UserMngProfileRequestDto userMngProfileRequestDto) {
+        Long idUser = userMngProfileRequestDto.getId();
+        UserEntity userCurrent = this.iuserRepository.findUserEntityById(idUser);
+        try {
+            userCurrent.setFirstName(userMngProfileRequestDto.getFirstName());
+            userCurrent.setLastName(userMngProfileRequestDto.getLastName());
+            userCurrent.setGender(userMngProfileRequestDto.getGender());
+            userCurrent.setDateOfBirth(DateUtils.convertToDate(userMngProfileRequestDto.getDateOfBirth()) );
+            userCurrent.setPhone(userMngProfileRequestDto.getPhone());
+            userCurrent.setEmail(userMngProfileRequestDto.getEmail());
+            userCurrent.setInfomationCode(userMngProfileRequestDto.getInformationCode());
+            userCurrent.setMajor(userMngProfileRequestDto.getMajor().toString());
+            userCurrent.setAddress(userMngProfileRequestDto.getAddress());
+            userCurrent.setEmailPersonal(userMngProfileRequestDto.getEmailPersonal());
+            userCurrent.setProvince(userMngProfileRequestDto.getProvince());
+            userCurrent.setDistrict(userMngProfileRequestDto.getDistrict());
+            userCurrent.setWard(userMngProfileRequestDto.getWard());
+            userCurrent.setAddress(userMngProfileRequestDto.getAvatar());
+            this.iuserRepository.save(userCurrent);
+            return ResponseEntity.ok().body("Save profile management success");
+        }catch (Exception e){
+            System.out.println("--ER error save profile management : "+ e.getMessage());
+            e.printStackTrace();
+        }
+
+    return null;
     }
 
     @Override

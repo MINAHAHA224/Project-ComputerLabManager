@@ -14,6 +14,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -22,7 +23,7 @@ import java.util.Date;
 @NoArgsConstructor
 @ToString
 @Validated
-public class UserMngRequestDto {
+public class UserMngProfileRequestDto {
 
     @JsonProperty("id")
     @Schema(type = "Long" , example = "1")
@@ -45,10 +46,10 @@ public class UserMngRequestDto {
     private Gender gender;
 
     @JsonProperty("dateOfBirth")
-    @Schema(type = "string", format = "date", example = "2025-02-19")
+    @Schema(type = "string", format = "date", example = "yyyy-MM-dd")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date dateOfBirth ;
+    private LocalDate dateOfBirth ;
 
     @JsonProperty("phone")
     @NotBlank(message = "Phone must not be blank")

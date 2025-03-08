@@ -4,7 +4,7 @@ import com.example.computerweb.DTO.dto.ProfileResponseDto;
 import com.example.computerweb.DTO.dto.UserManagementDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
-import com.example.computerweb.DTO.requestBody.userRequest.UserMngRequestDto;
+import com.example.computerweb.DTO.requestBody.userRequest.UserMngProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.userRequest.UserProfileRequestDto;
 import com.example.computerweb.services.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,10 +45,9 @@ public class UserController {
     }
 
     @PostMapping("/userManagement")
-    public  ResponseData<?> postUserManagement (@RequestBody UserMngRequestDto userMngRequestDto){
-
-
-        return null;
+    public  ResponseData<?> postUserManagement (@RequestBody UserMngProfileRequestDto userMngRequestDto){
+        ResponseEntity<String> handleSaveProfile =  this.iUserService.handleSaveProfileMng(userMngRequestDto);
+        return new ResponseSuccess<>(HttpStatus.OK.value(), handleSaveProfile.getBody());
     }
 
     @GetMapping("/userManagement/export")

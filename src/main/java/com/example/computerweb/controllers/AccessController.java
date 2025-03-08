@@ -1,5 +1,6 @@
 package com.example.computerweb.controllers;
 
+import com.example.computerweb.DTO.dto.HomeResponseDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
@@ -55,7 +56,14 @@ public class AccessController {
 
     }
 
+    @GetMapping("/home")
+    public ResponseData<HomeResponseDto> getHomePage (){
 
+        Map<String , String> dataUser = this.iUserService.handleGetDataUserCurrent();
+        HomeResponseDto homeResponseDto = new HomeResponseDto();
+        homeResponseDto.setDataUser(dataUser);
+        return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , homeResponseDto );
+    }
 
 
 }

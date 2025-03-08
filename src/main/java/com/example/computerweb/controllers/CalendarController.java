@@ -31,16 +31,9 @@ import java.util.TreeMap;
 @Tag(name = "CalendarManagement only for GVU")
 public class CalendarController {
     private final ICalendarService iCalendarService;
-    private  final IUserService iUserService;
 
-    @GetMapping("/home")
-    public ResponseData<HomeResponseDto> getHomePage (){
 
-        Map<String , String> dataUser = this.iUserService.handleGetDataUserCurrent();
-        HomeResponseDto homeResponseDto = new HomeResponseDto();
-        homeResponseDto.setDataUser(dataUser);
-        return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , homeResponseDto );
-    }
+
     @GetMapping("/calendar")
     public ResponseData<List<CalendarManagementDto>> getCalendar (){
         List<CalendarManagementDto> data = this.iCalendarService.handleGetAllDataCalendar();
