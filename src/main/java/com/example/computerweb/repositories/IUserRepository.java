@@ -1,5 +1,6 @@
 package com.example.computerweb.repositories;
 
+import com.example.computerweb.models.entity.MajorEntity;
 import com.example.computerweb.models.entity.RoleEntity;
 import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.repositories.custom.UserRepositoryCustom;
@@ -13,16 +14,23 @@ import java.util.Optional;
 @Repository
 public interface IUserRepository extends JpaRepository<UserEntity, Long> , UserRepositoryCustom {
 
+
+
     UserEntity findUserEntityById (Long id);
 
 
     Optional<UserEntity> findUserEntityByEmail(String email);
 
+    UserEntity findUserEntityByEmailPersonal ( String email);
+
     Optional<UserEntity> findUserEntityByPhone(String phone);
 
+   Optional<List<UserEntity> > findAllByRoleAndMajor (RoleEntity  roleEntity , MajorEntity majorEntity);
     List<UserEntity> findAllByRole(RoleEntity roleEntity);
 
     boolean existsByEmail(String email);
+
+    boolean existsByEmailPersonal ( String email);
 
     boolean existsByPhone(String phone);
 }

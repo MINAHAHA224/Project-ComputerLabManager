@@ -117,7 +117,7 @@ public class JwtTokenFilter
 
         final List<Pair<String, String>> bybassTokens = Arrays.asList(
                 Pair.of("/access/login" , "POST"),
-                Pair.of("/access/register", "POST")
+                Pair.of("/access/forgotPassword", "POST")
                 );
 
         for ( Pair<String , String > bybassToken : bybassTokens){

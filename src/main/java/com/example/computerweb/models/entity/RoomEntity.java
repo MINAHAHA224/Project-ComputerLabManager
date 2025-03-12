@@ -24,6 +24,10 @@ public class RoomEntity {
     @Column(name = "SoLuongMay")
     private Long numberOfComputers;
 
+    @ManyToOne
+    @JoinColumn(name = "CoSo_FK")
+    private FacilityEntity facilityEntityRoom;
+
 //    @OneToMany(mappedBy = "roomEntity")
 //    private List<TicketRequestEntity> ticketRequestEntities ;
 }

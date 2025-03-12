@@ -101,7 +101,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
             for (Object[] result : results) {
                 CalendarManagementDto data = new CalendarManagementDto();
                 data.setDate(dateFormat.format((Date) result[0]));
-                data.setTeacher("");
+                data.setTeacher((String) result[1]);
                 data.setRoom((String) result[2]);
                 data.setSubject("");
                 data.setClassroom("");

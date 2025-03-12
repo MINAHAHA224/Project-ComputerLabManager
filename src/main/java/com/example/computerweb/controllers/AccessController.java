@@ -9,6 +9,7 @@ import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.services.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,25 +25,15 @@ import java.util.Map;
 @Slf4j
 @Tag(name="Access user for GVU|CSVC|GV")
 @RequiredArgsConstructor
-@RequestMapping("/access")
 public class AccessController {
 
     // Error code : 400 of Controller
 
     private final  IUserService iUserService;
-    @Operation(summary = "Register User" , description = "API Register user")
-    @PostMapping("/register")
-    public ResponseData<?> registerUser(@Valid @RequestBody UserRegisterDto userRegisterDTO) {
-        ResponseEntity<String> handleSaveRegister = this.iUserService.handleRergister(userRegisterDTO);
-        if (handleSaveRegister.getStatusCode() == HttpStatus.BAD_REQUEST) {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),handleSaveRegister.getBody());
-        }
 
-        return new  ResponseSuccess<>(HttpStatus.OK.value(),handleSaveRegister.getBody());
-    }
 
     @Operation(summary = "login User" , description = "API Login user")
-    @PostMapping("/login")
+    @PostMapping("/access/login")
     public ResponseData<?> createLogin (@Valid @RequestBody UserLoginDto userLoginDTO ){
       ResponseEntity<String> handleLogin = this.iUserService.handleLogin(userLoginDTO);
       if (handleLogin.getStatusCode() == HttpStatus.OK ){
@@ -56,6 +48,7 @@ public class AccessController {
 
     }
 
+    @Operation(summary = "Home page" , description = "Show Information and Role of user")
     @GetMapping("/home")
     public ResponseData<HomeResponseDto> getHomePage (){
 
@@ -65,5 +58,19 @@ public class AccessController {
         return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , homeResponseDto );
     }
 
+
+
+    @PostMapping("/access/forgotPassword")
+    public ResponseData<?>  postForgotPassword (@RequestParam(required = true) String email) throws MessagingException, UnsupportedEncodingException {
+        ResponseEntity<String> sendEmail = this.iUserService.handleCheckExistEmailAndSendMail(email);
+                if(sendEmail.getStatusCode() ==HttpStatus.BAD_REQUEST){
+                    return new ResponseFailure( HttpStatus.BAD_REQUEST.value(), sendEmail.getBody()) ;
+                }
+                else {
+                    return new ResponseSuccess<>( HttpStatus.OK.value(), sendEmail.getBody()) ;
+                }
+
+    }
+    // navigation to next Page
 
 }

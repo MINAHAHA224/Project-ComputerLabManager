@@ -1,49 +1,31 @@
 package com.example.computerweb.DTO.dto;
 
-import com.example.computerweb.models.enums.Gender;
-import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Date;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
-public class UserManagementDto {
+public class UserResponseDto {
 
 
     private String id ;
-    private String codeUser;
-
+    private String userCode;
+    private String email;
     private String firstName;
-
     private String lastName;
-
     private String gender;
-
+    private String major;
     private String dateOfBirth ;
 
-    private String phone ;
-
-    private String email;
-
-    private String passWord;
 
     private String informationCode;
-
-    private String major;
-
+    private String phone ;
+    private String emailPersonal;
+    private String province;
+    private String district;
+    private String ward;
     private String address;
 
-    private String emailPersonal;
-
-    private String province;
-
-    private String district;
-
-    private String ward;
-
-    private String avatar;
 }

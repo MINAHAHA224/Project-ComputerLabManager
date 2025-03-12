@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PTIT Email Template</title>
+</head>
+<body style="margin:0; padding:0; font-family:Arial, sans-serif; background-color:#800000; color:white;">
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="background-color:#800000;">
+    <!-- Header Section
+     https://play-lh.googleusercontent.com/CoHZBnuWQRT15pi23JlZwi0WswnJEZXzPRGP3CYwn_Fid-SRkw8v2suUi31YvwC7zQ
+     https://fit.ptithcm.edu.vn/wp-content/uploads/2022/05/Logo_PTIT_University-1920x1920.png
+     -->
+    <tr>
+        <td align="center" style="padding:20px;">
+
+            <img src="https://fit.ptithcm.edu.vn/wp-content/uploads/2022/05/Logo_PTIT_University-1920x1920.png" alt="PTIT Logo" width="100" style="display:block;">
+            <h2 style="margin:10px 0 0 0; font-size:24px; font-weight:bold;">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</h2>
+            <p style="font-size:16px; margin-top:8px;">TRƯỜNG TRỌNG ĐIỂM QUỐC GIA VỀ KỸ THUẬT CÔNG NGHỆ</p>
+        </td>
+    </tr>
+<!--    <div style="background-color: #8B0000; padding: 30px 0; text-align: center; color: white;">-->
+<!--        <img src="/images/Logo_PTIT_University.png" alt="PTIT Logo" style="width: 120px; margin-bottom: 15px;">-->
+
+<!--        <h1 style="margin: 0; font-size: 28px; font-weight: bold;">-->
+<!--            HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG-->
+<!--        </h1>-->
+
+<!--        <p style="margin: 5px 0 0; font-size: 16px; font-weight: 500;">-->
+<!--            TRƯỜNG TRỌNG ĐIỂM QUỐC GIA VỀ KỸ THUẬT, CÔNG NGHỆ-->
+<!--        </p>-->
+<!--    </div>-->
+    <!-- Main Content -->
+    <tr>
+        <td bgcolor="#ffffff" style="color:#000000; padding:30px; border-radius:10px;">
+            <h3 style="font-size:20px; margin-bottom:10px;">Xác nhận tài khoản của bạn</h3>
+            <p style="font-size:14px;">Cảm ơn bạn đã đăng ký. Vui lòng nhấn vào liên kết bên dưới để xác nhận tài khoản của bạn:</p>
+
+            <div style="text-align:center; margin:20px 0;">
+                <a th:href="@{http://localhost:8080/access/login}" style="background-color:#800000; color:#fff; padding:12px 30px; border-radius:6px; text-decoration:none; font-size:16px;">
+                    Xác nhận tài khoản
+                </a>
+
+            </div>
+
+            <hr style="border:none; border-top:1px solid #ccc; margin:30px 0;">
+
+            <h4 style="font-size:16px;">Thông tin tài khoản</h4>
+            <p><strong>Tài khoản:</strong> <span th:text="${emailLogin}">email_placeholder</span></p>
+            <p><strong>Mật khẩu:</strong> <span th:text="${newPassword}">password_placeholder</span></p>
+
+        </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+        <td align="center" style="padding:20px; font-size:12px; color:#ddd;">
+            © 2025 Minahaha224 Develope - Học viện Công nghệ Bưu chính Viễn thông
+        </td>
+    </tr>
+</table>
+</body>
+</html>

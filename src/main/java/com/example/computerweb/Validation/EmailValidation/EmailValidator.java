@@ -32,9 +32,9 @@ public class EmailValidator implements ConstraintValidator<EmailChecked , String
             boolean userExist = this.iUserService.checkEamilExist(email);
 
             if (userExist){
-                return false;
-            }else {
                 return true;
+            }else {
+                return false;
             }
         }else {
             return false;

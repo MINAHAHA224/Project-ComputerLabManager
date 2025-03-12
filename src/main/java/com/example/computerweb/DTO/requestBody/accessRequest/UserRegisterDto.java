@@ -18,7 +18,8 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 
-@Builder
+@Getter
+@Setter
 @ToString
 @Validated
 @NoArgsConstructor
@@ -53,51 +54,17 @@ public class UserRegisterDto implements Serializable {
     @Schema(type = "string", example = "NAM|NU")
     private Gender gender;
 
-
-    @JsonProperty("email")
-    @Schema(type = "string" , example = "ct@ptithcm.edu.vn")
-    @EmailChecked
-    private String email;
-
-
-    @JsonProperty("passWord")
-    @Schema(type = "string" , example = "Abc123")
-    @PasswordChecked
-    private String password;
+    @JsonProperty("informationCode")
+    @Schema(type = "string", example = "0129310923102")
+    private String informationCode;
 
     @JsonProperty("roleId")
     @Schema(type = "Long", example = "1")
     private Long roleId;
 
-    public String getFirstName() {
-        return firstName;
-    }
 
-    public String getLastName() {
-        return lastName;
-    }
+    @JsonProperty("majorId")
+    @Schema(type = "Long", example = "1")
+    private Long majorId;
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public LocalDate  getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Long getRoleId() {
-        return roleId;
-    }
 }

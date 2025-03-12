@@ -4,6 +4,7 @@ import com.example.computerweb.Validation.PhoneValidation.PhoneChecked;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
@@ -17,6 +18,11 @@ public class UserProfileRequestDto {
     @JsonProperty("id")
     private Long id;
 
+    @JsonProperty("reset password")
+    @Schema(type = "string" , example = "0964515599")
+    @NotBlank(message = "Password must not be blank")
+    @Pattern(regexp = "\\d{6,}", message = "Password must be at least 6 digits")
+    private String resetPassword;
 
     @JsonProperty("phone")
     @PhoneChecked(message = "phone invalid format")

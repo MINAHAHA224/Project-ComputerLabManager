@@ -26,6 +26,9 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     @Column(name = "UserID")
     private Long id ;
 
+    @Column(name = "MaNguoiDung")
+    private String codeUser;
+
     @Column(name = "Ho")
     private String firstName;
 
@@ -33,7 +36,7 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     private String lastName;
 
     @Column(name = "GioiTinh")
-    private Gender gender;
+    private String gender;
 
     @Column(name = "NgaySinh")
     @Temporal(TemporalType.DATE)//ngày (yyyy-MM-dd) (không lưu thời gian)
@@ -51,8 +54,7 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     @Column(name = "CCCD")
     private String infomationCode;
 
-    @Column(name = "ChuyenNganh")
-    private String major;
+
 
     @Column(name = "Diachi")
     private String address;
@@ -75,6 +77,10 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     @ManyToOne
     @JoinColumn(name = "QuyenID_FK")
     private RoleEntity role;
+
+    @ManyToOne
+    @JoinColumn(name = "ChuyenNghanh_FK")
+    private MajorEntity major;
 
     @OneToMany(mappedBy = "user")
     private List<CalendarEntity> calendarEntities;

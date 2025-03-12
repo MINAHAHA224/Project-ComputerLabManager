@@ -9,10 +9,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 public interface ICalendarRepository extends JpaRepository<CalendarEntity , Long> , CalendarRepositoryCustom {
         CalendarEntity findCalendarEntityById (Long id);
         boolean existsByDateOfCalendarAndUserAndPracticeCase (Date dateOfCalendar , UserEntity user , PracticeCaseEntity practiceCase);
+      Optional<List<CalendarEntity> > findAllByDateOfCalendarAndPracticeCase (Date dateOfCalendar , PracticeCaseEntity practiceCase);
         void deleteById( Long id);
 }

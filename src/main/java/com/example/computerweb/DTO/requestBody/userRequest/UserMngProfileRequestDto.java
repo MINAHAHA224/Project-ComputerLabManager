@@ -3,7 +3,6 @@ package com.example.computerweb.DTO.requestBody.userRequest;
 import com.example.computerweb.Validation.EmailValidation.EmailChecked;
 import com.example.computerweb.Validation.EnumPatternValidation.EnumPattern;
 import com.example.computerweb.models.enums.Gender;
-import com.example.computerweb.models.enums.Major;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,7 +14,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -67,9 +65,8 @@ public class UserMngProfileRequestDto {
     private String informationCode;
 
     @JsonProperty("major")
-    @EnumPattern(name = "major" , regexp = "CNTT|KTPM|CTNT")
     @Schema(type = "string" , example = "CNTT|KTPM|CTNT")
-    private Major major;
+    private String major;
 
     @JsonProperty("address")
     @NotBlank(message = "Address must not be blank")

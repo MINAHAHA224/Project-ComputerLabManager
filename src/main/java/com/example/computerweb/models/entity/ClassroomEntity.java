@@ -35,4 +35,8 @@ public class ClassroomEntity {
 
     @OneToMany(mappedBy = "classroomEntity")
     private List<TicketRequestEntity> ticketRequestEntities;
+
+    @ManyToOne
+    @JoinColumn(name = "CoSo_FK")
+    private FacilityEntity facilityEntityClassroom;
 }

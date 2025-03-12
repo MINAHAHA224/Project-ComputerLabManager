@@ -1,16 +1,21 @@
 package com.example.computerweb.repositories.custom.impl;
 
+import com.example.computerweb.models.entity.CalendarEntity;
+import com.example.computerweb.models.entity.RoomEntity;
+import com.example.computerweb.repositories.IRoomRepository;
 import com.example.computerweb.repositories.custom.RoomRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.persistence.Tuple;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+@RequiredArgsConstructor
 public class RoomRepositoryCustomImpl implements RoomRepositoryCustom {
 
     @PersistenceContext
@@ -84,6 +89,29 @@ public class RoomRepositoryCustomImpl implements RoomRepositoryCustom {
         return  roomId;
     }
 
+    @Override
+    public ResponseEntity<String> checkExistCalendarAndRoom(List<Long> listIdCalendar, List<Long> listIdRoom) {
+        for ( Long idCalendar :listIdCalendar ){
+            for ( Long idRoom :listIdRoom  ){
+                String sql = "SELECT LTH_Phong FROM LTH_Phong WHERE LTH_Phong.LichID_FK =" +idCalendar + " AND LTH_Phong.PhongID_FK =" + idRoom;
+                Query query = entityManager.createNativeQuery(sql);
+                if(query.getResultList() != null){
+                String nameRoom = findRoomById(idRoom);
+                    return ResponseEntity.badRequest().body("Room : " + nameRoom + " is duplicated");
+                }
+            }
+        }
+        return ResponseEntity.ok().body("No room duplicated");
+    }
+
+    @Override
+    public String findRoomById(Long idRoom) {
+
+        String sql = " SELECT PhongThucHanh.TenPhong where PhongThucHanh.PhongID = " +idRoom;
+        Query query = entityManager.createNativeQuery(sql);
+
+        return query.getSingleResult().toString();
+    }
 
 
 }
