@@ -90,7 +90,7 @@ public class CalendarController {
 
     // Only sent this to API , don't need next to new page
     @Operation(summary = "Feature delete of GVU" )
-    @PostMapping  ("/calendarManagement/delete/{calendarId}")
+    @DeleteMapping  ("/calendarManagement/delete/{calendarId}")
     public ResponseData<?>  postDeleteCalendar (@PathVariable("calendarId") Long calendarId){
         this.iCalendarService.handleDeleteCalendar(calendarId);
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Delete calendar success");

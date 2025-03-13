@@ -179,6 +179,8 @@ public class UserServiceImpl implements IUserService {
         UserEntity userEntity = this.iuserRepository.findUserEntityByEmail(emailUser).get();
         userCurrent.put("userName", userEntity.getFirstName() + " " + userEntity.getLastName());
         userCurrent.put("role", userEntity.getRole().getContentRole());
+        userCurrent.put("userId" , userEntity.getId().toString());
+        userCurrent.put("userCode" , userEntity.getCodeUser());
         return userCurrent;
     }
 

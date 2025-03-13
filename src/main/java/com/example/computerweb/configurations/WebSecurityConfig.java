@@ -50,7 +50,7 @@ public class WebSecurityConfig {
                     request.requestMatchers(
                             "/calendarManagement/**" , "/userManagement/**" ).hasRole("GVU");
                     request.requestMatchers("/roomManagement").hasRole("CSVC");
-                    request.requestMatchers("/requestChangeCalendar/**" ,"/requestRentRoom").hasRole("GV");
+                    request.requestMatchers("/requestChangeCalendar/**" ,"/requestRentRoom" , "/notification/**").hasRole("GV");
                     request.requestMatchers("/requestManagement").hasAnyRole("GVU" , "CSVC");
                     request.requestMatchers("/calendar" , "/home"  , "/profile").hasAnyRole("GVU" , "CSVC" , "GV");
                     request.requestMatchers("/actuator/**", "/v3/**", "/webjars/**", "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**").permitAll();

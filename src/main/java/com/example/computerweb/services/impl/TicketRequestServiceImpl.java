@@ -1,9 +1,6 @@
 package com.example.computerweb.services.impl;
 
-import com.example.computerweb.DTO.dto.CalendarManagementDto;
-import com.example.computerweb.DTO.dto.CalendarResponseDto;
-import com.example.computerweb.DTO.dto.CalendarResponseFields;
-import com.example.computerweb.DTO.dto.TicketResponseMgmDto;
+import com.example.computerweb.DTO.dto.*;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketManagementRequestDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketRentDto;
@@ -20,10 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -392,5 +386,66 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public  List<NotificationResponseDto> handleGetAllNotificationOfUser() {
+        String emailUser = SecurityUtils.getPrincipal();
+        UserEntity user = this.iUserRepository.findUserEntityByEmail(emailUser).get();
+        List<NotificationEntity> allNotification = this.iNotificationRepository.findAllByUser(user);
+        List<NotificationResponseDto> noteResponses = new ArrayList<>();
+        for (NotificationEntity note :allNotification ){
+            NotificationResponseDto noteResponse = new NotificationResponseDto();
+            noteResponse.setId(note.getId().toString());
+            noteResponse.setNameNotification(note.getNameNotification());
+            noteResponse.setContentNotification(note.getContentNotification());
+            noteResponse.setDateNotification(note.getDateNotification().toString());
+            noteResponse.setStatus(note.getStatus().getNameStatus());
+            noteResponses.add(noteResponse);
+        }
+        return noteResponses;
+    }
+
+    @Override
+    @Transactional
+    public NotificationResponseDto handleChangeStatusNote(Long notificationId) {
+        NotificationEntity notification = this.iNotificationRepository.findNotificationEntityById(notificationId);
+        NotificationResponseDto noteResponseDto = new NotificationResponseDto();
+        noteResponseDto.setNameNotification(notification.getNameNotification());
+        noteResponseDto.setContentNotification(notification.getContentNotification());
+        noteResponseDto.setDateNotification(notification.getDateNotification().toString());
+
+        try {
+            StatusEntity status = this.iStatusRepository.findStatusEntityByNameStatus("SEEN");
+            notification.setStatus(status);
+            this.iNotificationRepository.save(notification);
+        }catch (Exception e ){
+            System.out.println("--ER error save status notification" + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return noteResponseDto;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> handleDeleteOneOrMoreNote(String noteId) {
+        List<String> listId = new ArrayList<>();
+        if (noteId.contains(",")) {
+            listId  = Arrays.asList(noteId.split(","));
+        }else {
+            listId.add(noteId);
+        }
+        try {
+            for ( String id  : listId ){
+                this.iNotificationRepository.deleteById(Long.valueOf(id));
+            }
+        }catch (Exception e){
+            System.out.println("--ER error delete notification" + e.getMessage());
+            e.printStackTrace();
+
+        }
+
+        return ResponseEntity.ok().body("Delete notification success");
     }
 }

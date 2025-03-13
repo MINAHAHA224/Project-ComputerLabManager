@@ -2,6 +2,7 @@ package com.example.computerweb.controllers;
 
 import com.example.computerweb.DTO.dto.CalendarResponseDto;
 import com.example.computerweb.DTO.dto.CalendarResponseFields;
+import com.example.computerweb.DTO.dto.NotificationResponseDto;
 import com.example.computerweb.DTO.dto.TicketResponseMgmDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
@@ -64,9 +65,31 @@ public class RequestController {
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success " ,calendarResponseFields);
     }
 
+    @Operation(summary = "This feature only for GV" , description = "When GV action rent room")
     @PostMapping("/requestRentRoom")
     public ResponseData<?> postRequestRentRoom (@Valid @RequestBody TicketRentDto ticketRentDto){
         ResponseEntity<String> handleCreateRentRoom = this.iTicketRequestService.handlePostCreateTicketRentRoom(ticketRentDto);
         return new ResponseSuccess<>(HttpStatus.OK.value(),  handleCreateRentRoom.getBody());
+    }
+
+
+    @Operation(summary = "This feature only for GV" , description = "When GV action watch notification")
+    @GetMapping("/notification")
+    public ResponseData< List<NotificationResponseDto>> getNotification (){
+        List<NotificationResponseDto> dataNote = this.iTicketRequestService.handleGetAllNotificationOfUser();
+
+        return new ResponseSuccess<>(HttpStatus.OK.value() , "Execute success" ,dataNote ) ;
+    }
+
+    @PostMapping("/notification/{notificationId}")
+    public ResponseData<NotificationResponseDto> postNotification (@PathVariable("notificationId") Long notificationId){
+        NotificationResponseDto handleChangeStatus = this.iTicketRequestService.handleChangeStatusNote(notificationId);
+        return new ResponseSuccess<>(HttpStatus.OK.value() , "Execute success" , handleChangeStatus);
+    }
+
+    @DeleteMapping("/notification/delete/{notificationId}")
+    public ResponseData<?> deleteNotification (@PathVariable("notificationId") String notificationId){
+        ResponseEntity<String> handleDelete = this.iTicketRequestService.handleDeleteOneOrMoreNote(notificationId);
+        return new ResponseSuccess<>(HttpStatus.OK.value() ,handleDelete.getBody() );
     }
 }

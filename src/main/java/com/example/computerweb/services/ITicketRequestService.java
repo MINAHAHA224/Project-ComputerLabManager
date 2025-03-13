@@ -1,6 +1,7 @@
 package com.example.computerweb.services;
 
 import com.example.computerweb.DTO.dto.CalendarResponseDto;
+import com.example.computerweb.DTO.dto.NotificationResponseDto;
 import com.example.computerweb.DTO.dto.TicketResponseMgmDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketManagementRequestDto;
@@ -22,4 +23,10 @@ public interface ITicketRequestService {
     ResponseEntity<String>  handlePostCreateTicketChangeCalendar (TicketChangeDto ticketChangeDto);
 
     ResponseEntity<String> handlePostCreateTicketRentRoom (TicketRentDto ticketRentDto);
+
+    List<NotificationResponseDto> handleGetAllNotificationOfUser ( );
+
+    NotificationResponseDto handleChangeStatusNote (Long notificationId);
+
+    ResponseEntity<String> handleDeleteOneOrMoreNote (String noteId);
 }
