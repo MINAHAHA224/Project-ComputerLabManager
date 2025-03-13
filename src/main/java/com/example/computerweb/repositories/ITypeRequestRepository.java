@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface ITypeRequestRepository extends JpaRepository<TypeRequestEntity,Long > {
 
     TypeRequestEntity findTypeRequestEntityByNameTypeRequest ( String nameType);
+
+    TypeRequestEntity findTypeRequestEntityById ( Long id);
 }

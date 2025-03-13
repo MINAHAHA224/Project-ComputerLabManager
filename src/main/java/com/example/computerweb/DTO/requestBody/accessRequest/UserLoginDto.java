@@ -9,7 +9,10 @@ import org.springframework.validation.annotation.Validated;
 
 import java.io.Serializable;
 
-@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 @Validated
 public class UserLoginDto implements Serializable {
@@ -18,7 +21,7 @@ public class UserLoginDto implements Serializable {
 
     @JsonProperty("email")
     @Schema(type = "string" , example = "ct@ptithcm.edu.vn")
-    @EmailChecked
+    @NotBlank(message = "Email must not be blank")
     private String email;
 
 

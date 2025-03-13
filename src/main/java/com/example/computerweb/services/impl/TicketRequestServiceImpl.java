@@ -1,7 +1,12 @@
 package com.example.computerweb.services.impl;
 
+import com.example.computerweb.DTO.dto.CalendarManagementDto;
+import com.example.computerweb.DTO.dto.CalendarResponseDto;
+import com.example.computerweb.DTO.dto.CalendarResponseFields;
 import com.example.computerweb.DTO.dto.TicketResponseMgmDto;
+import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketManagementRequestDto;
+import com.example.computerweb.DTO.requestBody.ticketRequest.TicketRentDto;
 import com.example.computerweb.models.entity.*;
 import com.example.computerweb.models.enums.PurposeUse;
 import com.example.computerweb.repositories.*;
@@ -19,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +38,8 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
     private final IPracticeCaseRepository iPracticeCaseRepository;
     private final IRoomRepository iRoomRepository;
     private final ITypeRequestRepository iTypeRequestRepository;
-
+    private final IClassroomRepository iClassroomRepository;
+    private  final ISubjectRepository iSubjectRepository;
     @Override
     public List<TicketResponseMgmDto> handleGetAllDataForRqManagementPage() {
         return this.iTicketRequestRepository.getAllDataRequestManagement();
@@ -233,6 +240,157 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         }
 
+        return null;
+    }
+
+    @Override
+    public CalendarResponseDto handleGetCreateTicketChangeCalendar(Long calendarId) {
+        CalendarResponseDto calendarResponseAllData = new CalendarResponseDto();
+        // get data calendar current
+        CalendarEntity calendarEntity = this.iCalendarRepository.findCalendarEntityById(calendarId);
+        // get listIdRoom
+        List<Long> listRoomOfCalendar = this.iRoomRepository.getIdRoomsByCalendarIdOnLTH_Phong(calendarId);
+        String listIdRoom = listRoomOfCalendar.stream().map(Object::toString).collect(Collectors.joining(","));
+
+        CalendarManagementDto calendarCurrent = new CalendarManagementDto();
+        calendarCurrent.setId(calendarEntity.getId().toString());
+        calendarCurrent.setDate(calendarEntity.getDateOfCalendar().toString());
+        calendarCurrent.setTeacher(calendarEntity.getUser().getFirstName() + " " + calendarEntity.getUser().getLastName());
+        calendarCurrent.setRoom(listIdRoom);
+        calendarCurrent.setSubject(calendarEntity.getSubject().getId().toString());
+        calendarCurrent.setClassroom(calendarEntity.getClassroom().getId().toString());
+        calendarCurrent.setPracticeCase(calendarEntity.getPracticeCase().getId().toString());
+        calendarCurrent.setNote(calendarEntity.getNoteCalendar());
+        // get database
+        CalendarResponseFields calendarResponseFields = this.iCalendarService.handleGetDataForCreatePage();
+
+        // set data , then response
+
+        calendarResponseAllData.setUserCurrent(calendarCurrent);
+        calendarResponseAllData.setDataBase(calendarResponseFields);
+
+        return calendarResponseAllData;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> handlePostCreateTicketChangeCalendar(TicketChangeDto ticketChangeDto) {
+        try {
+            CalendarEntity currentCalendar = this.iCalendarRepository.findCalendarEntityById(ticketChangeDto.getIdCalendar());
+            TicketRequestEntity newTicket = new TicketRequestEntity();
+            // set NoteTicket
+            newTicket.setNoteTicket(ticketChangeDto.getNote());
+            //set Date Old
+            newTicket.setDateOld(currentCalendar.getDateOfCalendar());
+            //set dateNew
+            Date dateNew = DateUtils.convertToDate(ticketChangeDto.getDateNew());
+            newTicket.setDateNew(dateNew);
+            //set practiceCaseOld
+            newTicket.setPracticeCaseOld(currentCalendar.getPracticeCase().getId().toString());
+            // set practiceCaseNew
+            newTicket.setPracticeCaseNew(ticketChangeDto.getPracticeCaseNew().toString());
+            // get listIdRoom
+            List<Long> listRoomOfCalendar = this.iRoomRepository.getIdRoomsByCalendarIdOnLTH_Phong(ticketChangeDto.getIdCalendar());
+            String listIdRoom = listRoomOfCalendar.stream().map(Object::toString).collect(Collectors.joining(","));
+            newTicket.setRoomOld(listIdRoom);
+            //set roomNew
+            String listIdRoomNew = ticketChangeDto.getListRoomNew().stream().map(Object::toString).collect(Collectors.joining(","));
+            newTicket.setRoomNew(listIdRoomNew);
+            // set idCalendar change
+            newTicket.setCalendarId(ticketChangeDto.getIdCalendar());
+            // set user request ticket
+            newTicket.setUser(currentCalendar.getUser());
+
+            // set TypeRequest
+            TypeRequestEntity typeRequest = this.iTypeRequestRepository.findTypeRequestEntityById(2L);
+            newTicket.setTypeRequest(typeRequest);
+
+            // set Classroom
+            newTicket.setClassroomEntity(currentCalendar.getClassroom());
+
+            //set Subject
+            newTicket.setSubject(currentCalendar.getSubject());
+
+            //set status
+            StatusEntity status = this.iStatusRepository.findStatusEntityByNameStatus("PENDING");
+            newTicket.setStatus(status);
+
+            // set dateRequest
+            newTicket.setDateRequest(new Date());
+
+            // set DuyetCSVC
+            // SET DuyetGVU
+            newTicket.setDoneCSVC(status);
+            newTicket.setDoneGVU(status);
+            this.iTicketRequestRepository.save(newTicket);
+            return ResponseEntity.ok().body("Request change calendar success");
+        }catch (Exception e){
+            System.out.println("---ER error save ticketRequest on request GV" + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> handlePostCreateTicketRentRoom(TicketRentDto ticketRentDto) {
+
+        try {
+            TicketRequestEntity newTicketRent = new TicketRequestEntity();
+            // set NoteTicket
+            newTicketRent.setNoteTicket(ticketRentDto.getNote());
+           //set date old
+            newTicketRent.setRoomOld(null);
+            //set dateNew
+            Date dateNew = DateUtils.convertToDate(ticketRentDto.getDate());
+            newTicketRent.setDateNew(dateNew);
+            //set practiceCaseOld
+            newTicketRent.setPracticeCaseOld(null);
+            // set practiceCaseNew
+            newTicketRent.setPracticeCaseNew(ticketRentDto.getPracticeCaseId().toString());
+            // get listIdRoom old
+
+            newTicketRent.setRoomOld(null);
+            //set roomNew
+            String listIdRoomNew = ticketRentDto.getRoomId().stream().map(Object::toString).collect(Collectors.joining(","));
+            newTicketRent.setRoomNew(listIdRoomNew);
+            // set idCalendar change
+            newTicketRent.setCalendarId(null);
+            // set user request ticket
+            UserEntity user = this.iUserRepository.findUserEntityById(ticketRentDto.getTeacherId());
+            newTicketRent.setUser(user);
+
+            // set TypeRequest
+            TypeRequestEntity typeRequest = this.iTypeRequestRepository.findTypeRequestEntityById(1L);
+            newTicketRent.setTypeRequest(typeRequest);
+
+            // set Classroom
+            ClassroomEntity classroom = this
+                    .iClassroomRepository.findClassroomEntityById(ticketRentDto.getClassroomId());
+            newTicketRent.setClassroomEntity(classroom);
+
+            //set Subject
+            SubjectEntity subject = this.iSubjectRepository.findSubjectEntityById(ticketRentDto.getSubjectId());
+            newTicketRent.setSubject(subject);
+
+            //set status
+            StatusEntity status = this.iStatusRepository.findStatusEntityByNameStatus("PENDING");
+            newTicketRent.setStatus(status);
+
+            // set dateRequest
+            newTicketRent.setDateRequest(new Date());
+
+            // set DuyetCSVC
+            // SET DuyetGVU
+            newTicketRent.setDoneCSVC(status);
+            newTicketRent.setDoneGVU(status);
+            this.iTicketRequestRepository.save(newTicketRent);
+            return ResponseEntity.ok().body("Request rent room success");
+        }catch (Exception e){
+            System.out.println("---ER error save ticketRequest on request GV" + e.getMessage());
+            e.printStackTrace();
+        }
         return null;
     }
 }
