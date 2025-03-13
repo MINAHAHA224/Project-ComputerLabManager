@@ -1,9 +1,6 @@
 package com.example.computerweb.controllers;
 
-import com.example.computerweb.DTO.dto.CalendarResponseDto;
-import com.example.computerweb.DTO.dto.CalendarResponseFields;
-import com.example.computerweb.DTO.dto.NotificationResponseDto;
-import com.example.computerweb.DTO.dto.TicketResponseMgmDto;
+import com.example.computerweb.DTO.dto.*;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeDto;
@@ -72,6 +69,26 @@ public class RequestController {
         return new ResponseSuccess<>(HttpStatus.OK.value(),  handleCreateRentRoom.getBody());
     }
 
+    @GetMapping("/requestTickets")
+    public ResponseData<List<RequestTicketResponseDto>> getRequestTickets (){
+        List<RequestTicketResponseDto> data = this.iTicketRequestService.handleGetAllRequestTicketGV();
+
+        return  new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" , data);
+    }
+
+    @GetMapping("/requestTickets/{idTicketRequest}")
+    public ResponseData<RequestTkResponseDto> getOneRequestTickets (@PathVariable("idTicketRequest") Long idTicketRequest){
+        RequestTkResponseDto data = this.iTicketRequestService.handleGetRequestTicketGV(idTicketRequest);
+
+        return  new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" , data);
+    }
+
+    @DeleteMapping("/requestTickets/delete/{idTicketRequest}")
+    public ResponseData<?> deleteRequestTickets (@PathVariable("idTicketRequest") String idTicketRequest){
+        ResponseEntity<String> handleDelete = this.iTicketRequestService.handleDeleteOneOrMoreTicketRequest(idTicketRequest);
+
+        return  new ResponseSuccess<>(HttpStatus.OK.value(), handleDelete.getBody() );
+    }
 
     @Operation(summary = "This feature only for GV" , description = "When GV action watch notification")
     @GetMapping("/notification")

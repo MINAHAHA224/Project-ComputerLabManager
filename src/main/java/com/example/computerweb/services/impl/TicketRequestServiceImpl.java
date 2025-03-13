@@ -448,4 +448,77 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         return ResponseEntity.ok().body("Delete notification success");
     }
+
+    @Override
+    public List<RequestTicketResponseDto> handleGetAllRequestTicketGV() {
+        String emailUser = SecurityUtils.getPrincipal();
+        UserEntity user = this.iUserRepository.findUserEntityByEmail(emailUser).get();
+        List<TicketRequestEntity> listTicketRequest = this.iTicketRequestRepository.findAllByUser(user);
+        List<RequestTicketResponseDto> requestTkResponses = new ArrayList<>();
+        for (TicketRequestEntity ticketRequest :  listTicketRequest ){
+            RequestTicketResponseDto requestTkResponse = new RequestTicketResponseDto();
+            requestTkResponse.setIdRequestTicket(ticketRequest.getId().toString());
+            requestTkResponse.setDateTimeRequest(ticketRequest.getDateRequest().toString());
+            requestTkResponse.setNameUser(ticketRequest.getUser().getFirstName() + " " + ticketRequest.getUser().getLastName());
+            requestTkResponse.setTypeRequest(ticketRequest.getTypeRequest().getNameTypeRequest());
+            requestTkResponse.setDoneGVU(ticketRequest.getDoneGVU().getNameStatus());
+            requestTkResponse.setDoneCSVC(ticketRequest.getDoneCSVC().getNameStatus());
+            requestTkResponse.setStatus(ticketRequest.getStatus().getNameStatus());
+            requestTkResponses.add(requestTkResponse);
+        }
+
+
+        return requestTkResponses;
+    }
+
+    @Override
+    public RequestTkResponseDto handleGetRequestTicketGV(Long id) {
+        TicketRequestEntity ticketRequestEntity = this.iTicketRequestRepository.getTicketRequestEntityById(id);
+        RequestTicketResponseDto ticketResponseDto = new RequestTicketResponseDto();
+        ticketResponseDto.setIdRequestTicket(ticketRequestEntity.getId().toString());
+        ticketResponseDto.setDateTimeRequest(ticketRequestEntity.getDateRequest().toString());
+        ticketResponseDto.setNameUser(ticketRequestEntity.getUser().getFirstName() + " " + ticketRequestEntity.getUser().getLastName());
+        ticketResponseDto.setTypeRequest(ticketRequestEntity.getTypeRequest().getNameTypeRequest());
+        ticketResponseDto.setDoneGVU(ticketRequestEntity.getDoneGVU().getNameStatus());
+        ticketResponseDto.setDoneCSVC(ticketRequestEntity.getDoneCSVC().getNameStatus());
+        ticketResponseDto.setStatus(ticketRequestEntity.getStatus().getNameStatus());
+
+
+        ticketResponseDto.setNoteTicket(ticketRequestEntity.getNoteTicket());
+        ticketResponseDto.setDateOld(ticketRequestEntity.getDateOld().toString());
+        ticketResponseDto.setDateNew(ticketRequestEntity.getDateNew().toString());
+        ticketResponseDto.setPracticeCaseNew(ticketRequestEntity.getPracticeCaseNew());
+        ticketResponseDto.setPracticeCaseOld(ticketRequestEntity.getPracticeCaseOld());
+        ticketResponseDto.setRoomOld(ticketRequestEntity.getRoomOld());
+        ticketResponseDto.setRoomNew(ticketRequestEntity.getRoomNew());
+        ticketResponseDto.setClassroom(ticketRequestEntity.getClassroomEntity().getNameClassroom());
+        ticketResponseDto.setSubject(ticketRequestEntity.getSubject().getNameSubject());
+        RequestTkResponseDto response = new RequestTkResponseDto();
+        response.setRequestTicket(ticketResponseDto);
+        response.setDataBase(this.iCalendarService.handleGetDataForCreatePage());
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> handleDeleteOneOrMoreTicketRequest(String requestTicketId) {
+        List<String> idTickets = new ArrayList<>();
+        if (requestTicketId.contains(",")) {
+            idTickets = Arrays.asList(requestTicketId.split(","));
+        }else {
+            idTickets.add(requestTicketId);
+        }
+
+        try {
+            for (String  idTicket : idTickets ){
+                this.iTicketRequestRepository.deleteById(Long.valueOf(idTicket));
+            }
+        }catch (Exception e){
+            System.out.println("--ER error delete ticketRequest " + e.getMessage());
+            e.printStackTrace();
+        }
+
+
+        return ResponseEntity.ok().body("Delete request ticket success");
+    }
 }
