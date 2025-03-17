@@ -11,7 +11,7 @@
 	<groupId>com.example</groupId>
 	<artifactId>computerweb</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>computerweb</name>
 	<description>web management of computer lab practice schedule</description>
 	<url/>
@@ -119,15 +119,6 @@
 	</dependencies>
 
 
-<!--	<build>-->
-<!--		<plugins>-->
-<!--			<plugin>-->
-<!--				<groupId>org.springframework.boot</groupId>-->
-<!--				<artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--			</plugin>-->
-<!--		</plugins>-->
-<!--	</build>-->
-
 	<build>
 		<plugins>
 			<plugin>
@@ -145,23 +136,5 @@
 		</plugins>
 
 	</build>
-
-<!--	<build>-->
-<!--		<plugins>-->
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-compiler-plugin</artifactId>-->
-<!--				<configuration>-->
-<!--					<annotationProcessorPaths>-->
-<!--						<path>-->
-<!--							<groupId>org.projectlombok</groupId>-->
-<!--							<artifactId>lombok</artifactId>-->
-<!--						</path>-->
-<!--					</annotationProcessorPaths>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
-
-<!--		</plugins>-->
-<!--	</build>-->
 
 </project>
