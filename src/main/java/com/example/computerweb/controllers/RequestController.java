@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "Request management for GVU|CSVC")
+@Tag(name = "Request management for GVU|CSVC , RequestTickets and Notification for GV")
 public class RequestController {
     private final ITicketRequestService iTicketRequestService;
     private  final ICalendarService iCalendarService;

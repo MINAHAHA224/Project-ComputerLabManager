@@ -30,7 +30,7 @@ import java.util.TreeMap;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "CalendarManagement only for GVU")
+@Tag(name = "CalendarManagement only for GVU , Calendar for GVU|CSVC|GV")
 public class CalendarController {
     private final ICalendarService iCalendarService;
 
