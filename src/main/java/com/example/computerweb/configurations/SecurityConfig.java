@@ -2,6 +2,8 @@ package com.example.computerweb.configurations;
 
 import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.repositories.IUserRepository;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

@@ -15,6 +15,9 @@ import com.example.computerweb.services.ICalendarService;
 import com.example.computerweb.services.IUserService;
 import com.example.computerweb.utils.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,25 +42,25 @@ public class CalendarController {
     @GetMapping("/calendar")
     @Operation(summary = "Show all calendar" , description = "If GVU show all data , " +
             "If CSVC show some fields ex : Date,Room, PracticeCase , Time , " +
-            "If GV only show data calendar of GV ")
+            "If GV only show data calendar of GV ", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseData<List<CalendarManagementDto>> getCalendar (){
         List<CalendarManagementDto> data = this.iCalendarService.handleGetAllDataCalendar();
 
         return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , data );
     }
-    @Operation(summary = "Show all data calendar admin page" , description = "GVU can setting update|delete on this page")
+    @Operation(summary = "Show all data calendar admin page" , description = "GVU can setting update|delete on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement")
     public ResponseData<List<CalendarManagementDto>> getCalendarManagement (){
        List<CalendarManagementDto> data = this.iCalendarService.handleGetAllDataCalendar();
             return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , data );
     }
-    @Operation(summary = "Page create calendar of GVU" , description = "GVU can select field calendar on this page")
+    @Operation(summary = "Page create calendar of GVU" , description = "GVU can select field calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement/create")
     public ResponseData<CalendarResponseFields> getCreateCalendarManagement (){
         CalendarResponseFields data = this.iCalendarService.handleGetDataForCreatePage();
         return new ResponseSuccess<>(HttpStatus.OK.value(),"Execute data success" ,data );
     }
-    @Operation(summary = "Post info calendar, only of GVU" , description = "GVU create calendar on this page")
+    @Operation(summary = "Post info calendar, only of GVU" , description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/calendarManagement/create")
     public ResponseData<?> createCalendar (@RequestBody CalendarRequestDto calendarRequestDto){
       ResponseEntity<String> createCalendar =  this.iCalendarService.handleCreateCalendar(calendarRequestDto);
@@ -69,14 +72,14 @@ public class CalendarController {
 
     }
 
-    @Operation(summary = "Show info calendar of user" , description = "GVU can update info calendar of user on this page")
+    @Operation(summary = "Show info calendar of user" , description = "GVU can update info calendar of user on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement/update/{calendarId}")
     public ResponseData<CalendarResponseDto> getUpdateCalendar (@PathVariable("calendarId") Long calendarId ){
             CalendarResponseDto calendarManagementDto = this.iCalendarService.handleGetDataForUpdatePage(calendarId);
             return new ResponseSuccess<>(HttpStatus.OK.value() , "Execute data success" , calendarManagementDto  );
     }
 
-    @Operation(summary = "Post info  calendar of user" )
+    @Operation(summary = "Post info  calendar of user" , security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping ("/calendarManagement/update")
     public ResponseData<?>  postUpdateCalendar (@RequestBody CalendarRequestDto calendarRequestDto){
         ResponseEntity<String> updateCalendar =  this.iCalendarService.handleUpdateCalendar(calendarRequestDto);
@@ -89,7 +92,7 @@ public class CalendarController {
     }
 
     // Only sent this to API , don't need next to new page
-    @Operation(summary = "Feature delete of GVU" )
+    @Operation(summary = "Feature delete of GVU" , security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping  ("/calendarManagement/delete/{calendarId}")
     public ResponseData<?>  postDeleteCalendar (@PathVariable("calendarId") Long calendarId){
         this.iCalendarService.handleDeleteCalendar(calendarId);

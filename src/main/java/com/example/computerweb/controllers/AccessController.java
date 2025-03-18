@@ -8,6 +8,9 @@ import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.services.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -48,7 +51,7 @@ public class AccessController {
 
     }
 
-    @Operation(summary = "Home page" , description = "Show Information and Role of user")
+    @Operation(summary = "Home page" , description = "Show Information and Role of user" , security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/home")
     public ResponseData<HomeResponseDto> getHomePage (){
 
