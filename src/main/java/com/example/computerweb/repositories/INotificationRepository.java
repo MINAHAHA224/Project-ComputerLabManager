@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+
 public interface INotificationRepository extends JpaRepository<NotificationEntity , Long> {
 
     List<NotificationEntity> findAllByUser(UserEntity user);

@@ -18,25 +18,24 @@ public class ClassroomEntity {
     @Column(name = "LopID")
     private Long id ;
 
-    @Column(name = "TenLop")
+    @Column(name = "MaLop")
     private String nameClassroom;
 
     @Column(name = "SoLuongSV")
     private Long numberOfStudents;
 
-    @Column(name = "GVCN")
-    private String nameTeacher ;
-
     @Column(name = "Khoa")
     private  String nameOfFaculty;
 
-    @OneToMany(mappedBy = "classroom")
-    private List<CalendarEntity> calendarEntities;
-
-    @OneToMany(mappedBy = "classroomEntity")
-    private List<TicketRequestEntity> ticketRequestEntities;
-
     @ManyToOne
-    @JoinColumn(name = "CoSo_FK")
-    private FacilityEntity facilityEntityClassroom;
+    @JoinColumn(name = "CVHT_FK")
+    private  AdvisorEntity advisor;
+
+    @OneToMany(mappedBy = "classroom")
+    private List<CreditClassEntity> creditClassEntities;
+
+
+
+
+
 }

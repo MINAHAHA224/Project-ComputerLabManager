@@ -21,34 +21,42 @@ import java.util.List;
 @Validated
 public class TicketChangeDto {
 
-    @JsonProperty("id")
-    @Schema(type = "String" , example = "1")
-    private Long idCalendar;
-
-    @JsonProperty("typeRequest")
-    @Schema(type = "String" , example = "2")
-    private Long typeRequest;
-
-    @JsonProperty("dateNew")
-    @Schema(type = "String" , example = "2025-03-25")
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate dateNew;
-
-
-    @JsonProperty("practiceCaseNew")
+    @JsonProperty("typeRequestId")
     @Schema(type = "Long" , example = "2")
-    @NotNull(message = "PracticeCase must not be null")
-    private Long practiceCaseNew;
+    private Long typeRequestId;
 
-    @JsonProperty("listRoomNew")
-    @NotNull(message = "Room must not be null")
-    @Schema(type = "array", example = "[1,2]")
-    private List<Long> listRoomNew ;
+    @JsonProperty("calendarId")
+    @Schema(type = "Long" , example = "1")
+    private Long calendarId;
 
-    @JsonProperty("note")
-    @NotBlank(message = "Please fill the note that why you need this request")
-    @Schema(type = "String" , example = "Changle calendar because i have take care my mom sick")
-    private String note;
+
+    @JsonProperty("weekSemesterId")
+    @Schema(type = "Long" , example = "1")
+    private Long weekSemesterId;
+
+    @JsonProperty("day")
+    @Schema(type = "Long" , example = "3")
+    private Long day;
+
+
+    @JsonProperty("caseBeginId")
+    @Schema(type = "Long" , example = "1")
+    private Long caseBeginId;
+
+
+    @JsonProperty("allCase")
+    @Schema(type = "Long" , example = "4")
+    private Long allCase;
+
+    @JsonProperty("roomId")
+    @Schema(type = "Long" , example = "4")
+    private Long roomId;
+
+    @NotBlank(message = "PurposeUse must not be blank")
+    @JsonProperty("purposeUse")
+    @Schema(type = "String" , example = "hm.....")
+    private String purposeUse;
+
+
 
 }

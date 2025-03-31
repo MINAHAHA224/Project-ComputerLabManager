@@ -13,8 +13,6 @@ public class NotificationResponseDto {
 
     private String nameNotification;
 
-    private String contentNotification;
-
     private String dateNotification;
 
     private  String status;

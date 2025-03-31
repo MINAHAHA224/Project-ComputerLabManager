@@ -22,15 +22,28 @@ public class SubjectEntity {
     @Column(name = "TenMH")
     private String nameSubject ;
 
+    @Column(name = "MaMH")
+    private String codeSubject;
+
+    @Column(name = "TongTiet")
+    private Long allT ;
+
     @Column(name = "SoTLT")
     private Long SoTLT;
 
     @Column(name = "SoTTH")
     private  Long SoTTH;
 
-    @OneToMany(mappedBy = "subject")
-    private List<CalendarEntity> calendarEntities;
+    @Column(name = "TongTC")
+    private Long allCredit;
 
-    @OneToMany(mappedBy = "subject")
-    private List<TicketRequestEntity> ticketRequestEntities;
+    @OneToOne(mappedBy = "subject")
+    private CreditClassEntity creditClassEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "HocKy_FK")
+    private  SemesterEntity semester;
+
+
+
 }

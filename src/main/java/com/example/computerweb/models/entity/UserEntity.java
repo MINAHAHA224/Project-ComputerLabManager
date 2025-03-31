@@ -18,7 +18,7 @@ import java.util.*;
 @Setter
 @Builder
 @Table(name = "NguoiDung")
-public class UserEntity extends AbstractEntity implements UserDetails , Serializable {
+public class UserEntity extends AbstractEntity implements   Serializable {
 
 
     @Id
@@ -45,11 +45,7 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     @Column(name = "SoDienThoai")
     private String phone ;
 
-    @Column(name = "Email")
-    private String email;
 
-    @Column(name = "MatKhau")
-    private String passWord;
 
     @Column(name = "CCCD")
     private String infomationCode;
@@ -59,8 +55,6 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     @Column(name = "Diachi")
     private String address;
 
-    @Column(name = "EmailCN")
-    private String emailPersonal;
 
     @Column(name = "TinhThanh")
     private String province;
@@ -79,55 +73,38 @@ public class UserEntity extends AbstractEntity implements UserDetails , Serializ
     private RoleEntity role;
 
     @ManyToOne
-    @JoinColumn(name = "ChuyenNghanh_FK")
+    @JoinColumn(name = "ChuyenNganh_FK")
     private MajorEntity major;
+
+
+
+    @OneToMany(mappedBy = "user")
+    private List<NotificationEntity> notificationEntities;
+
+
+
+    @OneToOne(mappedBy = "user" , cascade = CascadeType.ALL)
+    private  AccountEntity accountEntity;
+
+    @OneToOne(mappedBy = "user" , cascade = CascadeType.ALL)
+    private  AdvisorEntity advisor;
+
+    @OneToMany(mappedBy = "userGui" , cascade = CascadeType.ALL)
+    private  List<NotificationEntity> notificationEntity;
+
+    @OneToMany(mappedBy = "user")
+    private List<CreditClassEntity> creditClassEntities;
 
     @OneToMany(mappedBy = "user")
     private List<CalendarEntity> calendarEntities;
 
     @OneToMany(mappedBy = "user")
-    private List<NotificationEntity> notificationEntities;
-
-    @OneToMany(mappedBy = "user")
     private List<TicketRequestEntity> ticketRequestEntities;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        authorityList.add( new SimpleGrantedAuthority("ROLE_" + getRole().getNameRole().toUpperCase()));
-        return authorityList;
+    @OneToMany(mappedBy = "userCSVC")
+    private List<TicketRequestEntity> ticketRequestCSVCs;
 
-       // return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + getRole().getName().toUpperCase()));
-    }
+    @OneToMany(mappedBy = "userGVU")
+    private List<TicketRequestEntity> ticketRequestGVUs;
 
-
-    @Override
-    public String getPassword() {
-        return this.passWord;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

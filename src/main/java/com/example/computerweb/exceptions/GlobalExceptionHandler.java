@@ -41,6 +41,19 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
+    @ExceptionHandler({CalendarException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleCalendarException (CalendarException e , WebRequest  request){
+    ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponse.setError("Duplication calendar");
+        errorResponse.setPath("");
+        errorResponse.setMessage(e.getErrorMessage());
+
+        return errorResponse;
+    }
+
     private static int getStatus (Exception e ){
         int status = 0;
         if ( e instanceof ConstraintViolationException ) {
@@ -48,6 +61,7 @@ public class GlobalExceptionHandler {
         }else if ( e instanceof MethodArgumentNotValidException ||
                 e instanceof HttpMessageNotReadableException ||
         e instanceof  DataIntegrityViolationException
+
         )
         {
             status = HttpStatus.BAD_REQUEST.value();

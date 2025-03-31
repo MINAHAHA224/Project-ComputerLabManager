@@ -9,18 +9,34 @@ import lombok.*;
 @ToString
 public class TicketResponseMgmDto {
 
-    private String idTicket;
-    private String dateSent;
-    private String teacher;
+    // one Side
+    private String requestId;
     private String typeRequest;
-    private String noteTicket;
-    private String dateOld;
-    private String dateNew;
-    private String practiceCaseOld;
-    private String practiceCaseNew;
-    private String nameRoomOld;
-    private String nameRoomNew;
-    private String nameClassroom;
-    private String nameSubject;
-    private String status;
+    private String dateRequest;
+    private String userRequest;
+
+    private String doneCSVC;
+    private String created_CSVC;
+    private String modified_CSVC;
+
+    private String doneGVU;
+    private String created_GVU;
+    private String modified_GVU;
+
+
+    // two Side Old - New
+    private String weekSemesterOld;
+    private String dayOld;
+    private String practiceCaseBeginOld;
+    private String allCaseOld;
+    private String roomOld;
+    private String noteOld;
+
+    private String weekSemesterNew;
+    private String dayNew;
+    private String practiceCaseBeginNew;
+    private String allCaseNew;
+    private String roomNew;
+    private String noteNew;
+
 }

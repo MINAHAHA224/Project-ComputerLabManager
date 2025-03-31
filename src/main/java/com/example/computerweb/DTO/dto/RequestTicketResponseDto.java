@@ -8,22 +8,12 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class RequestTicketResponseDto {
-    private String idRequestTicket;
-    private String dateTimeRequest;
-    private String nameUser;
+    private String requestTicketId;
     private String typeRequest;
-    private String doneGVU;
-    private String doneCSVC;
-    private String status;
+    private String dateSent;
+    private String userSent;
+    private String statusCSVC;
+    private String statusGVU;
 
-    private String noteTicket;
-    private String dateOld;
-    private String dateNew;
-    private String practiceCaseOld;
-    private String practiceCaseNew;
-    private String roomOld;
-    private String roomNew;
-    private String classroom;
-    private String subject;
 
 }

@@ -32,6 +32,15 @@ public class NotificationEntity {
     private  UserEntity user;
 
     @ManyToOne
+    @JoinColumn(name = "UserGui")
+    private UserEntity userGui;
+
+    @ManyToOne
     @JoinColumn(name = "TrangThaiID_FK")
     private StatusEntity status;
+
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "YeuCauID_FK" )
+    private TicketRequestEntity ticketRequest;
 }

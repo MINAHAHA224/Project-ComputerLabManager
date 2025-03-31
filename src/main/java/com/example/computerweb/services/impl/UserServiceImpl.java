@@ -9,9 +9,11 @@ import com.example.computerweb.DTO.requestBody.userRequest.UserMngProfileRequest
 import com.example.computerweb.DTO.requestBody.userRequest.UserProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.components.JwtTokenUtil;
+import com.example.computerweb.models.entity.AccountEntity;
 import com.example.computerweb.models.entity.MajorEntity;
 import com.example.computerweb.models.entity.RoleEntity;
 import com.example.computerweb.models.entity.UserEntity;
+import com.example.computerweb.repositories.IAccountRepository;
 import com.example.computerweb.repositories.IMajorRepository;
 import com.example.computerweb.repositories.IRoleRepository;
 import com.example.computerweb.repositories.IUserRepository;
@@ -44,11 +46,9 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
+    private final IAccountRepository iAccountRepository;
 
-    @Override
-    public boolean checkEamilExist(String email) {
-        return this.iuserRepository.existsByEmail(email);
-    }
+
 
     @Override
     public boolean checkPhoneExist(String phone) {
@@ -58,7 +58,7 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public ResponseEntity<String> handleRergister(UserRegisterDto userRegisterDTO) {
+    public ResponseEntity<String> handleRegister(UserRegisterDto userRegisterDTO) {
         try {
 
             UserEntity user = new UserEntity();
@@ -70,7 +70,7 @@ public class UserServiceImpl implements IUserService {
             // set dateOfBirth
             user.setDateOfBirth(DateUtils.convertToDate(userRegisterDTO.getDateOfBirth()));
             // set role
-            RoleEntity roles = this.iRoleRepository.findById(userRegisterDTO.getRoleId()).get();
+            RoleEntity roles = this.iRoleRepository.findRoleEntityById(userRegisterDTO.getRoleId()).get();
             user.setRole(roles);
             //set major
             MajorEntity major = this.iMajorRepository.findMajorEntityById(userRegisterDTO.getMajorId());
@@ -89,21 +89,28 @@ public class UserServiceImpl implements IUserService {
             // set codeUser
             String codeUser = roles.getNameRole() + major.getCodeMajor() + amountCode;
             user.setCodeUser(codeUser);
+            // save user
+             UserEntity  userEntity =   this.iuserRepository.save(user);
 
+            AccountEntity account = new AccountEntity();
             // set email
             String domain = "@ptithcm.edu.vn";
             String email = codeUser + domain;
-            user.setEmail(email);
+            account.setEmail(email);
 
             //set password
             String passWordDefault = userRegisterDTO.getDateOfBirth().toString();
             String passWord = passwordEncoder.encode(passWordDefault);
-            user.setPassWord(passWord);
+            account.setPassWord(passWord);
+            account.setUser(userEntity);
 
+            // save account
+            this.iAccountRepository.save(account);
             log.info("Entity User : {}", user);
+            log.info("Account : {}", account);
             // handle save
             // Error of SQL VD : UNIQUE KEY ==> 403 Forbiden
-            this.iuserRepository.save(user);
+
 
             return ResponseEntity.ok().body("Register success");
         } catch (RuntimeException e) {
@@ -116,16 +123,16 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ResponseEntity<String> handleLogin(UserLoginDto userLoginDTO) {
-        boolean existsEmail = checkEamilExist(userLoginDTO.getEmail());
+        boolean existsEmail = this.iAccountRepository.existsByEmail(userLoginDTO.getEmail());
         if (existsEmail) {
-            UserEntity userCurrent = this.iuserRepository.findUserEntityByEmail(userLoginDTO.getEmail()).get();
-            if (passwordEncoder.matches(userLoginDTO.getPassWord(), userCurrent.getPassword())) {
+            AccountEntity accountEntity = this.iAccountRepository.findAccountEntityByEmail(userLoginDTO.getEmail()).get();
+            UserEntity userCurrent = accountEntity.getUser();
+            if (passwordEncoder.matches(userLoginDTO.getPassWord(), accountEntity.getPassword())) {
                 try {
-                    String testEmail = userLoginDTO.getEmail();
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userLoginDTO.getEmail(),
                             userLoginDTO.getPassWord(),
-                            userCurrent.getAuthorities()
+                            accountEntity.getAuthorities()
                     );
 
                     authenticationManager.authenticate(authenticationToken);
@@ -150,15 +157,19 @@ public class UserServiceImpl implements IUserService {
     @Transactional
     public ResponseEntity<String> handleUpdateFieldProfile(UserProfileRequestDto userProfileDto) {
         try {
+
             UserEntity userEntity = this.iuserRepository.findUserEntityById(userProfileDto.getId());
+
             userEntity.setPhone(userProfileDto.getPhone());
-            userEntity.setEmailPersonal(userProfileDto.getEmailPersonal());
             userEntity.setProvince(userProfileDto.getProvince());
             userEntity.setDistrict(userProfileDto.getDistrict());
             userEntity.setWard(userProfileDto.getWard());
             userEntity.setAddress(userProfileDto.getAddress());
             userEntity.setInfomationCode(userProfileDto.getInformationCode());
-            userEntity.setPassWord(passwordEncoder.encode(userProfileDto.getResetPassword()));
+            // save account password
+            userEntity.getAccountEntity().setEmailOfPersonal(userProfileDto.getEmailPersonal());
+            userEntity.getAccountEntity().setPassWord(passwordEncoder.encode(userProfileDto.getResetPassword()));
+            // save
             this.iuserRepository.save(userEntity);
 
             return ResponseEntity.ok().body("Update profile success");
@@ -176,7 +187,8 @@ public class UserServiceImpl implements IUserService {
         Map<String, String> userCurrent = new TreeMap<>();
 
         String emailUser = SecurityUtils.getPrincipal();
-        UserEntity userEntity = this.iuserRepository.findUserEntityByEmail(emailUser).get();
+        AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(emailUser).get();
+        UserEntity userEntity = account.getUser();
         userCurrent.put("userName", userEntity.getFirstName() + " " + userEntity.getLastName());
         userCurrent.put("role", userEntity.getRole().getContentRole());
         userCurrent.put("userId" , userEntity.getId().toString());
@@ -185,30 +197,32 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public ProfileResponseDto handleGetDataProfile() {
+    public UserResponseDto handleGetDataProfile() {
         ProfileResponseDto profileResponseDto = new ProfileResponseDto();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        UserEntity userCurrent = this.iuserRepository.findUserEntityByEmail(SecurityUtils.getPrincipal()).get();
+
+        String emailUser = SecurityUtils.getPrincipal();
+        AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(emailUser).get();
+        UserEntity userCurrent = account.getUser();
         UserResponseDto userResponseDto = new UserResponseDto();
         userResponseDto.setId(userCurrent.getId().toString());
         userResponseDto.setUserCode(userCurrent.getCodeUser());
-        userResponseDto.setEmail(userCurrent.getEmail());
+        userResponseDto.setEmail(account.getEmail());
         userResponseDto.setFirstName(userCurrent.getFirstName());
         userResponseDto.setLastName(userCurrent.getLastName());
         userResponseDto.setMajor(userCurrent.getMajor()== null ? "" : userCurrent.getMajor().getCodeMajor() );
 
         userResponseDto.setGender(userCurrent.getGender());
-        userResponseDto.setDateOfBirth(dateFormat.format(userCurrent.getDateOfBirth()));
+        userResponseDto.setDateOfBirth(DateUtils.convertToString(userCurrent.getDateOfBirth()));
         userResponseDto.setPhone(userCurrent.getPhone());
         userResponseDto.setInformationCode(userCurrent.getInfomationCode());
         userResponseDto.setAddress(userCurrent.getAddress());
-        userResponseDto.setEmailPersonal(userCurrent.getEmailPersonal());
+        userResponseDto.setEmailPersonal(account.getEmailOfPersonal());
         userResponseDto.setProvince(userCurrent.getProvince());
         userResponseDto.setDistrict(userCurrent.getDistrict());
         userResponseDto.setWard(userCurrent.getWard());
-        profileResponseDto.setDataUser(userResponseDto);
-        profileResponseDto.setDataBase(this.handleGetDataForUserCreate());
-        return profileResponseDto;
+
+
+        return userResponseDto;
     }
 
     @Override
@@ -225,11 +239,11 @@ public class UserServiceImpl implements IUserService {
             userManagementDto.setGender(userEntity.getGender().toString());
             userManagementDto.setDateOfBirth(dateFormat.format(userEntity.getDateOfBirth()));
             userManagementDto.setPhone(userEntity.getPhone());
-            userManagementDto.setEmail(userEntity.getEmail());
+            userManagementDto.setEmail(userEntity.getAccountEntity().getEmail());
             userManagementDto.setInformationCode(userEntity.getInfomationCode());
             userManagementDto.setMajor(userEntity.getMajor()== null ? "" : userEntity.getMajor().getCodeMajor() );
             userManagementDto.setAddress(userEntity.getAddress());
-            userManagementDto.setEmailPersonal(userEntity.getEmailPersonal());
+            userManagementDto.setEmailPersonal(userEntity.getAccountEntity().getEmailOfPersonal());
             userManagementDto.setProvince(userEntity.getProvince());
             userManagementDto.setDistrict(userEntity.getDistrict());
             userManagementDto.setWard(userEntity.getWard());
@@ -252,12 +266,12 @@ public class UserServiceImpl implements IUserService {
             userCurrent.setGender(userMngProfileRequestDto.getGender().toString());
             userCurrent.setDateOfBirth(DateUtils.convertToDate(userMngProfileRequestDto.getDateOfBirth()));
             userCurrent.setPhone(userMngProfileRequestDto.getPhone());
-            userCurrent.setEmail(userMngProfileRequestDto.getEmail());
+            userCurrent.getAccountEntity().setEmail(userMngProfileRequestDto.getEmail());
             userCurrent.setInfomationCode(userMngProfileRequestDto.getInformationCode());
             MajorEntity major = this.iMajorRepository.findMajorEntityByCodeMajor(userMngProfileRequestDto.getMajor().toString());
             userCurrent.setMajor(major);
             userCurrent.setAddress(userMngProfileRequestDto.getAddress());
-            userCurrent.setEmailPersonal(userMngProfileRequestDto.getEmailPersonal());
+            userCurrent.getAccountEntity().setEmailOfPersonal(userMngProfileRequestDto.getEmailPersonal());
             userCurrent.setProvince(userMngProfileRequestDto.getProvince());
             userCurrent.setDistrict(userMngProfileRequestDto.getDistrict());
             userCurrent.setWard(userMngProfileRequestDto.getWard());
@@ -274,8 +288,8 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Map<String, String> handleGetAllUserByRole() {
-        RoleEntity roleEntity = this.iRoleRepository.findById(1).get();
-        List<UserEntity> users = this.iuserRepository.findAllByRole(roleEntity);
+        RoleEntity roleEntity = this.iRoleRepository.findRoleEntityById(1L).get();
+        List<UserEntity> users = this.iuserRepository.findUserEntitiesByRole(roleEntity);
         Map<String, String> teachers = new HashMap<>();
         for (UserEntity user : users) {
             teachers.put(user.getId().toString(), user.getFirstName() + " " + user.getLastName());
@@ -303,11 +317,13 @@ public class UserServiceImpl implements IUserService {
     public ProfileResponseDto handleGetDataByUserMngUpdate(Long idUser) {
         ProfileResponseDto profileResponseDto = new ProfileResponseDto();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        UserEntity userCurrent = this.iuserRepository.findUserEntityByEmail(SecurityUtils.getPrincipal()).get();
+        String email = SecurityUtils.getPrincipal();
+        AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(email).get();
+        UserEntity userCurrent = account.getUser();
         UserResponseDto userResponseDto = new UserResponseDto();
         userResponseDto.setId(userCurrent.getId().toString());
         userResponseDto.setUserCode(userCurrent.getCodeUser());
-        userResponseDto.setEmail(userCurrent.getEmail());
+        userResponseDto.setEmail(userCurrent.getAccountEntity().getEmail());
         userResponseDto.setFirstName(userCurrent.getFirstName());
         userResponseDto.setLastName(userCurrent.getLastName());
         userResponseDto.setMajor(userCurrent.getMajor()== null ? "" : userCurrent.getMajor().getCodeMajor() );
@@ -316,7 +332,7 @@ public class UserServiceImpl implements IUserService {
         userResponseDto.setPhone(userCurrent.getPhone());
         userResponseDto.setInformationCode(userCurrent.getInfomationCode());
         userResponseDto.setAddress(userCurrent.getAddress());
-        userResponseDto.setEmailPersonal(userCurrent.getEmailPersonal());
+        userResponseDto.setEmailPersonal(userCurrent.getAccountEntity().getEmailOfPersonal());
         userResponseDto.setProvince(userCurrent.getProvince());
         userResponseDto.setDistrict(userCurrent.getDistrict());
         userResponseDto.setWard(userCurrent.getWard());
@@ -329,32 +345,32 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public ResponseEntity<String> handleCheckExistEmailAndSendMail(String email) throws MessagingException, UnsupportedEncodingException {
-        boolean checkExistEmail = this.iuserRepository.existsByEmail(email);
-        boolean checkExistEmailPersonal = this.iuserRepository.existsByEmailPersonal(email);
+        boolean checkExistEmail = this.iAccountRepository.existsByEmail(email);
+        boolean checkExistEmailPersonal = this.iAccountRepository.existsByEmailOfPersonal(email);
         try {
             if ( !checkExistEmail && !checkExistEmailPersonal){
                 return ResponseEntity.badRequest().body("Email not exist. Please try again!!!");
             }else if (checkExistEmail){
-                UserEntity user = this.iuserRepository.findUserEntityByEmail(email).get();
+                AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(email).get();
                 String passwordRandom = String.format("%06d", new Random().nextInt(1000000));
-                String emailLogin = user.getEmail();
-                user.setPassWord(passwordEncoder.encode(passwordRandom));
+                String emailLogin = account.getEmail();
+                account.setPassWord(passwordEncoder.encode(passwordRandom));
               boolean sendMail=  mailService.sendConfirmLink("caothaiiop1234@gmail.com",passwordRandom,emailLogin);
                if ( sendMail){
-                   this.iuserRepository.save(user);
+                   this.iAccountRepository.save(account);
                    return ResponseEntity.ok().body("The password has send in your email");
                }else {
                    return ResponseEntity.badRequest().body("Error send mail");
                }
 
             }else {
-                UserEntity user = this.iuserRepository.findUserEntityByEmailPersonal(email);
+                AccountEntity account = this.iAccountRepository.findAccountEntityByEmailOfPersonal(email);
                 String passwordRandom = String.format("%06d", new Random().nextInt(1000000));
-                String emailLogin = user.getEmail();
-                user.setPassWord(passwordEncoder.encode(passwordRandom));
+                String emailLogin = account.getEmail();
+                account.setPassWord(passwordEncoder.encode(passwordRandom));
                 boolean sendMail=  mailService.sendConfirmLink("caothaiiop1234@gmail.com",passwordRandom,emailLogin);
                 if ( sendMail){
-                    this.iuserRepository.save(user);
+                    this.iAccountRepository.save(account);
                     return ResponseEntity.ok().body("The password has send in your email");
                 }else {
                     return ResponseEntity.badRequest().body("Error send mail");

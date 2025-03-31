@@ -2,6 +2,7 @@ package com.example.computerweb.filters;
 
 import com.example.computerweb.components.JwtTokenUtil;
 import com.example.computerweb.models.entity.UserEntity;
+import com.example.computerweb.services.UserDetailsServiceCustom;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +15,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -62,11 +64,11 @@ public class JwtTokenFilter
             final String emailOfToken = this.jwtTokenUtil.extractEmailToken(token);
 
              if(emailOfToken != null && SecurityContextHolder.getContext().getAuthentication() == null ){
-                 UserEntity userDetail = (UserEntity) this.userDetailsService.loadUserByUsername(emailOfToken);
+                 UserDetails userDetail =  this.userDetailsService.loadUserByUsername(emailOfToken);
                  if(jwtTokenUtil.validateToken(token ,userDetail )){
 
                      UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                             userDetail.getEmail(), null , userDetail.getAuthorities()
+                             userDetail.getUsername(), null , userDetail.getAuthorities()
                      );
                      authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

@@ -22,7 +22,7 @@ public class RoleEntity {
     @Column(name = "QuyenID")
     private Long id ;
 
-    @Column(name = "TenQuyen")
+    @Column(name = "MaQuyen")
     private String nameRole;
 
     @Column(name = "NDQuyen")
@@ -32,8 +32,8 @@ public class RoleEntity {
     private List<UserEntity> userEntities;
 
     public static String GV = "GIAO_VIEN";
-    public static String CSVC = "CO_SO_VAT_CHAT";
-    public static String GVU = "GIAO_VU";
+    public static String CSVC = "NHAN_VIEN_CO_SO_VAT_CHAT";
+    public static String GVU = "NHAN_VIEN_GIAO_VU";
 
 
 

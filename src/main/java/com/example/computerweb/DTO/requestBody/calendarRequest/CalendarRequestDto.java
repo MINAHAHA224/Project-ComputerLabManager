@@ -19,36 +19,68 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class CalendarRequestDto {
-    @JsonProperty("id")
+    @JsonProperty("creditClassId")
     @Schema(type = "Long",  example = "1")
-    private Long id;
+    private Long creditClassId;
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @Schema(type = "string", format = "date", example = "2025-02-19")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+//Group 1
+    @JsonProperty("groupId1")
+    @Schema(type = "Long",  example = "1")
+    private Long groupId1;
 
-    @JsonProperty("purposeUse")
-    @Schema(type = "string", example = "LICH_CHINH_THUC")
-    private PurposeUse purposeUse;
+    @JsonProperty("weekSemesterId1")
+    @Schema(type = "Long",  example = "1")
+    private Long weekSemesterId1;
 
-    @JsonProperty("teacher")
-    @Schema(type = "Long", example = "1")
-    private Long  teacherId;
+    @JsonProperty("dayId1")
+    @Schema(type = "Long",  example = "1")
+    private Long dayId1;
 
-    @Schema(type = "array", example = "[1,2]")
-    @JsonProperty("room")
-    private List<Long> roomId;
+    @JsonProperty("practiceCaseBeginId1")
+    @Schema(type = "Long",  example = "1")
+    private Long practiceCaseBeginId1;
 
-    @Schema(type = "Long", example = "1")
-    @JsonProperty("classroom")
-    private Long classroomId;
+    @JsonProperty("allCase1")
+    @Schema(type = "Long",  example = "1")
+    private Long allCase1;
 
-    @Schema(type = "Long", example = "1")
-    @JsonProperty("practiceCase")
-    private Long practiceCaseId;
+    @JsonProperty("roomId1")
+    @Schema(type = "Long",  example = "1")
+    private Long roomId1;
 
-    @Schema(type = "Long", example = "1")
-    @JsonProperty("subject")
-    private Long subjectId;
+    @JsonProperty("purposeUse1")
+    @Schema(type = "String",  example = "can be blank")
+    private String purposeUse1;
+
+
+//Group 2
+    @JsonProperty("groupId2")
+    @Schema(type = "Long",  example = "1")
+    private Long groupId2;
+
+    @JsonProperty("weekSemesterId2")
+    @Schema(type = "Long",  example = "1")
+    private Long weekSemesterId2;
+
+    @JsonProperty("dayId2")
+    @Schema(type = "Long",  example = "1")
+    private Long dayId2;
+
+    @JsonProperty("practiceCaseBeginId2")
+    @Schema(type = "Long",  example = "1")
+    private Long practiceCaseBeginId2;
+
+    @JsonProperty("allCase2")
+    @Schema(type = "Long",  example = "1")
+    private Long allCase2;
+
+    @JsonProperty("roomId2")
+    @Schema(type = "Long",  example = "1")
+    private Long roomId2;
+
+    @JsonProperty("purposeUse2")
+    @Schema(type = "String",  example = "can be blank")
+    private String purposeUse2;
+
+
 }

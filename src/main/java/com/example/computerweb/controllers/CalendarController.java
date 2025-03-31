@@ -8,6 +8,8 @@ import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestDto;
+import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestOneDto;
+import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestRoomDto;
 import com.example.computerweb.models.entity.CalendarEntity;
 import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.models.enums.PurposeUse;
@@ -21,6 +23,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +38,7 @@ import java.util.TreeMap;
 @Slf4j
 @Tag(name = "CalendarManagement only for GVU , Calendar for GVU|CSVC|GV")
 public class CalendarController {
+
     private final ICalendarService iCalendarService;
 
 
@@ -54,6 +58,8 @@ public class CalendarController {
        List<CalendarManagementDto> data = this.iCalendarService.handleGetAllDataCalendar();
             return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , data );
     }
+
+    // Create Calendar
     @Operation(summary = "Page create calendar of GVU" , description = "GVU can select field calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement/create")
     public ResponseData<CalendarResponseFields> getCreateCalendarManagement (){
@@ -62,7 +68,7 @@ public class CalendarController {
     }
     @Operation(summary = "Post info calendar, only of GVU" , description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/calendarManagement/create")
-    public ResponseData<?> createCalendar (@RequestBody CalendarRequestDto calendarRequestDto){
+    public ResponseData<?> getCreateCalendar (@RequestBody CalendarRequestDto calendarRequestDto){
       ResponseEntity<String> createCalendar =  this.iCalendarService.handleCreateCalendar(calendarRequestDto);
       if ( createCalendar.getStatusCode() == HttpStatus.BAD_REQUEST){
           return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), createCalendar.getBody());
@@ -71,7 +77,27 @@ public class CalendarController {
       }
 
     }
+    // Create room
+//    @Operation(summary = "Page create calendar of GVU" , description = "GVU can select field calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
+//    @GetMapping("/calendarManagement/createRoom")
+//    public ResponseData<CalendarResponseFields> getCreateRoomCalendarManagement (){
+//        CalendarResponseFields data = this.iCalendarService.handleGetDataForCreateRoomPage();
+//        return new ResponseSuccess<>(HttpStatus.OK.value(),"Execute data success" ,data );
+//    }
+//
+//    @Operation(summary = "Post info calendar, only of GVU" , description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
+//    @PostMapping("/calendarManagement/createRoom")
+//    public ResponseData<?> getCreateRoom (@RequestBody CalendarRequestRoomDto calendarRequestRoomDto){
+//        ResponseEntity<String> createRoom =  this.iCalendarService.handleCreateRoom(calendarRequestRoomDto);
+//        if ( createRoom.getStatusCode() == HttpStatus.BAD_REQUEST){
+//            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), createRoom.getBody());
+//        }else {
+//            return new ResponseSuccess<>(HttpStatus.OK.value(), createRoom.getBody());
+//        }
+//
+//    }
 
+    // UPDATE BOTH lich chinh thuc , lich muon phong
     @Operation(summary = "Show info calendar of user" , description = "GVU can update info calendar of user on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement/update/{calendarId}")
     public ResponseData<CalendarResponseDto> getUpdateCalendar (@PathVariable("calendarId") Long calendarId ){
@@ -81,8 +107,8 @@ public class CalendarController {
 
     @Operation(summary = "Post info  calendar of user" , security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping ("/calendarManagement/update")
-    public ResponseData<?>  postUpdateCalendar (@RequestBody CalendarRequestDto calendarRequestDto){
-        ResponseEntity<String> updateCalendar =  this.iCalendarService.handleUpdateCalendar(calendarRequestDto);
+    public ResponseData<?>  postUpdateCalendar (@RequestBody CalendarRequestOneDto calendarRequestOneDto){
+        ResponseEntity<String> updateCalendar =  this.iCalendarService.handleUpdateCalendar(calendarRequestOneDto);
 
         if ( updateCalendar.getStatusCode() == HttpStatus.BAD_REQUEST){
             return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), updateCalendar.getBody());
@@ -94,7 +120,7 @@ public class CalendarController {
     // Only sent this to API , don't need next to new page
     @Operation(summary = "Feature delete of GVU" , security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping  ("/calendarManagement/delete/{calendarId}")
-    public ResponseData<?>  postDeleteCalendar (@PathVariable("calendarId") Long calendarId){
+    public ResponseData<?>  postDeleteCalendar (@PathVariable("calendarId") String calendarId){
         this.iCalendarService.handleDeleteCalendar(calendarId);
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Delete calendar success");
     }

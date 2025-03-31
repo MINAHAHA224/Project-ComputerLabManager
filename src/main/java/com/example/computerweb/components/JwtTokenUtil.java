@@ -28,11 +28,11 @@ public class JwtTokenUtil {
 
     public String generateToken(UserEntity user) throws Exception {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email" , user.getEmail());
+        claims.put("email" , user.getAccountEntity().getEmail());
         try {
             String token = Jwts.builder()
                     .setClaims(claims)
-                    .setSubject(user.getEmail())
+                    .setSubject(user.getAccountEntity().getEmail())
                     .setExpiration( new Date(System.currentTimeMillis() + expiration * 1000L))
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();

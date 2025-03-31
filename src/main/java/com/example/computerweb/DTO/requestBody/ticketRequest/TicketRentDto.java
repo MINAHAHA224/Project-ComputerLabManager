@@ -23,40 +23,36 @@ public class TicketRentDto {
 
 
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @Schema(type = "string", format = "date", example = "2025-02-19")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate date;
+    @JsonProperty("typeRequestId")
+    @Schema(type = "Long" , example = "2")
+    private Long typeRequestId;
 
 
 
-    @JsonProperty("teacher")
-    @Schema(type = "Long", example = "1")
+    @JsonProperty("weekSemesterId")
+    @Schema(type = "Long" , example = "1")
+    private Long weekSemesterId;
 
-    private Long  teacherId;
+    @JsonProperty("day")
+    @Schema(type = "Long" , example = "3")
+    private Long day;
 
-    @Schema(type = "array", example = "[1,2]")
-    @JsonProperty("room")
-    @NotNull(message = "Room must not be null")
-    private List<Long> roomId;
 
-    @Schema(type = "Long", example = "1")
-    @JsonProperty("classroom")
-    @NotNull(message = "Classroom must not be null")
-    private Long classroomId;
+    @JsonProperty("caseBeginId")
+    @Schema(type = "Long" , example = "1")
+    private Long caseBeginId;
 
-    @Schema(type = "Long", example = "1")
-    @JsonProperty("practiceCase")
-    @NotNull(message = "PracticeCase must not be null")
-    private Long practiceCaseId;
 
-    @Schema(type = "Long", example = "1")
-    @JsonProperty("subject")
-    @NotNull(message = "Subject must not be null")
-    private Long subjectId;
+    @JsonProperty("allCase")
+    @Schema(type = "Long" , example = "4")
+    private Long allCase;
 
-    @JsonProperty("note")
-    @NotBlank(message = "Please fill the note that why you need this request")
-    @Schema(type = "String" , example = "I want to rent this room , at ... , to demo project to student on class ...")
-    private String note;
+    @JsonProperty("roomId")
+    @Schema(type = "Long" , example = "4")
+    private Long roomId;
+
+    @NotBlank(message = "PurposeUse must not be blank")
+    @JsonProperty("purposeUse")
+    @Schema(type = "String" , example = "hm.....")
+    private String purposeUse;
 }

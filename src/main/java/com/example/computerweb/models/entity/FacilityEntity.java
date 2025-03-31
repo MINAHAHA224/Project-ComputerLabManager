@@ -18,14 +18,13 @@ public class FacilityEntity {
     @Column(name = "CoSoID")
     private Long id ;
 
-    @Column(name = "TenCS")
+    @Column(name = "MaCS")
     private String nameFacility;
 
     @Column(name = "NDCoSo")
     private  String contentFacility;
 
-    @OneToMany(mappedBy = "facilityEntityClassroom")
-    private List<ClassroomEntity> classroomEntities;
+
 
     @OneToMany(mappedBy = "facilityEntityRoom")
     private List<RoomEntity> roomEntities;

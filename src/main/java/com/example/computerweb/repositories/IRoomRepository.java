@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
+
 public interface IRoomRepository  extends JpaRepository<RoomEntity , Long> , RoomRepositoryCustom {
 
     RoomEntity findRoomEntityById ( Long id);

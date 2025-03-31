@@ -18,7 +18,7 @@ public class StatusEntity {
     @Column(name = "TrangThaiID")
     private Long id ;
 
-    @Column(name = "TenTrangThai")
+    @Column(name = "MaTrangThai")
     private String nameStatus;
 
     @Column(name = "NDTrangThai")
@@ -27,12 +27,16 @@ public class StatusEntity {
     @OneToMany(mappedBy = "status")
     private List<NotificationEntity> notificationEntities;
 
+    @OneToMany(mappedBy = "statusCSVC")
+    private List<TicketRequestEntity> ticketRequestDoneCSVC;
+
+    @OneToMany(mappedBy = "statusGVU")
+    private List<TicketRequestEntity> ticketRequestDoneGVU;
+
+    @OneToMany(mappedBy = "statusTicket")
+    private List<TicketRequestEntity> ticketRequests;
+
     @OneToMany(mappedBy = "status")
-    private List<TicketRequestEntity> ticketRequestEntities;
+    private  List<CalendarEntity> calendarEntities;
 
-    @OneToMany(mappedBy = "doneCSVC")
-    private List<TicketRequestEntity> ticketDoneCSVC;
-
-    @OneToMany(mappedBy = "doneGVU")
-    private List<TicketRequestEntity> ticketDoneGVU;
 }

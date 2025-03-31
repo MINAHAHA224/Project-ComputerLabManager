@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface IUserRepository extends JpaRepository<UserEntity, Long> , UserRepositoryCustom {
 
 
@@ -19,18 +18,13 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> , UserR
     UserEntity findUserEntityById (Long id);
 
 
-    Optional<UserEntity> findUserEntityByEmail(String email);
 
-    UserEntity findUserEntityByEmailPersonal ( String email);
 
     Optional<UserEntity> findUserEntityByPhone(String phone);
 
    Optional<List<UserEntity> > findAllByRoleAndMajor (RoleEntity  roleEntity , MajorEntity majorEntity);
-    List<UserEntity> findAllByRole(RoleEntity roleEntity);
+    List<UserEntity> findUserEntitiesByRole(RoleEntity roleEntity);
 
-    boolean existsByEmail(String email);
-
-    boolean existsByEmailPersonal ( String email);
 
     boolean existsByPhone(String phone);
 }

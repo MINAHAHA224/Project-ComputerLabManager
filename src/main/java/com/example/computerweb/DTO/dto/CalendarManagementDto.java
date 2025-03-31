@@ -13,14 +13,25 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CalendarManagementDto implements Serializable {
 
-    private String date;
-    private String teacher;
-    private String room;
-    private String subject;
-    private String classroom;
-    private String practiceCase;
-    private String time;
+    private String calendarId;
+    private String creditClassId;
+    private String credit;
+    private String UserIdMp_FK;
+    private String codeSubject;
+    private String nameSubject;
+    private String group;
+    private String combination;
+    private String codeClassroom;
+    private String nameRoom;
+    private String codeFacility;
+    private String day;
+    private String lesson;
+    private String lessonBegin;
+    private String nameTeacher;
     private String note;
-    private String id;
+    private String date;
+    private String statusCalendar;
+
+
 
 }

@@ -11,15 +11,15 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Entity
-@Table(name = "ChuyenNghanh")
+@Table(name = "ChuyenNganh")
 public class MajorEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ChuyenNghanhID")
+    @Column(name = "ChuyenNganhID")
     private Long id ;
 
-    @Column(name = "MaChuyenNghanh")
+    @Column(name = "MaChuyenNganh")
     private String codeMajor;
 
     @Column(name = "NoiDungCN")

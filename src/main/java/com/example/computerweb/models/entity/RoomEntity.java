@@ -28,6 +28,10 @@ public class RoomEntity {
     @JoinColumn(name = "CoSo_FK")
     private FacilityEntity facilityEntityRoom;
 
-//    @OneToMany(mappedBy = "roomEntity")
-//    private List<TicketRequestEntity> ticketRequestEntities ;
+    @OneToMany(mappedBy = "room")
+    private List<CalendarEntity> calendarEntities;
+
+    @OneToMany(mappedBy = "room")
+    private List<TicketRequestEntity> ticketRequestEntities;
+
 }

@@ -17,12 +17,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
-@Service
 public interface IUserService {
 
-    ResponseEntity<String> handleRergister (UserRegisterDto userRegisterDTO);
+    ResponseEntity<String> handleRegister (UserRegisterDto userRegisterDTO);
 
-    boolean checkEamilExist (String email);
+
 
     boolean checkPhoneExist ( String phone);
 
@@ -31,7 +30,7 @@ public interface IUserService {
     ResponseEntity<String> handleUpdateFieldProfile (UserProfileRequestDto userProfileDto);
     Map<String,String> handleGetDataUserCurrent ();
 
-    ProfileResponseDto handleGetDataProfile ();
+    UserResponseDto handleGetDataProfile ();
 
    List<UserManagementDto>  handleGetAllDataUser ();
 

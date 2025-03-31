@@ -1,7 +1,9 @@
 package com.example.computerweb.configurations;
 
 import com.example.computerweb.models.entity.UserEntity;
+import com.example.computerweb.repositories.IAccountRepository;
 import com.example.computerweb.repositories.IUserRepository;
+import com.example.computerweb.services.UserDetailsServiceCustom;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final IUserRepository iUserRepository;
+    private final IAccountRepository iAccountRepository;
+    private  final UserDetailsServiceCustom userDetailsServiceCustom;
 
 
     @Bean
@@ -31,41 +35,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return new UserDetailsServiceCustom(iAccountRepository);
+//    }
     @Bean
     public UserDetailsService userDetailsService() {
-        return email -> iUserRepository
-                .findUserEntityByEmail(email)
-                .orElseThrow(() ->
-                        new UsernameNotFoundException(
-                                "Cannot find user with email = " + email));
+       return email -> iAccountRepository.findAccountEntityByEmail(email)
+               .orElseThrow(() ->
+                       new UsernameNotFoundException(
+                               "Cannot find user with email = " + email));
     }
-//    public UserDetailsService userDetailsService() {
-//        return new UserDetailsService() {
-//            @Override
-//            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//                UserEntity user = iUserRepository.findUserEntityByEmail(email);
-//                if (user == null) {
-//                    throw new UsernameNotFoundException("Cannot find user with email = " + email);
-//                }
-//                return new User(
-//                        user.getEmail(),
-//                        user.getPassWord(),
-//                        user.getAuthorities()
-//                );
-//            }
-//        };
-//    }
-//@Bean
-//public UserDetailsService userDetailsService() {
-//    return new UserDetailsService() {
-//        @Override
-//        public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//            return iUserRepository.findUserEntityByEmail(email)
-//                    .orElseThrow(() -> new UsernameNotFoundException("Cannot find user with email = " + email));
-//        }
-//    };
-//}
-
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -73,7 +53,6 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config

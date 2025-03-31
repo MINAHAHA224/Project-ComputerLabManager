@@ -18,7 +18,7 @@ public class TypeRequestEntity {
     @Column(name = "LoaiYcID")
     private Long id ;
 
-    @Column(name = "TenLoaiYC")
+    @Column(name = "MaLoaiYC")
     private String nameTypeRequest;
 
     @Column(name = "NDloaiYC")

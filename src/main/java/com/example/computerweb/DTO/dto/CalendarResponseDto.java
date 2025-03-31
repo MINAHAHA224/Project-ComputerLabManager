@@ -12,7 +12,7 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 public class CalendarResponseDto {
-    private CalendarManagementDto userCurrent;
+    private CalendarResponseOneDto userCurrent;
 
    private CalendarResponseFields dataBase;
 

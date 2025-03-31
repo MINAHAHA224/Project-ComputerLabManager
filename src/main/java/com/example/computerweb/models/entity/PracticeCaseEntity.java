@@ -12,14 +12,14 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Entity
-@Table(name = "CaThucHanh")
+@Table(name = "TietThucHanh")
 public class PracticeCaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "CaID")
+    @Column(name = "TietID")
     private Long id ;
 
-    @Column(name = "TenCa")
+    @Column(name = "MaTiet")
     private  String namePracticeCase;
 
     @Column(name = "ThoiGianBatDau")
@@ -31,11 +31,8 @@ public class PracticeCaseEntity {
     @OneToMany(mappedBy = "practiceCase")
     private List<CalendarEntity> calendarEntities;
 
-//    @OneToMany(mappedBy = "practiceCaseOld")
-//    private List<TicketRequestEntity> ticketRequestEntitiesOld;
-//
-//    @OneToMany(mappedBy = "practiceCaseNew")
-//    private List<TicketRequestEntity> ticketRequestEntitiesNew;
+    @OneToMany(mappedBy = "practiceCase")
+    private List<TicketRequestEntity> ticketRequestEntities;
 
 
 }

@@ -1,6 +1,7 @@
 package com.example.computerweb.Validation.EmailValidation;
 
 import com.example.computerweb.models.entity.UserEntity;
+import com.example.computerweb.repositories.IAccountRepository;
 import com.example.computerweb.repositories.IRoleRepository;
 import com.example.computerweb.repositories.IUserRepository;
 import com.example.computerweb.services.IUserService;
@@ -16,6 +17,7 @@ public class EmailValidator implements ConstraintValidator<EmailChecked , String
 
     private final IUserService iUserService;
     private final IUserRepository iUserRepository;
+    private  final IAccountRepository iAccountRepository;
     @Override
     public void initialize(EmailChecked constraintAnnotation) {
 
@@ -29,7 +31,7 @@ public class EmailValidator implements ConstraintValidator<EmailChecked , String
 
         if (email.contains("@ptithcm.edu.vn")){
 
-            boolean userExist = this.iUserService.checkEamilExist(email);
+            boolean userExist = this.iAccountRepository.existsByEmail(email);
 
             if (userExist){
                 return true;

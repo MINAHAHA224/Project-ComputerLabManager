@@ -25,7 +25,5 @@ public class TicketManagementRequestDto {
     @Schema(type = "String" , example = "Calendar of this week has been fulling, please try next week!!!")
     private String noteNotification;
 
-    @Schema(hidden = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date date = new Date();
+
 }
