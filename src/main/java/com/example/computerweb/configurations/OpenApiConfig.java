@@ -29,7 +29,7 @@ public class OpenApiConfig {
         // co 2 sever de sai
 
         Server server = new Server();
-        server.setUrl("https://project-computerlabmanager-production.up.railway.app");
+        server.setUrl("http://localhost:8080");
         server.setDescription("Production server");
 //        List<Server> listServer = new ArrayList<>();
 //
