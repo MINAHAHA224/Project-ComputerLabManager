@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -18,9 +20,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Validated
 public class CalendarRequestDto {
     @JsonProperty("creditClassId")
     @Schema(type = "Long",  example = "1")
+
     private Long creditClassId;
 
 //Group 1

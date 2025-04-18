@@ -62,6 +62,16 @@ public class JwtTokenFilter
             //log.info("Token: {}", token);
             // check subject của claims trong token
             final String emailOfToken = this.jwtTokenUtil.extractEmailToken(token);
+            // ***) boi vi sao thang JWT no chi chua email hay quyen thoi mà khong chua password mac du chua van duoc password
+            // va tai sao chi check moi email thoi trong trương hop project cua minh
+            // PHAI BIET LA : check JWT khi ma da dang nhap thanh cong => co token JWT roi moi check
+            // ==> thu nhat : khong can chua password và khong can check password boi vi password da duoc chwck tu  login roi vi vay khi ma vo cac
+            // api khong can check password măc du check van duoc nhung ma ton thoi gian , hay tuong tuong cu moi API lai phai giai ma password e check 1 lan
+            // thi no rat ton thoi gian
+            // ==> thu hai : tai sao JWT cua minh khong co thong tin cua quyen , boi vi minh khong xu dung JWT de check quyen ma minh sư dung UsernamePasswordAuthenticationToken
+            // ket hop voi securityFilterChain de check quyen , Project cua minh la SAU MOI LAN check JWT , ma minh se add thong tin email và quyen vô UsernamePasswordAuthenticationToken
+            // de securityFilterChain chech tiep quyen ==> giai dap van de la tai sao JWT cua minh ko co field quyen va khong check quyen o JWT
+            // ==> thu ba : JWT  cua minh chi check email , thoi han token , chu ki dien tu thoi con quyen la securityFilterChain check
 
              if(emailOfToken != null && SecurityContextHolder.getContext().getAuthentication() == null ){
                  UserDetails userDetail =  this.userDetailsService.loadUserByUsername(emailOfToken);

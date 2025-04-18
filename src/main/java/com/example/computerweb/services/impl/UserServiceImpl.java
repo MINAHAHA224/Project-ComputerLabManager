@@ -129,14 +129,24 @@ public class UserServiceImpl implements IUserService {
             UserEntity userCurrent = accountEntity.getUser();
             if (passwordEncoder.matches(userLoginDTO.getPassWord(), accountEntity.getPassword())) {
                 try {
+                    // day la buoc dien thong tin vo de thang securityFilterChain no kiem tra quyen , nhung cai API nao can kiem tra quyen ak
+                    // thì no se lay thong tin thang nay ra no kiem tra o ben cai requestMatches a
+                    // va va chi can 1 cai thong tin accountEntity.getAuthorities() la du roi , boi vi thang securityFilterChain no chi can check moi
+                    // cai quyen chu maays , vd .hasRole() , chu no co check tk , mk nua dau
+                    // ==> userLoginDTO.getEmail(), userLoginDTO.getPassWord()la khong can thiet thi do thang securityFilterCHain no check moi cai quyen nua chu may
+                    // boi vi 2 cai field nay minh check o ben tren roi con gì nua , email thi check dau , xong toi dung passEncode của springSecurity de check pass vay thi gio chi con check quyen => de securityFilterChain check
+                    // khong can thiet nhung ma no bat buoc dien
+                    // ===> UsernamePasswordAuthenticationToken dong vai tro la de cho securityFilterChain no check quyen
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+
                             userLoginDTO.getEmail(),
                             userLoginDTO.getPassWord(),
                             accountEntity.getAuthorities()
                     );
-
                     authenticationManager.authenticate(authenticationToken);
 
+                    // va thang token hien tai cua JWT a minh chi co email, thoi gian het han chu khong co role boi vi role la minh dùng UsernamePasswordAuthenticationToken ket hop securityFilterChain check roi
+                    // ==> trong jwt cua minh ko co quyen chi co moi email va thoi gian het han token jwt thoi
                     String token = this.jwtTokenUtil.generateToken(userCurrent);
                     return ResponseEntity.ok().body(token);
                 } catch (Exception e) {
@@ -145,11 +155,11 @@ public class UserServiceImpl implements IUserService {
                 }
 
             } else {
-                return ResponseEntity.badRequest().body("Email or Password incorrect");
+                return ResponseEntity.badRequest().body(" Password incorrect");
             }
         }
 
-        return ResponseEntity.badRequest().body("Email or Password incorrect");
+        return ResponseEntity.badRequest().body("Email  incorrect");
 
     }
 

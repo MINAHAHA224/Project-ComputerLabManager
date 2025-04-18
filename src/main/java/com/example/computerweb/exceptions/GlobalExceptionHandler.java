@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
         return errorResponse;
     }
 
-    @ExceptionHandler({CalendarException.class})
+    @ExceptionHandler({CalendarException.class })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleCalendarException (CalendarException e , WebRequest  request){
     ErrorResponse errorResponse = new ErrorResponse();

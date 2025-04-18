@@ -77,7 +77,7 @@ public class JwtTokenUtil {
     public boolean validateToken ( String token , UserDetails userDetails){
 
         String emailOfToken = extractClaim(token , Claims::getSubject);
-        if (emailOfToken.equals(userDetails.getUsername()) && !isTokenExpired(token) )
+        if (emailOfToken.equals(userDetails.getUsername()) && !isTokenExpired(token)  )
         {
             return true;
         }

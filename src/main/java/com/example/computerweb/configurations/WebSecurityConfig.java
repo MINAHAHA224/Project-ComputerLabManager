@@ -44,16 +44,21 @@ public class WebSecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .addFilterBefore(this.jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                // minh addFilterBefore bởi vì mình muốn check JWT truoc , va trong cong doan check JWT a
+                // minh da add thong tin vo UsernamePasswordAuthenticationFilter  de phuc vu cho minh dich doan code tiep theo ne .hasRole()
+                // do la check quyen
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(
                             "/access/login" , "/access/forgotPassword"  ).permitAll();
                     request.requestMatchers(
                             "/calendarManagement/**" , "/userManagement/**" ).hasRole("GVU");
                     request.requestMatchers("/roomManagement").hasRole("CSVC");
-                    request.requestMatchers("/requestChangeCalendar/**" ,"/requestRentRoom" , "/notification/**" , "/requestTickets" ,"/requestTickets/**" , "/requestRentRoomDelete").hasRole("GV");
+                    request.requestMatchers("/requestChangeCalendar/**" ,"/requestRentRoom" , "/notification/**"
+                            , "/requestTickets" ,"/requestTickets/**" , "/requestRentRoomDelete").hasRole("GV");
                     request.requestMatchers("/requestManagement").hasAnyRole("GVU" , "CSVC");
                     request.requestMatchers("/calendar" , "/home"  , "/profile").hasAnyRole("GVU" , "CSVC" , "GV");
-                    request.requestMatchers("/actuator/**", "/v3/**", "/webjars/**", "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**").permitAll();
+                    request.requestMatchers("/actuator/**", "/v3/**", "/webjars/**"
+                            , "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**").permitAll();
                     request.anyRequest().authenticated();
                 });
             //.exceptionHandling(ex -> ex.accessDeniedPage());
