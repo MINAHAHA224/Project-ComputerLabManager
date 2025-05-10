@@ -26,7 +26,6 @@ public class FacilityEntity {
 
 
 
-    @OneToMany(mappedBy = "facilityEntityRoom")
-    private List<RoomEntity> roomEntities;
+
 
 }

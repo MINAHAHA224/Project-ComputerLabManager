@@ -1,6 +1,6 @@
 package com.example.computerweb.repositories.custom.impl;
 
-import com.example.computerweb.DTO.dto.CalendarManagementDto;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarManagementDto;
 import com.example.computerweb.models.entity.AccountEntity;
 import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.repositories.IAccountRepository;
@@ -11,12 +11,10 @@ import com.example.computerweb.utils.SecurityUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import jakarta.persistence.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,67 +39,65 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
         String sql = null;
         if (userCurrent.getRole().getNameRole().equals("GVU") || userCurrent.getRole().getNameRole().equals("CSVC")) {
             sql = "SELECT \n" +
-                    "    LichThucHanh.LichID, \n" +
-                    "    ISNULL(LopTinChi.LopTinChiID,'') AS LopTinChiID ,\n" +
-                    "    ISNULL(LichThucHanh.UserIdMp_FK,'') AS UserIdMp_FK ,  \n" +
-                    "    ISNULL(MonHoc.MaMH,'')  AS MaMH ,  \n" +
-                    "    ISNULL(MonHoc.TenMH,'')  AS TenMH , \n" +
-                    "    ISNULL(LichThucHanh.Nhom,'')   AS Nhom ,\n" +
-                    "\tISNULL(LichThucHanh.ToHop,'')   AS ToHop ,\n" +
-                    "ISNULL( Lop.MaLop+'-'+LichThucHanh.Nhom ,'')  AS MaLop," +
-                    "    PhongThucHanh.TenPhong, \n" +
-                    "    CoSo.MaCS, \n" +
-                    "    LichThucHanh.Thu,\n" +
-                    "    LichThucHanh.SoTiet, \n" +
-                    "    LichThucHanh.SoTietBD_FK,\n" +
+                    "    LTH.LichID, \n" +
+                    "    ISNULL(LTC.LopTinChiID,'') AS LopTinChiID ,\n" +
+                    "    ISNULL(LTH.UserIdMp_FK,'') AS UserIdMp_FK ,  \n" +
+                    "    ISNULL(MH.MaMH,'')  AS MaMH , \n" +
+                    "\tISNULL(LTC.SoTC,'') AS SoTC ,\n" +
+                    "    ISNULL(MH.TenMH,'')  AS TenMH , \n" +
+                    "    ISNULL(LTC.Nhom,'')   AS Nhom ,\n" +
+                    "    ISNULL(LTHop.MaTo,'')   AS ToHop , \n" +
+                    "    PTH.TenPhong, \n" +
+                    "    CS.MaCS, \n" +
+                    "    LTH.Thu,\n" +
+                    "    LTH.SoTiet, \n" +
+                    "    LTH.SoTietBD_FK,\n" +
                     "    ISNULL(ND1.Ho + ' ' + ND1.Ten, ND2.Ho + ' ' + ND2.Ten) AS GiangVien,\n" +
-                    "    LichThucHanh.GhiChu,\n" +
-                    "    DATEADD(DAY, (LichThucHanh.Thu - 2), TuanHoc_KiHoc.NgayBatDau) AS NgayCuThe," +
-                    " TrangThai.MaTrangThai, "+
-                    "LopTinChi.SoTC "+
-                    " FROM LichThucHanh\n" +
-                    "LEFT JOIN TrangThai ON LichThucHanh.TrangThai_FK = TrangThai.TrangThaiID "+
-                    "LEFT JOIN LopTinChi ON LopTinChi.LopTinChiID = LichThucHanh.LopTinChiID_FK\n" +
-                    "LEFT JOIN PhongThucHanh ON PhongThucHanh.PhongID = LichThucHanh.PhongID_FK\n" +
-                    "LEFT JOIN TietThucHanh ON TietThucHanh.TietID = LichThucHanh.SoTietBD_FK\n" +
-                    "LEFT JOIN CoSo ON CoSo.CoSoID = PhongThucHanh.CoSo_Fk\n" +
-                    "LEFT JOIN Lop ON Lop.LopID = LopTinChi.Lop_FK\n" +
-                    "LEFT JOIN MonHoc ON MonHoc.MonHocID = LopTinChi.MonHoc_FK\n" +
-                    "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LichThucHanh.UserIdMp_FK\n" +
-                    "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LopTinChi.UserID_FK\n" +
-                    "LEFT JOIN TuanHoc_KiHoc ON TuanHoc_KiHoc.TuanHoc_KiHoc_Id = LichThucHanh.TuanHoc_KiHoc_Id_FK";
+                    "    LTH.GhiChu,\n" +
+                    "    DATEADD(DAY, (LTH.Thu - CASE WHEN DATEPART(WEEKDAY, TuanHK.NgayBatDau) = 1 THEN 7 ELSE DATEPART(WEEKDAY, TuanHK.NgayBatDau) - 1 END), TuanHK.NgayBatDau) AS NgayCuThe,\n" +
+                    "    TT.MaTrangThai \n" +
+                    "FROM LichThucHanh LTH -- Thêm Alias LTH cho ngắn gọn\n" +
+                    "LEFT JOIN TrangThai TT ON LTH.TrangThai_FK = TT.TrangThaiID \n" +
+                    "LEFT JOIN LopTinChi LTC ON LTC.LopTinChiID = LTH.LopTinChiID_FK \n" +
+                    "LEFT JOIN PhongThucHanh PTH ON PTH.PhongID = LTH.PhongID_FK \n" +
+                    "LEFT JOIN TietThucHanh TTH ON TTH.TietID = LTH.SoTietBD_FK \n" +
+                    "LEFT JOIN CoSo CS ON CS.CoSoID = PTH.CoSo_Fk \n" +
+                    "LEFT JOIN LopTinChi_ToHop LTHop ON LTHop.ToHopID = LTH.ToHop_FK\n" +
+                    "LEFT JOIN MonHoc MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
+                    "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
+                    "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +
+                    "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK ";
 
         } else if (userCurrent.getRole().getNameRole().equals("GV")) {
             sql = "SELECT \n" +
-                    "    LichThucHanh.LichID, \n" +
-                    "    ISNULL(LopTinChi.LopTinChiID,'') AS LopTinChiID ,\n" +
-                    "    ISNULL(LichThucHanh.UserIdMp_FK,'') AS UserIdMp_FK ,  \n" +
-                    "    ISNULL(MonHoc.MaMH,'')  AS MaMH ,  \n" +
-                    "    ISNULL(MonHoc.TenMH,'')  AS TenMH , \n" +
-                    "    ISNULL(LichThucHanh.Nhom,'')   AS Nhom ,\n" +
-                    "\tISNULL(LichThucHanh.ToHop,'')   AS ToHop ,\n" +
-                    " ISNULL( Lop.MaLop+'-'+LichThucHanh.Nhom ,'')  AS MaLop," +
-                    "    PhongThucHanh.TenPhong, \n" +
-                    "    CoSo.MaCS, \n" +
-                    "    LichThucHanh.Thu,\n" +
-                    "    LichThucHanh.SoTiet, \n" +
-                    "    LichThucHanh.SoTietBD_FK,\n" +
+                    "    LTH.LichID, \n" +
+                    "    ISNULL(LTC.LopTinChiID,'') AS LopTinChiID ,\n" +
+                    "    ISNULL(LTH.UserIdMp_FK,'') AS UserIdMp_FK ,  \n" +
+                    "    ISNULL(MH.MaMH,'')  AS MaMH , \n" +
+                    "\tISNULL(LTC.SoTC,'') AS SoTC ,\n" +
+                    "    ISNULL(MH.TenMH,'')  AS TenMH , \n" +
+                    "    ISNULL(LTC.Nhom,'')   AS Nhom ,\n" +
+                    "    ISNULL(LTHop.MaTo,'')   AS ToHop , \n" +
+                    "    PTH.TenPhong, \n" +
+                    "    CS.MaCS, \n" +
+                    "    LTH.Thu,\n" +
+                    "    LTH.SoTiet, \n" +
+                    "    LTH.SoTietBD_FK,\n" +
                     "    ISNULL(ND1.Ho + ' ' + ND1.Ten, ND2.Ho + ' ' + ND2.Ten) AS GiangVien,\n" +
-                    "    LichThucHanh.GhiChu,\n" +
-                    "    DATEADD(DAY, (LichThucHanh.Thu - 2), TuanHoc_KiHoc.NgayBatDau) AS NgayCuThe, " +
-                    " TrangThai.MaTrangThai , "+
-                    "LopTinChi.SoTC "+
-                    " FROM LichThucHanh\n" +
-                    "LEFT JOIN TrangThai ON LichThucHanh.TrangThai_FK = TrangThai.TrangThaiID "+
-                    "LEFT JOIN LopTinChi ON LopTinChi.LopTinChiID = LichThucHanh.LopTinChiID_FK\n" +
-                    "LEFT JOIN PhongThucHanh ON PhongThucHanh.PhongID = LichThucHanh.PhongID_FK\n" +
-                    "LEFT JOIN TietThucHanh ON TietThucHanh.TietID = LichThucHanh.SoTietBD_FK\n" +
-                    "LEFT JOIN CoSo ON CoSo.CoSoID = PhongThucHanh.CoSo_Fk\n" +
-                    "LEFT JOIN Lop ON Lop.LopID = LopTinChi.Lop_FK\n" +
-                    "LEFT JOIN MonHoc ON MonHoc.MonHocID = LopTinChi.MonHoc_FK\n" +
-                    "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LichThucHanh.UserIdMp_FK\n" +
-                    "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LopTinChi.UserID_FK\n" +
-                    "LEFT JOIN TuanHoc_KiHoc ON TuanHoc_KiHoc.TuanHoc_KiHoc_Id = LichThucHanh.TuanHoc_KiHoc_Id_FK\n" +
+                    "    LTH.GhiChu,\n" +
+                    "    DATEADD(DAY, (LTH.Thu - CASE WHEN DATEPART(WEEKDAY, TuanHK.NgayBatDau) = 1 THEN 7 ELSE DATEPART(WEEKDAY, TuanHK.NgayBatDau) - 1 END), TuanHK.NgayBatDau) AS NgayCuThe,\n" +
+                    "    TT.MaTrangThai \n" +
+                    "FROM LichThucHanh LTH -- Thêm Alias LTH cho ngắn gọn\n" +
+                    "LEFT JOIN TrangThai TT ON LTH.TrangThai_FK = TT.TrangThaiID \n" +
+                    "LEFT JOIN LopTinChi LTC ON LTC.LopTinChiID = LTH.LopTinChiID_FK \n" +
+                    "LEFT JOIN PhongThucHanh PTH ON PTH.PhongID = LTH.PhongID_FK \n" +
+                    "LEFT JOIN TietThucHanh TTH ON TTH.TietID = LTH.SoTietBD_FK \n" +
+                    "LEFT JOIN CoSo CS ON CS.CoSoID = PTH.CoSo_Fk \n" +
+                    "LEFT JOIN LopTinChi_ToHop LTHop ON LTHop.ToHopID = LTH.ToHop_FK\n" +
+                    "LEFT JOIN MonHoc MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
+                    "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
+                    "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +
+                    "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK\n" +
                     "WHERE ND1.UserID = "+idUser+" OR ND2.UserID = " + idUser;
         }
 
@@ -119,10 +115,10 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     data.setCreditClassId( String.valueOf(result[1]).equals("0") ? "" : String.valueOf(result[1]) );
                     data.setUserIdMp_FK(String.valueOf(result[2]).equals("0") ? "" : String.valueOf(result[2]));
                     data.setCodeSubject(result[3].toString());
-                    data.setNameSubject( result[4].toString());
-                    data.setGroup( result[5].toString());
-                    data.setCombination( result[6].toString());
-                    data.setCodeClassroom( result[7].toString());
+                    data.setCredit(result[4].toString());
+                    data.setNameSubject( result[5].toString());
+                    data.setGroup( result[6].toString());
+                    data.setCombination( result[7].toString());
                     data.setNameRoom( result[8].toString());
                     data.setCodeFacility( result[9].toString());
                     data.setDay( result[10].toString());
@@ -132,7 +128,6 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     data.setNote( result[14].toString());
                     data.setDate(DateUtils.convertToString((Date) result[15]) );
                     data.setStatusCalendar(result[16].toString());
-                    data.setCredit(result[17] != null ? result[17] .toString() : null);
                     datas.add(data);
                 }
                 return datas;
@@ -143,10 +138,11 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     data.setCreditClassId( String.valueOf(result[1]).equals("0") ? "" : String.valueOf(result[1]) );
                     data.setUserIdMp_FK(String.valueOf(result[2]).equals("0") ? "" : String.valueOf(result[2]));
                     data.setCodeSubject("");
+                    data.setCredit("");
                     data.setNameSubject("");
                     data.setGroup("");
                     data.setCombination("");
-                    data.setCodeClassroom("");
+
                     data.setNameRoom( result[8].toString());
                     data.setCodeFacility( result[9].toString());
                     data.setDay( result[10].toString());
@@ -156,7 +152,6 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     data.setNote( result[14].toString());
                     data.setDate( DateUtils.convertToString((Date) result[15]));
                     data.setStatusCalendar(result[16].toString());
-                    data.setCredit(result[17] != null ? result[17] .toString() : null);
                     datas.add(data);
                 }
                 return datas;

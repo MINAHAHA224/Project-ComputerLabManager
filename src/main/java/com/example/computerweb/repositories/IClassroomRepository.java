@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 
 public interface IClassroomRepository extends JpaRepository<ClassroomEntity , Long> {
     ClassroomEntity findClassroomEntityById ( Long id);
+
+
 }

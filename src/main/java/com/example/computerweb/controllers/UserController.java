@@ -1,29 +1,18 @@
 package com.example.computerweb.controllers;
 
-import com.example.computerweb.DTO.dto.ProfileResponseDto;
-import com.example.computerweb.DTO.dto.UserResponseDto;
-import com.example.computerweb.DTO.dto.UserCreateMgnDto;
-import com.example.computerweb.DTO.dto.UserManagementDto;
+import com.example.computerweb.DTO.dto.userResponse.UserResponseDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
-import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
-import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
-import com.example.computerweb.DTO.requestBody.userRequest.UserMngProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.userRequest.UserProfileRequestDto;
 import com.example.computerweb.services.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

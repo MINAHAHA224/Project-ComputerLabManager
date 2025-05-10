@@ -24,9 +24,12 @@ public class RoomEntity {
     @Column(name = "SoLuongMay")
     private Long numberOfComputers;
 
-    @ManyToOne
-    @JoinColumn(name = "CoSo_FK")
-    private FacilityEntity facilityEntityRoom;
+    @Column(name = "SoLuongMayHong")
+    private Long numberOfComputerError;
+
+
+    @Column(name = "CoSo")
+    private String facility;
 
     @OneToMany(mappedBy = "room")
     private List<CalendarEntity> calendarEntities;

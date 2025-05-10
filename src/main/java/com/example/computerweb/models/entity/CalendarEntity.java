@@ -28,12 +28,12 @@ public class CalendarEntity {
     @JoinColumn(name = "UserIdMp_FK")
     private UserEntity user;
 
-    @Column(name = "Nhom")
-    private String group;
 
 
-    @Column(name = "ToHop")
-    private String organization;
+    @ManyToOne
+    @JoinColumn (name = "ToHop_FK")
+    private CreditClassToEntity creditClassTo;
+
 
     @ManyToOne
     @JoinColumn(name = "TuanHoc_KiHoc_Id_FK")

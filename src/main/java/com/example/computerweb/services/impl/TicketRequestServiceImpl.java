@@ -1,27 +1,29 @@
 package com.example.computerweb.services.impl;
 
-import com.example.computerweb.DTO.dto.*;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseDto;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseFields;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseOneDto;
+import com.example.computerweb.DTO.dto.notificationResponse.NotificationDetailResponseDto;
+import com.example.computerweb.DTO.dto.notificationResponse.NotificationResponseDto;
+import com.example.computerweb.DTO.dto.requestTicketResponse.RequestTicketResponseDto;
+import com.example.computerweb.DTO.dto.ticketResponse.TicketResponseMgmDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketManagementRequestDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketRentDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketRequestOneDto;
 import com.example.computerweb.exceptions.CalendarException;
 import com.example.computerweb.models.entity.*;
-import com.example.computerweb.models.enums.PracticeCase;
-import com.example.computerweb.models.enums.PurposeUse;
 import com.example.computerweb.repositories.*;
 import com.example.computerweb.services.ICalendarService;
 import com.example.computerweb.services.ITicketRequestService;
 import com.example.computerweb.utils.DateUtils;
 import com.example.computerweb.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -103,7 +105,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         if (nameTypeRequest.equals("TDL")  ){
             CalendarEntity calendarOld = ticketRequest.getCalendar();
             WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-            ticket.setWeekSemesterOld(weekSemesterEntityOld.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+            ticket.setWeekSemesterOld("Week: "+weekSemesterEntityOld.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
             ticket.setDayOld(calendarOld.getDay().toString());
             ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseOld(calendarOld.getAllCase().toString());
@@ -112,7 +114,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
             // new use data on ticket
             WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
-            ticket.setWeekSemesterNew(weekSemesterEntityNew.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setWeekSemesterNew("Week : " +weekSemesterEntityNew.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
             ticket.setDayNew(ticketRequest.getDay().toString());
             ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
@@ -123,7 +125,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         }else if ( nameTypeRequest.equals("MP")) {
             // rent room
             WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
-            ticket.setWeekSemesterNew(weekSemesterEntityNew.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setWeekSemesterNew("Week : "+weekSemesterEntityNew.getWeekStudy()+ "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
             ticket.setDayNew(ticketRequest.getDay().toString());
             ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
@@ -133,7 +135,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         else if ( nameTypeRequest.equals("HUY")){
             CalendarEntity calendarOld = ticketRequest.getCalendar();
             WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-            ticket.setWeekSemesterOld(weekSemesterEntityOld.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+            ticket.setWeekSemesterOld("Week : " + weekSemesterEntityOld.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
             ticket.setDayOld(calendarOld.getDay().toString());
             ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseOld(calendarOld.getAllCase().toString());
@@ -217,8 +219,8 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                             CalendarEntity calendarEntity = new CalendarEntity();
                             calendarEntity.setCreditClass(null);
                             calendarEntity.setUser(teacher);
-                            calendarEntity.setGroup(null);
-                            calendarEntity.setOrganization(null);
+//                            calendarEntity.setGroup(null);
+//                            calendarEntity.setOrganization(null);
                             calendarEntity.setWeekSemester(weekSemesterNew);
                             calendarEntity.setDay(dayNew);
                             calendarEntity.setPracticeCase(practiceCaseBeginNew);
@@ -291,8 +293,8 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                         calendarEntityCurrent.setStatus(offStatus);
                         CalendarEntity calendarNew = new CalendarEntity();
                         calendarNew.setCreditClass(calendarEntityCurrent.getCreditClass());
-                        calendarNew.setGroup(calendarEntityCurrent.getGroup());
-                        calendarNew.setOrganization(calendarEntityCurrent.getOrganization());
+//                        calendarNew.setGroup(calendarEntityCurrent.getGroup());
+//                        calendarNew.setOrganization(calendarEntityCurrent.getOrganization());
                         calendarNew.setWeekSemester(weekSemesterNew);
                         calendarNew.setDay(dayNew);
                         calendarNew.setPracticeCase(practiceCaseBeginNew);
@@ -340,7 +342,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                         this.iTicketRequestRepository.save(ticketRequestEntity);
                     }else {
                         throw new CalendarException("Existed a calendar with day : " +
-                                dayNew + " ,"+weekSemesterNew.getWeek().getNameWeek()+" Time : [" +
+                                dayNew + " , Week : "+weekSemesterNew.getWeekStudy()+" Time : [" +
                                 DateUtils.convertToString(weekSemesterNew.getDateBegin())
                                 + "-"
                                 + DateUtils.convertToString(weekSemesterNew.getDateBegin())
@@ -416,7 +418,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         calendarCurrent.setCalendarId(calendarEntity.getId().toString());
         calendarCurrent.setCreditClassId(calendarEntity.getCreditClass() !=null ? calendarEntity.getCreditClass().getId().toString() : null);
         calendarCurrent.setUserIdMp_Fk(calendarEntity.getUser()!=null ? calendarEntity.getUser().getFirstName()+" " +calendarEntity.getUser().getLastName() : null);
-        calendarCurrent.setGroupId(calendarEntity.getGroup()!=null ? calendarEntity.getGroup() : null);
+//        calendarCurrent.setGroupId(calendarEntity.getGroup()!=null ? calendarEntity.getGroup() : null);
         calendarCurrent.setWeekSemesterId(calendarEntity.getWeekSemester().getId().toString());
         calendarCurrent.setDayId(calendarEntity.getDay().toString());
         calendarCurrent.setPracticeCaseBeginId(calendarEntity.getPracticeCase().getId().toString());
@@ -652,7 +654,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         if (nameTypeRequest.equals("TDL")  ){
             CalendarEntity calendarOld = ticketRequest.getCalendar();
             WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-            ticket.setWeekSemesterOld(weekSemesterEntityOld.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+            ticket.setWeekSemesterOld( "Week : " +weekSemesterEntityOld.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
             ticket.setDayOld(calendarOld.getDay().toString());
             ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseOld(calendarOld.getAllCase().toString());
@@ -661,7 +663,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
             // new use data on ticket
             WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
-            ticket.setWeekSemesterNew(weekSemesterEntityNew.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setWeekSemesterNew("Week : "+weekSemesterEntityNew.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
             ticket.setDayNew(ticketRequest.getDay().toString());
             ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
@@ -672,7 +674,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         }else if ( nameTypeRequest.equals("MP")) {
             // rent room
             WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
-            ticket.setWeekSemesterNew(weekSemesterEntityNew.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setWeekSemesterNew("Week : "+weekSemesterEntityNew.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
             ticket.setDayNew(ticketRequest.getDay().toString());
             ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
@@ -683,7 +685,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             if (ticketRequest.getCalendar() != null ){
                 CalendarEntity calendarOld = ticketRequest.getCalendar() ;
                 WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-                ticket.setWeekSemesterOld(weekSemesterEntityOld.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+                ticket.setWeekSemesterOld("Week : "+weekSemesterEntityOld.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
                 ticket.setDayOld(calendarOld.getDay().toString());
                 ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
                 ticket.setAllCaseOld(calendarOld.getAllCase().toString());

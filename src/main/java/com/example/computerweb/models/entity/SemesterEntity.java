@@ -26,9 +26,4 @@ public class SemesterEntity implements Serializable {
     @Column(name = "NamHoc")
     private String yearStudy;
 
-    @OneToMany(mappedBy = "semester")
-    private List<WeekSemesterEntity> weekSemesterEntities;
-
-    @OneToMany(mappedBy = "semester")
-    private  List<SubjectEntity> subjectEntities;
 }

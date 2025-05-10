@@ -1,15 +1,12 @@
 package com.example.computerweb.controllers;
 
-import com.example.computerweb.DTO.dto.HomeResponseDto;
+import com.example.computerweb.DTO.dto.userResponse.HomeResponseDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
-import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.services.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
@@ -43,12 +40,16 @@ public class AccessController {
           Map<String,String> token = new HashMap<>();
           token.put("token" , handleLogin.getBody());
           return new ResponseSuccess<>(HttpStatus.OK.value(), "Login Success" ,token );
-
       }
       else {
           return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),handleLogin.getBody());
       }
+    }
 
+    @Operation(summary = "logout User" , description = "When logout delete token")
+    @PostMapping("/access/logout")
+    public ResponseEntity<String> getLogout (){
+        return this.iUserService.handleLogout();
     }
 
     @Operation(summary = "Home page" , description = "Show Information and Role of user" , security = @SecurityRequirement(name = "bearerAuth"))

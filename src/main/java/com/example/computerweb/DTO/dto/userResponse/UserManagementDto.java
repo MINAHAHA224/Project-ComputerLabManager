@@ -1,4 +1,4 @@
-package com.example.computerweb.DTO.dto;
+package com.example.computerweb.DTO.dto.userResponse;
 
 import com.example.computerweb.models.enums.Gender;
 import jakarta.persistence.*;

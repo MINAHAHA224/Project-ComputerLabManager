@@ -1,32 +1,27 @@
 package com.example.computerweb.services.impl;
 
-import com.example.computerweb.DTO.dto.*;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarManagementDto;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseDto;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseFields;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseOneDto;
+import com.example.computerweb.DTO.dto.creditClassResponse.CreditClassEligibleDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestOneDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestRoomDto;
 import com.example.computerweb.exceptions.CalendarException;
 import com.example.computerweb.models.entity.*;
 import com.example.computerweb.models.enums.Day;
-import com.example.computerweb.models.enums.Group;
 import com.example.computerweb.models.enums.PracticeCase;
-import com.example.computerweb.models.enums.PurposeUse;
 import com.example.computerweb.repositories.*;
 import com.example.computerweb.services.ICalendarService;
 import com.example.computerweb.utils.DateUtils;
-import com.example.computerweb.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,19 +38,18 @@ public class CalendarServiceImpl implements ICalendarService {
     private final ISubjectRepository iSubjectRepository;
     private final ICreditClassRepository iCreditClassRepository;
     private final IWeekSemesterRepository iWeekSemesterRepository;
-    private final ISemesterRepository iSemesterRepository;
     private  final IStatusRepository iStatusRepository;
     private final ITypeRequestRepository iTypeRequestRepository;
     private final IAccountRepository iAccountRepository;
 
     @Override
     public List<CalendarManagementDto> handleGetAllDataCalendar() {
-        List<CalendarManagementDto> results = this.iCalendarRepository.findAllCustom();
-        return results;
+        List<CalendarManagementDto> listResult = this.iCalendarRepository.findAllCustom();
+        return listResult;
     }
 
     @Override
-    public CalendarResponseFields  handleGetDataForCreatePage() {
+    public CalendarResponseFields handleGetDataForCreatePage() {
         CalendarResponseFields calendarResponseFields = new CalendarResponseFields();
         // CreditClass
         List<CreditClassEligibleDto> ListCreditClassDto = this.iCreditClassRepository.findAllCreditClassEligible();
@@ -64,50 +58,32 @@ public class CalendarServiceImpl implements ICalendarService {
         for (CreditClassEligibleDto creditClassDto : ListCreditClassDto) {
             Map<String, String> creditClassDetails = new TreeMap<>();
             creditClassDetails.put("idCredit", creditClassDto.getCreditClassId());
-            creditClassDetails.put("codeSubject", creditClassDto.getCodeSubject());
+            creditClassDetails.put("codeCreditClass", creditClassDto.getCodeCreditClass());
             creditClassDetails.put("nameSubject", creditClassDto.getNameSubject());
-            creditClassDetails.put("codeClassroom", creditClassDto.getCodeClassroom());
             creditClassDetails.put("studentClassroom", creditClassDto.getStudentClassroom());
-            creditClassDetails.put("lessonSum", creditClassDto.getLessonSum());
-            creditClassDetails.put("lessonHave", creditClassDto.getLessonHave());
+            creditClassDetails.put("lessonDataBase", creditClassDto.getLessonSum());
+            creditClassDetails.put("lessonCurrent", creditClassDto.getLessonHave());
             arrayCreditClass.add(creditClassDetails);
         }
 
         calendarResponseFields.setCreditClass(arrayCreditClass);
 
-        //teachers
-//        RoleEntity roleEntity = this.iRoleRepository.findById(1).get();
-//        List<UserEntity> users = this.iUserRepository.findAllByRole(roleEntity);
-//        Map<String, String> teachers = new TreeMap<>();
-//        for (UserEntity user : users) {
-//            teachers.put(user.getId().toString(), user.getFirstName() + " " + user.getLastName());
-//        }
 
 
         // WeekSemester
         // semester 2 year 2024-2025
-        SemesterEntity semester = this.iSemesterRepository.findSemesterEntityById(2L);
-        // week_semester  on 2024-2025
-        List<WeekSemesterEntity> weekSemesterEntities = this.iWeekSemesterRepository.findAllBySemester(semester);
-        ArrayList<Map<String, String>> arrayWeekSemester = new ArrayList<>();
-        for (WeekSemesterEntity weekSemesterEntity : weekSemesterEntities) {
-            Map<String, String> weekSemesterDetails = new TreeMap<>();
-            weekSemesterDetails.put("idWeekSemester", weekSemesterEntity.getId().toString());
-            weekSemesterDetails.put("time", weekSemesterEntity.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntity.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntity.getDateEnd()) + "]");
-            arrayWeekSemester.add(weekSemesterDetails);
-        }
-        calendarResponseFields.setWeekSemester(arrayWeekSemester);
+
 
         // group
-        Map<String, String> dataGroups = Group.getGroup();
-        ArrayList<Map<String, String>> arrayGroup = new ArrayList<>();
-        for (Map.Entry<String, String> dataGroup : dataGroups.entrySet()) {
-            Map<String, String> groupDetail = new HashMap<>();
-            groupDetail.put("idGroup", dataGroup.getKey());
-            groupDetail.put("name", dataGroup.getValue());
-            arrayGroup.add( groupDetail);
-        }
-        calendarResponseFields.setGroup(arrayGroup);
+//        Map<String, String> dataGroups = Group.getGroup();
+//        ArrayList<Map<String, String>> arrayGroup = new ArrayList<>();
+//        for (Map.Entry<String, String> dataGroup : dataGroups.entrySet()) {
+//            Map<String, String> groupDetail = new HashMap<>();
+//            groupDetail.put("idGroup", dataGroup.getKey());
+//            groupDetail.put("name", dataGroup.getValue());
+//            arrayGroup.add( groupDetail);
+//        }
+//        calendarResponseFields.setGroup(arrayGroup);
 
         // day
         Map<String, String> dataDays = Day.getDay();
@@ -139,39 +115,35 @@ public class CalendarServiceImpl implements ICalendarService {
             Map<String, String> roomDetails = new TreeMap<>();
             roomDetails.put("idRoom", roomEntity.getId().toString());
             roomDetails.put("quantity", roomEntity.getNumberOfComputers().toString());
-            roomDetails.put("facility", roomEntity.getFacilityEntityRoom().getNameFacility());
+            roomDetails.put("facility", roomEntity.getFacility());
             arrayRoom.add(roomDetails);
         }
         calendarResponseFields.setRoom(arrayRoom);
 
-        // practiceCases
-//        DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-//        List<PracticeCaseEntity> practiceCaseEntities = this.iPracticeCaseRepository.findAll();
-//        Map<String, Map<String, String>> practiceCases = new TreeMap<>();
-//        for (PracticeCaseEntity practiceCaseEntity : practiceCaseEntities) {
-//            Map<String, String> practiceCaseDetails = new TreeMap<>();
-//            practiceCaseDetails.put("name", practiceCaseEntity.getNamePracticeCase());
-//            practiceCaseDetails.put("timeStart", practiceCaseEntity.getTimeStart().format(dateTimeFormat));
-//            practiceCaseDetails.put("timeEnd", practiceCaseEntity.getTimeEnd().format(dateTimeFormat));
-//            practiceCases.put(practiceCaseEntity.getId().toString(), practiceCaseDetails);
-//        }
-        // subjects
-//        List<SubjectEntity> subjectEntities = this.iSubjectRepository.findAll();
-//        Map<String, Map<String, String>> subjects = new TreeMap<>();
-//        for (SubjectEntity subjectEntity : subjectEntities) {
-//            Map<String, String> subjectDetails = new TreeMap<>();
-//            subjectDetails.put("name", subjectEntity.getNameSubject());
-//            subjectDetails.put("credit", subjectEntity.getSoTTH().toString());
-//            subjects.put(subjectEntity.getId().toString(), subjectDetails);
-//        }
 
-//        Map<String, Map<String, String>> field = new TreeMap<>();
-//        field.put("purposeUses", purposeUse);
-//        field.put("teachers", teachers);
 
         return calendarResponseFields;
     }
 
+    @Override
+    public ArrayList<Map<String, String>> handleWeekStudyForCreateCreditClass(Long codeCreditClass) {
+        CreditClassEntity creditClass = this.iCreditClassRepository.findCreditClassEntityById(codeCreditClass);
+
+        SubjectEntity subject = creditClass.getSubject();
+        Long semesterOfSubject = Long.valueOf(subject.getSemesterPlan().substring(0,1)) ;
+
+        // week_semester  on 2024-2025
+        List<WeekSemesterEntity> weekSemesterEntities = this.iWeekSemesterRepository.findAllBySemesterStudy(semesterOfSubject);
+        ArrayList<Map<String, String>> arrayWeekSemester = new ArrayList<>();
+        for (WeekSemesterEntity weekSemesterEntity : weekSemesterEntities) {
+            Map<String, String> weekSemesterDetails = new TreeMap<>();
+            weekSemesterDetails.put("idWeekSemester", weekSemesterEntity.getId().toString());
+            weekSemesterDetails.put("time", "Week :" + weekSemesterEntity.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntity.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntity.getDateEnd()) + "]");
+            arrayWeekSemester.add(weekSemesterDetails);
+        }
+
+        return arrayWeekSemester;
+    }
 
 
     @Override
@@ -196,17 +168,17 @@ public class CalendarServiceImpl implements ICalendarService {
 
         // WeekSemester
         // semester 2 year 2024-2025
-        SemesterEntity semester = this.iSemesterRepository.findSemesterEntityById(2L);
-        // week_semester  on 2024-2025
-        List<WeekSemesterEntity> weekSemesterEntities = this.iWeekSemesterRepository.findAllBySemester(semester);
-        ArrayList<Map<String, String>> arrayWeekSemester = new ArrayList<>();
-        for (WeekSemesterEntity weekSemesterEntity : weekSemesterEntities) {
-            Map<String, String> weekSemesterDetails = new TreeMap<>();
-            weekSemesterDetails.put("idWeekSemester", weekSemesterEntity.getId().toString());
-            weekSemesterDetails.put("time", weekSemesterEntity.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntity.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntity.getDateEnd()) + "]");
-            arrayWeekSemester.add(weekSemesterDetails);
-        }
-        calendarResponseFields.setWeekSemester(arrayWeekSemester);
+//        SemesterEntity semester = this.iSemesterRepository.findSemesterEntityById(2L);
+//        // week_semester  on 2024-2025
+//        List<WeekSemesterEntity> weekSemesterEntities = this.iWeekSemesterRepository.findAllBySemester(semester);
+//        ArrayList<Map<String, String>> arrayWeekSemester = new ArrayList<>();
+//        for (WeekSemesterEntity weekSemesterEntity : weekSemesterEntities) {
+//            Map<String, String> weekSemesterDetails = new TreeMap<>();
+//            weekSemesterDetails.put("idWeekSemester", weekSemesterEntity.getId().toString());
+//            weekSemesterDetails.put("time", weekSemesterEntity.getWeek().getNameWeek() + "[From " + DateUtils.convertToString(weekSemesterEntity.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntity.getDateEnd()) + "]");
+//            arrayWeekSemester.add(weekSemesterDetails);
+//        }
+//        calendarResponseFields.setWeekSemester(arrayWeekSemester);
 
 
         // day
@@ -239,7 +211,7 @@ public class CalendarServiceImpl implements ICalendarService {
             Map<String, String> roomDetails = new TreeMap<>();
             roomDetails.put("idRoom", roomEntity.getId().toString());
             roomDetails.put("quantity", roomEntity.getNumberOfComputers().toString());
-            roomDetails.put("facility", roomEntity.getFacilityEntityRoom().getNameFacility());
+            roomDetails.put("facility", roomEntity.getFacility());
             arrayRoom.add(roomDetails);
         }
         calendarResponseFields.setRoom(arrayRoom);
@@ -256,7 +228,7 @@ public class CalendarServiceImpl implements ICalendarService {
         calendarResponseOneDto.setCalendarId(calendarEntity.getId().toString());
         calendarResponseOneDto.setCreditClassId(calendarEntity.getCreditClass() != null ? calendarEntity.getCreditClass().getId().toString() : null);
         calendarResponseOneDto.setUserIdMp_Fk(calendarEntity.getUser()!=null ?calendarEntity.getUser().getFirstName()+ calendarEntity.getUser().getLastName() : null );
-        calendarResponseOneDto.setGroupId(calendarEntity.getGroup() != null ? calendarEntity.getGroup() : null);
+//        calendarResponseOneDto.setGroupId(calendarEntity.getGroup() != null ? calendarEntity.getGroup() : null);
         calendarResponseOneDto.setWeekSemesterId(calendarEntity.getWeekSemester().getId().toString());
         calendarResponseOneDto.setDayId(calendarEntity.getDay().toString());
         calendarResponseOneDto.setPracticeCaseBeginId(calendarEntity.getPracticeCase().getId().toString());
@@ -286,8 +258,8 @@ public class CalendarServiceImpl implements ICalendarService {
                if (!checkExisting1) {
                    CalendarEntity calendarEntity1 = new CalendarEntity();
                    calendarEntity1.setCreditClass(creditClass);
-                   calendarEntity1.setGroup("0" + calendarRequestDto.getGroupId1());
-                   calendarEntity1.setOrganization("01");
+//                   calendarEntity1.setGroup("0" + calendarRequestDto.getGroupId1());
+//                   calendarEntity1.setOrganization("01");
                    calendarEntity1.setWeekSemester(weekSemester1);
                    calendarEntity1.setDay(day1);
                    calendarEntity1.setPracticeCase(practiceCase1);
@@ -300,7 +272,7 @@ public class CalendarServiceImpl implements ICalendarService {
                    return ResponseEntity.ok().body("Create calendar success");
                }else {
                    throw new  CalendarException("Existed  calendar 1 with day : " +
-                           day1 + " ,"+weekSemester1.getWeek().getNameWeek() + " Time : [" +
+                           day1 + " , Week : "+weekSemester1.getWeekStudy() + " Time : [" +
                            DateUtils.convertToString(weekSemester1.getDateBegin())
                            + "]-["
                            + DateUtils.convertToString(weekSemester1.getDateEnd())
@@ -330,8 +302,8 @@ public class CalendarServiceImpl implements ICalendarService {
             if (!checkExisting1) {
                 CalendarEntity calendarEntity1 = new CalendarEntity();
                 calendarEntity1.setCreditClass(creditClass);
-                calendarEntity1.setGroup("0" + calendarRequestDto.getGroupId1());
-                calendarEntity1.setOrganization("01");
+//                calendarEntity1.setGroup("0" + calendarRequestDto.getGroupId1());
+//                calendarEntity1.setOrganization("01");
                 calendarEntity1.setWeekSemester(weekSemester1);
                 calendarEntity1.setDay(day1);
                 calendarEntity1.setPracticeCase(practiceCase1);
@@ -353,8 +325,8 @@ public class CalendarServiceImpl implements ICalendarService {
                      if (!checkExisting2) {
                          CalendarEntity calendarEntity2 = new CalendarEntity();
                          calendarEntity2.setCreditClass(creditClass);
-                         calendarEntity2.setGroup("0" + calendarRequestDto.getGroupId2());
-                         calendarEntity2.setOrganization("01");
+//                         calendarEntity2.setGroup("0" + calendarRequestDto.getGroupId2());
+//                         calendarEntity2.setOrganization("01");
                          calendarEntity2.setWeekSemester(weekSemester2);
                          calendarEntity2.setDay(day2);
                          calendarEntity2.setPracticeCase(practiceCase2);
@@ -366,7 +338,7 @@ public class CalendarServiceImpl implements ICalendarService {
                      } else {
 
                          throw new  CalendarException("Existed a calendar 2 day : " +
-                                 day2 + " ,"+weekSemester2.getWeek().getNameWeek()+" Time : [" +
+                                 day2 + " , Week : "+weekSemester2.getWeekStudy()+" Time : [" +
                                  DateUtils.convertToString(weekSemester2.getDateBegin())
                                  + "]-["
                                  + DateUtils.convertToString(weekSemester2.getDateEnd())
@@ -383,7 +355,7 @@ public class CalendarServiceImpl implements ICalendarService {
 
             } else {
                 throw new  CalendarException("Existed a calendar 1 day : " +
-                        day1 + " ,"+weekSemester1.getWeek().getNameWeek()+" Time : [" +
+                        day1 + " , Week : "+weekSemester1.getWeekStudy()+" Time : [" +
                         DateUtils.convertToString(weekSemester1.getDateBegin())
                         + "]-["
                         + DateUtils.convertToString(weekSemester1.getDateEnd())
@@ -420,8 +392,8 @@ public class CalendarServiceImpl implements ICalendarService {
                 CalendarEntity calendar = new CalendarEntity();
                 calendar.setCreditClass(null);
                 calendar.setUser(userIdMp_FK);
-                calendar.setGroup(null);
-                calendar.setOrganization(null);
+//                calendar.setGroup(null);
+//                calendar.setOrganization(null);
                 calendar.setWeekSemester(weekSemester);
                 calendar.setDay(day);
                 calendar.setPracticeCase(practiceCase);
@@ -432,7 +404,7 @@ public class CalendarServiceImpl implements ICalendarService {
                 return ResponseEntity.ok().body("Create calendar rent room success");
             }else {
                 throw new  CalendarException("Existed a calendar with day : " +
-                        day + " ,"+weekSemester.getWeek().getNameWeek()+" Time : [" +
+                        day + " , Week :"+weekSemester.getWeekStudy()+" Time : [" +
                         DateUtils.convertToString(weekSemester.getDateBegin())
                         + "]-["
                         + DateUtils.convertToString(weekSemester.getDateEnd())
@@ -477,7 +449,7 @@ public class CalendarServiceImpl implements ICalendarService {
                 return ResponseEntity.ok().body("Update calendar success");
             } else {
                 throw new  CalendarException("Existed a calendar with day : " +
-                        dayNew + " ,"+weekSemesterNew.getWeek().getNameWeek()+" Time : [" +
+                        dayNew + " , Week : "+weekSemesterNew.getWeekStudy()+" Time : [" +
                         DateUtils.convertToString(weekSemesterNew.getDateBegin())
                         + "]-["
                         + DateUtils.convertToString(weekSemesterNew.getDateEnd())

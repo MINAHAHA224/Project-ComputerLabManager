@@ -1,7 +1,9 @@
 package com.example.computerweb.components;
 
 import com.example.computerweb.customexceptions.InvalidParamException;
+import com.example.computerweb.models.entity.AccountEntity;
 import com.example.computerweb.models.entity.UserEntity;
+import com.example.computerweb.repositories.IAccountRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,6 +27,8 @@ public class JwtTokenUtil {
     private int expiration;
     @Value("${jwt.secretKey}")
     private String secretKey;
+
+    private final IAccountRepository iAccountRepository;
 
     public String generateToken(UserEntity user) throws Exception {
         Map<String, Object> claims = new HashMap<>();
@@ -77,10 +81,15 @@ public class JwtTokenUtil {
     public boolean validateToken ( String token , UserDetails userDetails){
 
         String emailOfToken = extractClaim(token , Claims::getSubject);
-        if (emailOfToken.equals(userDetails.getUsername()) && !isTokenExpired(token)  )
-        {
-            return true;
+        AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(userDetails.getUsername()).get();
+        String tokenDb = account.getToken();
+        if ( tokenDb != null && !tokenDb.isEmpty()){
+            if (emailOfToken.equals(userDetails.getUsername()) && !isTokenExpired(token) && token.trim().equals(tokenDb.trim())  )
+            {
+                return true;
+            }
         }
+
        return false;
     }
 

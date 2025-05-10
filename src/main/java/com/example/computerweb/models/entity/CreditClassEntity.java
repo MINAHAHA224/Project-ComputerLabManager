@@ -19,14 +19,21 @@ public class CreditClassEntity implements Serializable {
     @Column(name = "LopTinChiID")
     private Long id;
 
+    @Column(name = "tenLopTinChi")
+    private String nameCreditClass;
+
     @Column(name = "SoTC")
     private Long credits;
 
-    @ManyToOne
-    @JoinColumn(name = "Lop_FK")
-    private ClassroomEntity classroom;
+    @Column(name = "Nhom")
+    private String group;
 
-    @OneToOne
+    @Column(name = "SoLuongSvLTC")
+    private Long numberOfStudentsLTC;
+
+
+
+    @ManyToOne
     @JoinColumn(name = "MonHoc_FK")
     private SubjectEntity subject;
 
@@ -36,4 +43,11 @@ public class CreditClassEntity implements Serializable {
 
     @OneToMany(mappedBy = "creditClass")
     private List<CalendarEntity> calendarEntities;
+
+    @OneToMany(mappedBy = "creditClass" , cascade = {CascadeType.REMOVE  } , orphanRemoval = true)
+    private List<CreditClassToEntity> creditClassToEntities;
+
+    @ManyToOne
+    @JoinColumn(name = "Lop_FK")
+    private ClassroomEntity classroom;
 }

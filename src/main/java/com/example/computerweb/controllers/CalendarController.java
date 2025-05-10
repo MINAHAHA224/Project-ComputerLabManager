@@ -1,36 +1,26 @@
 package com.example.computerweb.controllers;
 
-import com.example.computerweb.DTO.dto.CalendarManagementDto;
-import com.example.computerweb.DTO.dto.CalendarResponseDto;
-import com.example.computerweb.DTO.dto.CalendarResponseFields;
-import com.example.computerweb.DTO.dto.HomeResponseDto;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarManagementDto;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseDto;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseFields;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestOneDto;
-import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestRoomDto;
-import com.example.computerweb.models.entity.CalendarEntity;
-import com.example.computerweb.models.entity.UserEntity;
-import com.example.computerweb.models.enums.PurposeUse;
 import com.example.computerweb.services.ICalendarService;
-import com.example.computerweb.services.IUserService;
-import com.example.computerweb.utils.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 
 @RestController
@@ -66,6 +56,14 @@ public class CalendarController {
         CalendarResponseFields data = this.iCalendarService.handleGetDataForCreatePage();
         return new ResponseSuccess<>(HttpStatus.OK.value(),"Execute data success" ,data );
     }
+
+    @Operation(summary = "GVU Choose WeekStudy" , description = "GVU Choose WeekStudy when choose CreditClass", security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping("/calendarManagement/weekSemester/{creditClassId}")
+    public ResponseData<?> getWeekStudyForCreateCreditClass(@PathVariable("creditClassId") Long codeCreditClass){
+        ArrayList<Map<String, String>> data = this.iCalendarService.handleWeekStudyForCreateCreditClass(codeCreditClass);
+        return new ResponseSuccess<>(HttpStatus.OK.value(),"Execute data success" ,data );
+    }
+
     @Operation(summary = "Post info calendar, only of GVU" , description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/calendarManagement/create")
     public ResponseData<?> getCreateCalendar (@RequestBody CalendarRequestDto calendarRequestDto){

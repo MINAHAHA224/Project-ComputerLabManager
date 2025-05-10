@@ -1,4 +1,4 @@
-package com.example.computerweb.DTO.dto;
+package com.example.computerweb.DTO.dto.notificationResponse;
 
 import lombok.*;
 

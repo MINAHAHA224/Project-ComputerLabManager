@@ -1,6 +1,11 @@
 package com.example.computerweb.controllers;
 
-import com.example.computerweb.DTO.dto.*;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseDto;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseFields;
+import com.example.computerweb.DTO.dto.notificationResponse.NotificationDetailResponseDto;
+import com.example.computerweb.DTO.dto.notificationResponse.NotificationResponseDto;
+import com.example.computerweb.DTO.dto.requestTicketResponse.RequestTicketResponseDto;
+import com.example.computerweb.DTO.dto.ticketResponse.TicketResponseMgmDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
@@ -8,8 +13,6 @@ import com.example.computerweb.DTO.requestBody.ticketRequest.*;
 import com.example.computerweb.services.ICalendarService;
 import com.example.computerweb.services.ITicketRequestService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -54,7 +57,7 @@ public class RequestController {
     @Operation(summary = "This feature only for GV" , description = "When GV action change calendar", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/requestChangeCalendar/{calendarId}")
     public  ResponseData<?> getCreateTicket (@PathVariable("calendarId") Long calendarId){
-        CalendarResponseDto   data = this.iTicketRequestService.handleGetCreateTicketChangeCalendar(calendarId);
+        CalendarResponseDto data = this.iTicketRequestService.handleGetCreateTicketChangeCalendar(calendarId);
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" ,data );
     }
 
@@ -87,7 +90,7 @@ public class RequestController {
     @Operation(summary = "This feature only for GV" , description = "When GV action rent room", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/requestRentRoom")
     public  ResponseData<?> getPageRentRoom (){
-        CalendarResponseFields   calendarResponseFields = this.iCalendarService.handleGetDataForCreateRoomPage();
+        CalendarResponseFields calendarResponseFields = this.iCalendarService.handleGetDataForCreateRoomPage();
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success " ,calendarResponseFields);
     }
 

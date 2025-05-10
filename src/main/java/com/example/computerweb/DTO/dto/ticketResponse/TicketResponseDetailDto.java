@@ -1,4 +1,4 @@
-package com.example.computerweb.DTO.dto;
+package com.example.computerweb.DTO.dto.ticketResponse;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;

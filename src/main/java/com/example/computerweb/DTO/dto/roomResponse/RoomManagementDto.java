@@ -1,4 +1,4 @@
-package com.example.computerweb.DTO.dto;
+package com.example.computerweb.DTO.dto.roomResponse;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
@@ -14,11 +14,9 @@ import lombok.*;
 @ToString
 public class RoomManagementDto {
 
-    private String id ;
-
-
+    private Long id ;
     private  String nameRoom ;
-
-
-    private String numberOfComputers;
+    private Long numberOfComputers;
+    private Long numberOfComputerError;
+    private String facility;
 }

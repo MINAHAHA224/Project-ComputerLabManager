@@ -12,4 +12,6 @@ import java.util.List;
 public interface IRoomRepository  extends JpaRepository<RoomEntity , Long> , RoomRepositoryCustom {
 
     RoomEntity findRoomEntityById ( Long id);
+
+    boolean existsByNameRoom ( String nameRoom);
 }

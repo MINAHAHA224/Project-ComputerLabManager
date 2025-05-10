@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.ExceptionHandlingDsl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,8 +41,8 @@ public class WebSecurityConfig {
         http
             // Error Code : 403 Forbidden of SpringSecurity
 
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // API dạng RESTful không dùng CSRF.
+
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .addFilterBefore(this.jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 // minh addFilterBefore bởi vì mình muốn check JWT truoc , va trong cong doan check JWT a
@@ -51,12 +52,12 @@ public class WebSecurityConfig {
                     request.requestMatchers(
                             "/access/login" , "/access/forgotPassword"  ).permitAll();
                     request.requestMatchers(
-                            "/calendarManagement/**" , "/userManagement/**" ).hasRole("GVU");
-                    request.requestMatchers("/roomManagement").hasRole("CSVC");
+                            "/calendarManagement/**" , "/userManagement/**" , "/creditClassManagement/**" ,"/creditClassManagement" ).hasRole("GVU");
+                    request.requestMatchers("/roomManagement" ,"/roomManagement/**" ).hasRole("CSVC");
                     request.requestMatchers("/requestChangeCalendar/**" ,"/requestRentRoom" , "/notification/**"
                             , "/requestTickets" ,"/requestTickets/**" , "/requestRentRoomDelete").hasRole("GV");
                     request.requestMatchers("/requestManagement").hasAnyRole("GVU" , "CSVC");
-                    request.requestMatchers("/calendar" , "/home"  , "/profile").hasAnyRole("GVU" , "CSVC" , "GV");
+                    request.requestMatchers("/calendar" , "/home"  , "/profile" , "/access/logout").hasAnyRole("GVU" , "CSVC" , "GV");
                     request.requestMatchers("/actuator/**", "/v3/**", "/webjars/**"
                             , "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**").permitAll();
                     request.anyRequest().authenticated();

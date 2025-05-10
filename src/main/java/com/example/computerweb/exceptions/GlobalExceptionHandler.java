@@ -89,7 +89,7 @@ public class GlobalExceptionHandler {
             int messageEnd = message.lastIndexOf("]");
             message = message.substring(messageStart + 1 , messageEnd - 1);
         }else if ( e instanceof  HttpMessageNotReadableException ) {
-            message = "expected format yyyy-MM-dd";
+            message = "expected format String of Json  or  yyyy-MM-dd";
         } else if ( e instanceof  ConstraintViolationException )
         {
             message = "userId must greater than 0";

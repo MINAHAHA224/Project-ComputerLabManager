@@ -1,4 +1,4 @@
-package com.example.computerweb.DTO.dto;
+package com.example.computerweb.DTO.dto.calendarResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,7 +21,6 @@ public class CalendarManagementDto implements Serializable {
     private String nameSubject;
     private String group;
     private String combination;
-    private String codeClassroom;
     private String nameRoom;
     private String codeFacility;
     private String day;

@@ -1,4 +1,4 @@
-package com.example.computerweb.DTO.dto;
+package com.example.computerweb.DTO.dto.creditClassResponse;
 
 import lombok.*;
 
@@ -10,9 +10,8 @@ import lombok.*;
 public class CreditClassEligibleDto {
 
     private String creditClassId;
-    private String codeSubject ;
+    private String codeCreditClass ;
     private String nameSubject;
-    private String codeClassroom;
     private String studentClassroom;
     private String lessonSum;
     private String lessonHave;

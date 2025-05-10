@@ -1,5 +1,6 @@
-package com.example.computerweb.DTO.dto;
+package com.example.computerweb.DTO.dto.requestTicketResponse;
 
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseFields;
 import lombok.*;
 
 @Getter

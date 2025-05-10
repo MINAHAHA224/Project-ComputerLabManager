@@ -24,7 +24,6 @@ import java.util.List;
 public class CalendarRequestDto {
     @JsonProperty("creditClassId")
     @Schema(type = "Long",  example = "1")
-
     private Long creditClassId;
 
 //Group 1

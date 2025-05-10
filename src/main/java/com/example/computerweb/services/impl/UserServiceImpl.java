@@ -1,9 +1,9 @@
 package com.example.computerweb.services.impl;
 
-import com.example.computerweb.DTO.dto.ProfileResponseDto;
-import com.example.computerweb.DTO.dto.UserResponseDto;
-import com.example.computerweb.DTO.dto.UserCreateMgnDto;
-import com.example.computerweb.DTO.dto.UserManagementDto;
+import com.example.computerweb.DTO.dto.userResponse.ProfileResponseDto;
+import com.example.computerweb.DTO.dto.userResponse.UserResponseDto;
+import com.example.computerweb.DTO.dto.userResponse.UserCreateMgnDto;
+import com.example.computerweb.DTO.dto.userResponse.UserManagementDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
 import com.example.computerweb.DTO.requestBody.userRequest.UserMngProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.userRequest.UserProfileRequestDto;
@@ -122,6 +122,7 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
+    @Transactional
     public ResponseEntity<String> handleLogin(UserLoginDto userLoginDTO) {
         boolean existsEmail = this.iAccountRepository.existsByEmail(userLoginDTO.getEmail());
         if (existsEmail) {
@@ -148,6 +149,15 @@ public class UserServiceImpl implements IUserService {
                     // va thang token hien tai cua JWT a minh chi co email, thoi gian het han chu khong co role boi vi role la minh dùng UsernamePasswordAuthenticationToken ket hop securityFilterChain check roi
                     // ==> trong jwt cua minh ko co quyen chi co moi email va thoi gian het han token jwt thoi
                     String token = this.jwtTokenUtil.generateToken(userCurrent);
+                    try {
+                        accountEntity.setToken(token);
+                        this.iAccountRepository.save(accountEntity);
+                    }catch (RuntimeException e){
+                        System.out.println("--ER save account token " + e.getMessage());
+                        e.printStackTrace();
+                    }
+
+
                     return ResponseEntity.ok().body(token);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -161,6 +171,24 @@ public class UserServiceImpl implements IUserService {
 
         return ResponseEntity.badRequest().body("Email  incorrect");
 
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> handleLogout() {
+        String email = SecurityUtils.getPrincipal();
+        // handle set token account = null when logout
+        try {
+            AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(email).get();
+            account.setToken(null);
+            this.iAccountRepository.save(account);
+            return  ResponseEntity.ok().body("Logout success");
+        }catch (RuntimeException e){
+            System.out.println("--ER logout set account token = null fail");
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.badRequest().body("Logout failed");
     }
 
     @Override

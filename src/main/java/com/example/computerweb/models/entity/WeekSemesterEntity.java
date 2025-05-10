@@ -19,7 +19,13 @@ public class WeekSemesterEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TuanHoc_KiHoc_Id")
+
     private Long id;
+    @Column(name = "TuanHocId")
+    private Long weekStudy;
+
+    @Column(name = "HocKyId")
+    private Long semesterStudy;
 
     @Column(name = "NgayBatDau")
     private Date dateBegin;
@@ -27,13 +33,8 @@ public class WeekSemesterEntity implements Serializable {
     @Column(name = "NgayKetThuc")
     private Date dateEnd;
 
-    @ManyToOne
-    @JoinColumn(name = "TuanHocId")
-    private WeekStudyEntity week;
-
-    @ManyToOne
-    @JoinColumn(name= "HocKyId")
-    private SemesterEntity semester;
+    @Column(name = "NamHoc")
+    private String yearStudy;
 
     @OneToMany(mappedBy = "weekSemester")
     private List<CalendarEntity> calendarEntities;

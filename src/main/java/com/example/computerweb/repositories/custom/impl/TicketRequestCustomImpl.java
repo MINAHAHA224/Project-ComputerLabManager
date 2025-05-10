@@ -1,25 +1,17 @@
 package com.example.computerweb.repositories.custom.impl;
 
-import com.example.computerweb.DTO.dto.TicketResponseMgmDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketRequestOneDto;
 import com.example.computerweb.models.entity.*;
 import com.example.computerweb.repositories.*;
 import com.example.computerweb.repositories.custom.TicketRequestCustom;
 import com.example.computerweb.utils.DateUtils;
-import com.example.computerweb.utils.SecurityUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.sql.Timestamp;
 

@@ -1,8 +1,6 @@
 package com.example.computerweb.repositories.custom;
 
-import com.example.computerweb.DTO.dto.CalendarManagementDto;
-
-import org.springframework.stereotype.Repository;
+import com.example.computerweb.DTO.dto.calendarResponse.CalendarManagementDto;
 
 import java.util.List;
 

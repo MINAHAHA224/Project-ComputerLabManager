@@ -19,5 +19,6 @@ public interface ICalendarRepository extends JpaRepository<CalendarEntity , Long
         // check exist rent room
         boolean existsByWeekSemesterAndDayAndPracticeCaseAndRoomAndStatus(WeekSemesterEntity weekSemester , Long day , PracticeCaseEntity practiceCase, RoomEntity room , StatusEntity status);
 
+        boolean existsByCreditClass ( CreditClassEntity creditClass);
         void deleteById( Long id);
 }

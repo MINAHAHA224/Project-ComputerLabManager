@@ -37,12 +37,13 @@ public class SubjectEntity {
     @Column(name = "TongTC")
     private Long allCredit;
 
-    @OneToOne(mappedBy = "subject")
-    private CreditClassEntity creditClassEntity;
+    @Column(name = "KeHoachHocKy")
+    private  String semesterPlan;
 
-    @ManyToOne
-    @JoinColumn(name = "HocKy_FK")
-    private  SemesterEntity semester;
+    @OneToMany(mappedBy = "subject")
+    private List<CreditClassEntity>  creditClassEntities;
+
+
 
 
 

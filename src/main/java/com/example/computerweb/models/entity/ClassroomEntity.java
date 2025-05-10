@@ -31,9 +31,9 @@ public class ClassroomEntity {
     @JoinColumn(name = "CVHT_FK")
     private  AdvisorEntity advisor;
 
+
     @OneToMany(mappedBy = "classroom")
     private List<CreditClassEntity> creditClassEntities;
-
 
 
 

@@ -12,6 +12,8 @@ public interface IAccountRepository extends JpaRepository<AccountEntity , Long> 
 
    Optional<AccountEntity>  findAccountEntityByEmail (String email);
 
+
+
    AccountEntity findAccountEntityByEmailOfPersonal ( String email);
    boolean existsByEmail ( String email);
 
