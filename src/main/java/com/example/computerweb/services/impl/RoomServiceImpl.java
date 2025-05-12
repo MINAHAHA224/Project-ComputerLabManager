@@ -39,9 +39,9 @@ public class RoomServiceImpl  implements IRoomService {
             data.add(roomManagementDto);
         }
         if( data!=null && !data.isEmpty()){
-            return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" , data) ;
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" , data) ;
         }else {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "No data");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Không có dữ liệu");
         }
 
     }
@@ -52,7 +52,7 @@ public class RoomServiceImpl  implements IRoomService {
         boolean checkExistNameRoom = this.iRoomRepository.existsByNameRoom(roomCreateRqDto.getNameRoom().trim());
         FacilityEntity facility = this.iFacilityRepository.findFacilityEntityById(roomCreateRqDto.getFacility());
         if (checkExistNameRoom ){
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Name room is duplicate");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Tên phòng trùng lặp");
         }
         RoomEntity room = new RoomEntity();
         try {
@@ -63,11 +63,11 @@ public class RoomServiceImpl  implements IRoomService {
 
             this.iRoomRepository.save(room);
 
-            return new ResponseSuccess<>(HttpStatus.OK.value(), "Create room success");
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Tạo phòng thành công");
         }catch (RuntimeException e){
             System.out.println("--ER : handleCreateRoom " +e.getMessage());
             e.printStackTrace();
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Create room fail");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Tạo phòng thất bại");
         }
 
     }
@@ -83,7 +83,7 @@ public class RoomServiceImpl  implements IRoomService {
         result.setNumberOfComputerError(room.getNumberOfComputerError());
         result.setFacility(room.getFacility().getId());
 
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" ,result );
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" ,result );
     }
 
     @Override
@@ -95,7 +95,7 @@ public class RoomServiceImpl  implements IRoomService {
         if ( !roomCurrent.getNameRoom().trim().equals(roomUpdateRqDto.getNameRoom().trim()) ){
             boolean checkNameUnique = this.iRoomRepository.existsByNameRoom(roomUpdateRqDto.getNameRoom().trim());
             if (checkNameUnique ){
-                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Name room is duplicated");
+                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Tên phòng bị trùng lặp");
             }
         }
         try {
@@ -104,11 +104,11 @@ public class RoomServiceImpl  implements IRoomService {
             roomCurrent.setNumberOfComputerError(roomUpdateRqDto.getNumberOfComputerError());
             roomCurrent.setFacility(facility);
             this.iRoomRepository.save(roomCurrent);
-            return new ResponseSuccess<>(HttpStatus.OK.value(), "Update room success");
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Cập nhật phòng thành công");
         }catch (RuntimeException e){
             System.out.println("--ER handlePostUpdateRoom :" + e.getMessage());
             e.printStackTrace();
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Update room fail");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Cập nhật phòng thất bại");
         }
 
     }
@@ -118,11 +118,11 @@ public class RoomServiceImpl  implements IRoomService {
     public ResponseData<?> handleDeleteRoom(Long idRoom) {
         try {
             this.iRoomRepository.deleteById(idRoom);
-            return new ResponseSuccess<>(HttpStatus.OK.value(), "Delete success");
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Xóa phòng thành công");
         }catch (RuntimeException e){
             System.out.println("--ER handleDeleteRoom " + e.getMessage());
             e.printStackTrace();
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Delete fail");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Xóa phòng thất bại");
         }
 
     }

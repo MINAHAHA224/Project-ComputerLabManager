@@ -41,13 +41,13 @@ public class CalendarController {
     public ResponseData<List<CalendarManagementDto>> getCalendar (){
         List<CalendarManagementDto> data = this.iCalendarService.handleGetAllDataCalendar();
 
-        return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , data );
+        return new ResponseData<>(HttpStatus.OK.value() , "Thực hiện thành công" , data );
     }
     @Operation(summary = "Show all data calendar admin page" , description = "GVU can setting update|delete on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement")
     public ResponseData<List<CalendarManagementDto>> getCalendarManagement (){
        List<CalendarManagementDto> data = this.iCalendarService.handleGetAllDataCalendar();
-            return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , data );
+            return new ResponseData<>(HttpStatus.OK.value() , "Thực hiện thành công" , data );
     }
 
     // Create Calendar
@@ -55,14 +55,14 @@ public class CalendarController {
     @GetMapping("/calendarManagement/create")
     public ResponseData<CalendarResponseFields> getCreateCalendarManagement (){
         CalendarResponseFields data = this.iCalendarService.handleGetDataForCreatePage();
-        return new ResponseSuccess<>(HttpStatus.OK.value(),"Execute data success" ,data );
+        return new ResponseSuccess<>(HttpStatus.OK.value(),"Thực hiện thành công" ,data );
     }
 
     @Operation(summary = "GVU Choose WeekStudy" , description = "GVU Choose WeekStudy when choose CreditClass", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement/{semesterYear}")
     public ResponseData<?> getWeekStudyForCreateCreditClass(@PathVariable("semesterYear") String semesterYear){
         ArrayList<Map<String, String>> data = this.iCalendarService.handleWeekStudyForCreateCreditClass(semesterYear);
-        return new ResponseSuccess<>(HttpStatus.OK.value(),"Execute data success" ,data );
+        return new ResponseSuccess<>(HttpStatus.OK.value(),"Thực hiện thành công" ,data );
     }
 
     @Operation(summary = "Post info calendar, only of GVU", description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
@@ -95,7 +95,7 @@ public class CalendarController {
     @GetMapping("/calendarManagement/update/{calendarId}")
     public ResponseData<CalendarResponseDto> getUpdateCalendar (@PathVariable("calendarId") Long calendarId ){
             CalendarResponseDto calendarManagementDto = this.iCalendarService.handleGetDataForUpdatePage(calendarId);
-            return new ResponseSuccess<>(HttpStatus.OK.value() , "Execute data success" , calendarManagementDto  );
+            return new ResponseSuccess<>(HttpStatus.OK.value() , "Thực hiện thành công" , calendarManagementDto  );
     }
 
     @Operation(summary = "Post info  calendar of user" , security = @SecurityRequirement(name = "bearerAuth"))
@@ -111,7 +111,7 @@ public class CalendarController {
     @DeleteMapping  ("/calendarManagement/delete/{calendarId}")
     public ResponseData<?>  postDeleteCalendar (@PathVariable("calendarId") String calendarId){
         this.iCalendarService.handleDeleteCalendar(calendarId);
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Delete calendar success");
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Xóa lịch thành công");
     }
 
 

@@ -19,21 +19,21 @@ public class CalendarRequestOneDto {
 
     @JsonProperty("weekSemesterId")
     @Schema(type = "Long", example = "1")
-    @NotNull(message = "Week Semester ID không được để trống")
+    @NotNull(message = "Tuần học không được để trống")
     private Long weekSemesterId;
 
     @JsonProperty("dayId")
     @Schema(type = "Long", example = "1")
-    @NotNull(message = "Day ID không được để trống")
+    @NotNull(message = "Thứ không được để trống")
     private Long dayId;
 
     @JsonProperty("practiceCaseBeginId")
     @Schema(type = "Long", example = "1")
-    @NotNull(message = "Practice Case Begin ID không được để trống")
+    @NotNull(message = "Tiết bắt đầu không được để trống")
     private Long practiceCaseBeginId;
 
     @JsonProperty("purposeUse")
     @Schema(type = "String", example = "can be blank")
-    @Size(max = 255, message = "Purpose Use không được vượt quá 255 ký tự")
+    @Size(max = 255, message = "Ghi chú không được vượt quá 255 ký tự")
     private String purposeUse;
 }

@@ -168,7 +168,7 @@ public class CalendarServiceImpl implements ICalendarService {
         for (WeekTimeDto result : listResult) {
             Map<String, String> resultDetails = new TreeMap<>();
             resultDetails.put("idWeekTime",result.getIdWeekTime());
-            resultDetails.put("time", "Week " + result.getWeek() + " [From " + DateUtils.convertToString(result.getTimeBegin()) + " to " + DateUtils.convertToString(result.getTimeEnd()) + "]");
+            resultDetails.put("time", "Tuần " + result.getWeek() + " [Từ " + DateUtils.convertToString(result.getTimeBegin()) + " đến " + DateUtils.convertToString(result.getTimeEnd()) + "]");
             arrayWeekTime.add(resultDetails);
         }
 
@@ -281,6 +281,111 @@ public class CalendarServiceImpl implements ICalendarService {
         return calendarResponseDto;
     }
 
+//    @Override
+//    @Transactional
+//    public ResponseData<?> handleCreateCalendar(CalendarRequestDto calendarRequestDto) {
+//        //LTC
+//        CreditClassEntity creditClass = this.iCreditClassRepository.findCreditClassEntityById(calendarRequestDto.getCreditClassId());
+//        //SLSV
+//        Long numberOfStudent = creditClass.getNumberOfStudentsLTC();
+//        // CoSo
+//        FacilityEntity facility = this.iFacilityRepository.findFacilityEntityById(calendarRequestDto.getIdFacility());
+//        // Danh sach phong cua co so
+//        List<RoomEntity> listRoom = this.iRoomRepository.findRoomEntitiesByFacility(facility);
+//
+//        // check credit class if lessonCurrent = lessonDb can't create calendar
+//        List<CreditClassEligibleDto> listCredit = this.iCreditClassRepository.findAllCreditClassEligible();
+//        for ( CreditClassEligibleDto credit : listCredit ){
+//            if ( credit.getCreditClassId().equals(calendarRequestDto.getCreditClassId().toString())    && credit.getLessonHave().equals(credit.getLessonSum()) ){
+//                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Credit created full , please choose another credit");
+//            }
+//        }
+//
+//        Map<String , String> messageIfCreateSuccessButRoomHaveComputerError = new HashMap<>();
+//
+//
+//        List<CalendarRequestDetailDto> listCalendarCreate = calendarRequestDto.getCalendarDetail();
+//        try {
+//            for (CalendarRequestDetailDto calendarCreate : listCalendarCreate) {
+//
+//                WeekSemesterEntity weekSemester = this.iWeekSemesterRepository.findWeekSemesterEntityById(calendarCreate.getWeekSemesterId()) ;
+//                Long day = calendarCreate.getDayId();
+//                PracticeCaseEntity practiceCase = this.iPracticeCaseRepository.findPracticeCaseEntityById(calendarCreate.getPracticeCaseBeginId());
+//                Long allCase = calendarCreate.getAllCase();
+//                String note = calendarCreate.getPurposeUse();
+//                String toHop = "0"+ calendarCreate.getGroupId();
+//                // 6 : Active
+//                StatusEntity status = this.iStatusRepository.findStatusEntityById(6L);
+//                CalendarEntity newCalendar = new CalendarEntity();
+//
+//                // check Number of case must greater than allCase
+//                Long countPracticeCase = this.iPracticeCaseRepository.count();
+//                if ( countPracticeCase - practiceCase.getId() + 1 < allCase){
+//                    return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Number of case must greater than allCase");
+//                }
+//
+//
+//                // choose the room can create
+//                Iterator<RoomEntity> iterator = listRoom.iterator();
+//                while (iterator.hasNext()){
+//                    RoomEntity room = iterator.next();
+//                    boolean checkCalendarExistRoom = this.iCalendarRepository.existsByWeekSemesterAndDayAndPracticeCaseAndRoomAndStatus(weekSemester,day,practiceCase,room,status);
+//                    if ( ! checkCalendarExistRoom){
+//                        newCalendar.setRoom(room);
+//                        break;
+//                    }
+//                }
+//                // if does not have any room to create calendar
+//                if ( newCalendar.getRoom()== null){
+//                    throw new  CalendarException("Calendar : " +
+//                            day + " , Week : "+weekSemester.getWeekStudy() + " Time : [" +
+//                           DateUtils.convertToString(weekSemester.getDateBegin())
+//                           + "]-["
+//                           + DateUtils.convertToString(weekSemester.getDateEnd())
+//                           + "]"
+//                           + " , PracticeCaseBegin : "
+//                           + practiceCase.getNamePracticeCase() + "does not have Room empty , please choose Another "
+//                   );
+//                }
+//
+//                // set data
+//                newCalendar.setCreditClass(creditClass);
+//                newCalendar.setWeekSemester(weekSemester);
+//                newCalendar.setDay(day);
+//                newCalendar.setPracticeCase(practiceCase);
+//                newCalendar.setAllCase(allCase);
+//                newCalendar.setNoteCalendar(note);
+//                newCalendar.setGroup(toHop);
+//                newCalendar.setStatus(status);
+//                try {
+//                    this.iCalendarRepository.save(newCalendar);
+//                }catch (RuntimeException e){
+//                    throw new  CalendarException("Existed  calendar with day : " +
+//                           day + " , Week : "+weekSemester.getWeekStudy() + " Time : [" +
+//                           DateUtils.convertToString(weekSemester.getDateBegin())
+//                           + "]-["
+//                           + DateUtils.convertToString(weekSemester.getDateEnd())
+//                           + "]"
+//                           + " , PracticeCaseBegin : "
+//                           + practiceCase.getNamePracticeCase() + " room : " + newCalendar.getRoom().getNameRoom()
+//                   );
+//                }
+//
+//
+//            }
+//
+//            return  new ResponseSuccess<>(HttpStatus.OK.value(), "Create calendar success"  );
+//        } catch (RuntimeException e) {
+//            System.out.println("--ER handleCreateCalendar " + e.getMessage());
+//            e.printStackTrace();
+//            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Create calendar fail");
+//        }
+//
+//
+//
+//
+//    }
+
     @Override
     @Transactional
     public ResponseData<?> handleCreateCalendar(CalendarRequestDto calendarRequestDto) {
@@ -297,58 +402,141 @@ public class CalendarServiceImpl implements ICalendarService {
         List<CreditClassEligibleDto> listCredit = this.iCreditClassRepository.findAllCreditClassEligible();
         for ( CreditClassEligibleDto credit : listCredit ){
             if ( credit.getCreditClassId().equals(calendarRequestDto.getCreditClassId().toString())    && credit.getLessonHave().equals(credit.getLessonSum()) ){
-                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Credit created full , please choose another credit");
+                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Lớp tín chỉ đã đủ tín , vui lòng chọn lớp tín chỉ khác");
             }
         }
 
         Map<String , String> messageIfCreateSuccessButRoomHaveComputerError = new HashMap<>();
 
+        //begin check test
+
+        Long totalStudentsInCreditClass = creditClass.getNumberOfStudentsLTC();
+        Integer numberOfGroupsToSchedule = calendarRequestDto.getCalendarDetail().size();
+
+        long baseStudentsPerGroup = 0L;
+        long remainingStudentsToDistribute = 0L;
+
+        if (numberOfGroupsToSchedule != 0) {
+            baseStudentsPerGroup = totalStudentsInCreditClass / numberOfGroupsToSchedule;
+            remainingStudentsToDistribute = totalStudentsInCreditClass % numberOfGroupsToSchedule;
+        } else {
+            // Xử lý fallback, có thể throw exception hoặc gán giá trị mặc định
+
+            throw new CalendarException("Số lượng nhóm phải lớn hơn 0 để thực hiện lịch.");
+        }
+
+        // end check test
+
 
         List<CalendarRequestDetailDto> listCalendarCreate = calendarRequestDto.getCalendarDetail();
         try {
-            for (CalendarRequestDetailDto calendarCreate : listCalendarCreate) {
+            for (int i = 0; i < numberOfGroupsToSchedule; i++) {
+                CalendarRequestDetailDto calendarCreate = listCalendarCreate.get(i);
 
-                WeekSemesterEntity weekSemester = this.iWeekSemesterRepository.findWeekSemesterEntityById(calendarCreate.getWeekSemesterId()) ;
+                long studentsForThisBooking = baseStudentsPerGroup + (i < remainingStudentsToDistribute ? 1 : 0);
+
+                if (studentsForThisBooking == 0) { // Nếu lớp tín chỉ không có SV, hoặc đã phân bổ hết
+                    continue;
+                }
+
+                // Lấy thông tin cần thiết từ calendarCreate
+                WeekSemesterEntity weekSemester = this.iWeekSemesterRepository.findWeekSemesterEntityById(calendarCreate.getWeekSemesterId());
                 Long day = calendarCreate.getDayId();
                 PracticeCaseEntity practiceCase = this.iPracticeCaseRepository.findPracticeCaseEntityById(calendarCreate.getPracticeCaseBeginId());
-                Long allCase = calendarCreate.getAllCase();
+                Long allCase = calendarCreate.getAllCase(); // Cần xem xét logic này nếu allCase > 1, phòng phải trống cho tất cả các ca đó
                 String note = calendarCreate.getPurposeUse();
-                String toHop = "0"+ calendarCreate.getGroupId();
-                // 6 : Active
-                StatusEntity status = this.iStatusRepository.findStatusEntityById(6L);
-                CalendarEntity newCalendar = new CalendarEntity();
-
+                String toHop = "0" + calendarCreate.getGroupId();
+                StatusEntity status = this.iStatusRepository.findStatusEntityById(6L); // Active
                 // check Number of case must greater than allCase
                 Long countPracticeCase = this.iPracticeCaseRepository.count();
                 if ( countPracticeCase - practiceCase.getId() + 1 < allCase){
                     return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Number of case must greater than allCase");
                 }
+                // --- LOGIC CHỌN PHÒNG BẮT ĐẦU TỪ ĐÂY ---
+                RoomEntity selectedRoom = null;
+                boolean usedRoomWithBrokenComputers = false;
 
-
-                // choose the room can create
-                Iterator<RoomEntity> iterator = listRoom.iterator();
-                while (iterator.hasNext()){
-                    RoomEntity room = iterator.next();
-                    boolean checkCalendarExistRoom = this.iCalendarRepository.existsByWeekSemesterAndDayAndPracticeCaseAndRoomAndStatus(weekSemester,day,practiceCase,room,status);
-                    if ( ! checkCalendarExistRoom){
-                        newCalendar.setRoom(room);
-                        break;
+                // Lấy danh sách phòng có sẵn tại thời điểm đó (chưa bị đặt)
+                List<RoomEntity> availableRoomsForSlot = new ArrayList<>();
+                for (RoomEntity roomCandidate : listRoom) { // listRoom là phòng của cơ sở đã fetch ở đầu
+                    // TODO: Nếu allCase > 1, bạn cần kiểm tra phòng trống cho TẤT CẢ các ca liên tiếp.
+                    // Ví dụ: nếu practiceCase là Ca1, allCase là 2, thì phải check Ca1 và Ca2.
+                    // Đoạn code dưới đây giả sử chỉ check cho practiceCaseBeginId.
+                    boolean checkCalendarExistRoom = this.iCalendarRepository.existsByWeekSemesterAndDayAndPracticeCaseAndRoomAndStatus(
+                            weekSemester, day, practiceCase, roomCandidate, status
+                    );
+                    if (!checkCalendarExistRoom) {
+                        availableRoomsForSlot.add(roomCandidate);
                     }
                 }
-                // if does not have any room to create calendar
-                if ( newCalendar.getRoom()== null){
-                    throw new  CalendarException("Calendar : " +
-                            day + " , Week : "+weekSemester.getWeekStudy() + " Time : [" +
-                           DateUtils.convertToString(weekSemester.getDateBegin())
-                           + "]-["
-                           + DateUtils.convertToString(weekSemester.getDateEnd())
-                           + "]"
-                           + " , PracticeCaseBegin : "
-                           + practiceCase.getNamePracticeCase() + "does not have Room empty , please choose Another "
-                   );
+
+                if (availableRoomsForSlot.isEmpty()) {
+                    throw new CalendarException("Không còn phòng trống tại cơ sở " + facility.getNameFacility() +
+                            " cho lịch: Thứ " + day + ", Tuần " + weekSemester.getWeekStudy() +
+                            ", Ca " + practiceCase.getNamePracticeCase());
                 }
 
-                // set data
+                // Ưu tiên phòng:
+                // 1. Đủ máy hoạt động, không có máy hỏng
+                // 2. Đủ máy hoạt động, có máy hỏng
+                // Sắp xếp danh sách phòng trống để dễ chọn
+                availableRoomsForSlot.sort((r1, r2) -> {
+                    long workingMachinesR1 = r1.getNumberOfComputers() - r1.getNumberOfComputerError();
+                    long workingMachinesR2 = r2.getNumberOfComputers() - r2.getNumberOfComputerError();
+
+                    // Ưu tiên phòng đủ máy cho số sinh viên hiện tại
+                    boolean r1CanFit = workingMachinesR1 >= studentsForThisBooking;
+                    boolean r2CanFit = workingMachinesR2 >= studentsForThisBooking;
+
+                    if (r1CanFit && !r2CanFit) return -1;
+                    if (!r1CanFit && r2CanFit) return 1;
+                    if (!r1CanFit && !r2CanFit) { // Cả 2 đều không đủ máy hoạt động, ưu tiên phòng có nhiều máy hoạt động hơn
+                        return Long.compare(workingMachinesR2, workingMachinesR1); // Nhiều hơn thì tốt hơn (ưu tiên)
+                    }
+
+                    // Cả 2 đều đủ máy hoạt động
+                    // Ưu tiên phòng không có máy hỏng
+                    if (r1.getNumberOfComputerError() == 0 && r2.getNumberOfComputerError() != 0) return -1;
+                    if (r1.getNumberOfComputerError() != 0 && r2.getNumberOfComputerError() == 0) return 1;
+
+                    // Cả 2 đều có máy hỏng (hoặc đều không có), ưu tiên phòng có nhiều máy hoạt động hơn (chỗ ngồi thoải mái hơn)
+                    // hoặc ít máy hỏng hơn nếu số máy hoạt động bằng nhau
+                    if (workingMachinesR1 != workingMachinesR2) {
+                        return Long.compare(workingMachinesR2, workingMachinesR1); // Nhiều máy hoạt động hơn thì tốt hơn
+                    }
+                    return Long.compare(r1.getNumberOfComputerError(), r2.getNumberOfComputerError()); // Ít máy hỏng hơn thì tốt hơn
+                });
+
+                // Chọn phòng đầu tiên trong danh sách đã sắp xếp mà đáp ứng được
+                for (RoomEntity room : availableRoomsForSlot) {
+                    long workingComputers = room.getNumberOfComputers() - room.getNumberOfComputerError();
+                    if (workingComputers >= studentsForThisBooking) {
+                        selectedRoom = room;
+                        if (room.getNumberOfComputerError() > 0) {
+                            usedRoomWithBrokenComputers = true;
+                        }
+                        break; // Đã tìm được phòng phù hợp
+                    }
+                }
+
+                // --- KẾT THÚC LOGIC CHỌN PHÒNG ---
+
+                if (selectedRoom == null) {
+                    // Không có phòng nào đủ SỐ MÁY HOẠT ĐỘNG cho studentsForThisBooking
+                    // Đây là trường hợp bạn cần quyết định:
+                    // 1. Báo lỗi luôn (khuyến nghị)
+                    // 2. (Không khuyến nghị) Nếu user yêu cầu "buộc phải xét": tìm phòng có TỔNG SỐ MÁY >= studentsForThisBooking
+                    //    nhưng SỐ MÁY HOẠT ĐỘNG < studentsForThisBooking. Điều này có nghĩa là có SV không có máy.
+                    //    Nếu theo hướng này, bạn cần thêm 1 vòng lặp nữa qua availableRoomsForSlot
+                    //    để tìm phòng có room.getNumberOfComputers() >= studentsForThisBooking và cảnh báo cực mạnh.
+                    //    Hiện tại, logic đang theo hướng báo lỗi nếu không đủ MÁY HOẠT ĐỘNG.
+                    throw new CalendarException("Không tìm thấy phòng nào có đủ " + studentsForThisBooking +
+                            " máy hoạt động cho lịch: Thứ " + day + ", Tuần " + weekSemester.getWeekStudy() +
+                            ", Ca " + practiceCase.getNamePracticeCase() + " (Nhóm " + toHop + ").");
+                }
+
+                // Tạo CalendarEntity
+                CalendarEntity newCalendar = new CalendarEntity();
                 newCalendar.setCreditClass(creditClass);
                 newCalendar.setWeekSemester(weekSemester);
                 newCalendar.setDay(day);
@@ -357,157 +545,52 @@ public class CalendarServiceImpl implements ICalendarService {
                 newCalendar.setNoteCalendar(note);
                 newCalendar.setGroup(toHop);
                 newCalendar.setStatus(status);
-                try {
-                    this.iCalendarRepository.save(newCalendar);
-                }catch (RuntimeException e){
-                    throw new  CalendarException("Existed  calendar with day : " +
-                           day + " , Week : "+weekSemester.getWeekStudy() + " Time : [" +
-                           DateUtils.convertToString(weekSemester.getDateBegin())
-                           + "]-["
-                           + DateUtils.convertToString(weekSemester.getDateEnd())
-                           + "]"
-                           + " , PracticeCaseBegin : "
-                           + practiceCase.getNamePracticeCase() + " room : " + newCalendar.getRoom().getNameRoom()
-                   );
+                newCalendar.setRoom(selectedRoom); // Gán phòng đã chọn
+
+                // Ghi nhận cảnh báo nếu cần
+                if (usedRoomWithBrokenComputers) {
+                    String warningKey = String.format("Nhóm %s (Lịch: Thứ %d, Tuần %s, Ca %s)",
+                            toHop, day, weekSemester.getWeekStudy(), practiceCase.getNamePracticeCase());
+                    String warningMessage = String.format("Phòng %s được chọn có %d máy, trong đó %d máy hỏng. Số máy hoạt động: %d (Đủ cho %d SV).",
+                            selectedRoom.getNameRoom(), selectedRoom.getNumberOfComputers(),
+                            selectedRoom.getNumberOfComputerError(),
+                            (selectedRoom.getNumberOfComputers() - selectedRoom.getNumberOfComputerError()),
+                            studentsForThisBooking);
+                    messageIfCreateSuccessButRoomHaveComputerError.put(warningKey, warningMessage);
+                    System.out.println("warningKey : " + warningKey );
+                    System.out.println("warningMessage : " + warningMessage );
                 }
 
+                try {
+                    this.iCalendarRepository.save(newCalendar);
+                    // Hoặc add vào newCalendarsToSave rồi saveAll ở cuối
+                    this.iCalendarRepository.flush(); // Ép flush để xem lỗi ngay
+                } catch (RuntimeException e) { // Bắt DataIntegrityViolationException nếu có unique constraint
+                    // Xử lý lỗi nếu có unique constraint bị vi phạm (ví dụ: đã có lịch khác được tạo đồng thời)
+                    // Hoặc bạn có thể đã check existsBy... ở trên, nhưng đây là một safeguard.
+                    throw new CalendarException("Lỗi khi lưu lịch cho Nhóm " + toHop +
+                            ": Thứ " + day + ", Tuần " + weekSemester.getWeekStudy() +
+                            ", Ca " + practiceCase.getNamePracticeCase() + ", Phòng " + selectedRoom.getNameRoom() +
+                            ". Lịch có thể đã tồn tại hoặc có lỗi cơ sở dữ liệu. Chi tiết: " + e.getMessage());
+                }
+            } // Kết thúc vòng lặp for qua listCalendarCreate
 
-            }
+            return  new ResponseSuccess<>(HttpStatus.OK.value(), "Tạo lịch thành công"  );
+        }catch (CalendarException e){
 
-            return  new ResponseSuccess<>(HttpStatus.OK.value(), "Create calendar success"  );
-        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw  new CalendarException(e.getMessage());
+            //return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+        catch (RuntimeException e) {
             System.out.println("--ER handleCreateCalendar " + e.getMessage());
             e.printStackTrace();
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Create calendar fail");
+            throw  new RuntimeException(e.getMessage());
+           // return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Create calendar fail");
         }
 
 
-//       if (  calendarRequestDto.getGroupId2() == null){
-//           CreditClassEntity creditClass = this.iCreditClassRepository.findCreditClassEntityById(calendarRequestDto.getCreditClassId());
-//           WeekSemesterEntity weekSemester1 = this.iWeekSemesterRepository.findWeekSemesterEntityById(calendarRequestDto.getWeekSemesterId1());
-//           Long day1 = calendarRequestDto.getDayId1();
-//           PracticeCaseEntity practiceCase1 = this.iPracticeCaseRepository.findPracticeCaseEntityById(calendarRequestDto.getPracticeCaseBeginId1());
-//           RoomEntity room1 = this.iRoomRepository.findRoomEntityById(calendarRequestDto.getRoomId1());
-//           StatusEntity status = this.iStatusRepository.findStatusEntityByNameStatus("ACTIVE");
-//
-//           boolean checkExisting1 = this.iCalendarRepository.existsByWeekSemesterAndDayAndPracticeCaseAndRoomAndStatus( weekSemester1, day1, practiceCase1, room1,status);
-//           try {
-//
-//               if (!checkExisting1) {
-//                   CalendarEntity calendarEntity1 = new CalendarEntity();
-//                   calendarEntity1.setCreditClass(creditClass);
-////                   calendarEntity1.setGroup("0" + calendarRequestDto.getGroupId1());
-////                   calendarEntity1.setOrganization("01");
-//                   calendarEntity1.setWeekSemester(weekSemester1);
-//                   calendarEntity1.setDay(day1);
-//                   calendarEntity1.setPracticeCase(practiceCase1);
-//                   calendarEntity1.setAllCase(calendarRequestDto.getAllCase1());
-//                   calendarEntity1.setRoom(room1);
-//                   calendarEntity1.setStatus(status);
-//                   calendarEntity1.setNoteCalendar(calendarRequestDto.getPurposeUse1() != null ? calendarRequestDto.getPurposeUse1() : "");
-//                   // save calendarEntity1
-//                   this.iCalendarRepository.save(calendarEntity1);
-//                   return ResponseEntity.ok().body("Create calendar success");
-//               }else {
-//                   throw new  CalendarException("Existed  calendar 1 with day : " +
-//                           day1 + " , Week : "+weekSemester1.getWeekStudy() + " Time : [" +
-//                           DateUtils.convertToString(weekSemester1.getDateBegin())
-//                           + "]-["
-//                           + DateUtils.convertToString(weekSemester1.getDateEnd())
-//                           + "]"
-//                           + " , PracticeCaseBegin : "
-//                           + practiceCase1.getNamePracticeCase()
-//                   );
-//               }
-//           }catch (CalendarException e){
-//               System.out.println("------ER error create calendar" + e.getMessage());
-//               e.printStackTrace();
-//               throw new  CalendarException(e.getMessage());
-//           }
-//
-//       }
-//    if (calendarRequestDto.getGroupId1() != null && calendarRequestDto.getGroupId2() != null ){
-//        CreditClassEntity creditClass = this.iCreditClassRepository.findCreditClassEntityById(calendarRequestDto.getCreditClassId());
-//        WeekSemesterEntity weekSemester1 = this.iWeekSemesterRepository.findWeekSemesterEntityById(calendarRequestDto.getWeekSemesterId1());
-//        Long day1 = calendarRequestDto.getDayId1();
-//        PracticeCaseEntity practiceCase1 = this.iPracticeCaseRepository.findPracticeCaseEntityById(calendarRequestDto.getPracticeCaseBeginId1());
-//        RoomEntity room1 = this.iRoomRepository.findRoomEntityById(calendarRequestDto.getRoomId1());
-//        StatusEntity status = this.iStatusRepository.findStatusEntityByNameStatus("ACTIVE");
-//
-//        boolean checkExisting1 = this.iCalendarRepository.existsByWeekSemesterAndDayAndPracticeCaseAndRoomAndStatus( weekSemester1, day1, practiceCase1, room1,status);
-//        try {
-//
-//            if (!checkExisting1) {
-//                CalendarEntity calendarEntity1 = new CalendarEntity();
-//                calendarEntity1.setCreditClass(creditClass);
-////                calendarEntity1.setGroup("0" + calendarRequestDto.getGroupId1());
-////                calendarEntity1.setOrganization("01");
-//                calendarEntity1.setWeekSemester(weekSemester1);
-//                calendarEntity1.setDay(day1);
-//                calendarEntity1.setPracticeCase(practiceCase1);
-//                calendarEntity1.setAllCase(calendarRequestDto.getAllCase1());
-//                calendarEntity1.setRoom(room1);
-//                calendarEntity1.setStatus(status);
-//                calendarEntity1.setNoteCalendar(calendarRequestDto.getPurposeUse1() != null ? calendarRequestDto.getPurposeUse1() : "");
-//                // save calendarEntity1
-//                this.iCalendarRepository.save(calendarEntity1);
-//
-//                WeekSemesterEntity weekSemester2 = this.iWeekSemesterRepository.findWeekSemesterEntityById(calendarRequestDto.getWeekSemesterId2());
-//                Long day2 = calendarRequestDto.getDayId1();
-//                PracticeCaseEntity practiceCase2 = this.iPracticeCaseRepository.findPracticeCaseEntityById(calendarRequestDto.getPracticeCaseBeginId2());
-//                RoomEntity room2 = this.iRoomRepository.findRoomEntityById(calendarRequestDto.getRoomId2());
-//                // check Second
-//
-//                boolean checkExisting2 = this.iCalendarRepository.existsByWeekSemesterAndDayAndPracticeCaseAndRoomAndStatus(  weekSemester2, day2, practiceCase2, room2,status);
-//
-//                     if (!checkExisting2) {
-//                         CalendarEntity calendarEntity2 = new CalendarEntity();
-//                         calendarEntity2.setCreditClass(creditClass);
-////                         calendarEntity2.setGroup("0" + calendarRequestDto.getGroupId2());
-////                         calendarEntity2.setOrganization("01");
-//                         calendarEntity2.setWeekSemester(weekSemester2);
-//                         calendarEntity2.setDay(day2);
-//                         calendarEntity2.setPracticeCase(practiceCase2);
-//                         calendarEntity2.setAllCase(calendarRequestDto.getAllCase2());
-//                         calendarEntity2.setRoom(room2);
-//                         calendarEntity2.setStatus(status);
-//                         calendarEntity2.setNoteCalendar(calendarRequestDto.getPurposeUse2() != null ? calendarRequestDto.getPurposeUse2() : "");
-//                         this.iCalendarRepository.save(calendarEntity2);
-//                     } else {
-//
-//                         throw new  CalendarException("Existed a calendar 2 day : " +
-//                                 day2 + " , Week : "+weekSemester2.getWeekStudy()+" Time : [" +
-//                                 DateUtils.convertToString(weekSemester2.getDateBegin())
-//                                 + "]-["
-//                                 + DateUtils.convertToString(weekSemester2.getDateEnd())
-//                                 + "]"
-//                                 + " , PracticeCaseBegin : "
-//                                 + practiceCase2.getNamePracticeCase()
-//                         );
-//
-//                     }
-//
-//                // Check calendar2
-//
-//                return ResponseEntity.ok().body("Create calendar success");
-//
-//            } else {
-//                throw new  CalendarException("Existed a calendar 1 day : " +
-//                        day1 + " , Week : "+weekSemester1.getWeekStudy()+" Time : [" +
-//                        DateUtils.convertToString(weekSemester1.getDateBegin())
-//                        + "]-["
-//                        + DateUtils.convertToString(weekSemester1.getDateEnd())
-//                        + "]"
-//                        + " , PracticeCaseBegin : "
-//                        + practiceCase1.getNamePracticeCase()
-//                );
-//            }
-//        } catch (CalendarException e) {
-//            System.out.println("---> ER :" + e.getMessage());
-//            e.printStackTrace();
-//            throw new  CalendarException(e.getMessage());
-//        }
-//    }
+
 
     }
 
@@ -525,6 +608,9 @@ public class CalendarServiceImpl implements ICalendarService {
         StatusEntity status = this.iStatusRepository.findStatusEntityByNameStatus("ACTIVE");
 
         boolean checkExisting = this.iCalendarRepository.existsByWeekSemesterAndDayAndPracticeCaseAndRoomAndStatus( weekSemester, day, practiceCase, room , status);
+
+
+
         try {
             if (!checkExisting){
                 CalendarEntity calendar = new CalendarEntity();
@@ -539,17 +625,18 @@ public class CalendarServiceImpl implements ICalendarService {
                 calendar.setRoom(room);
                 calendar.setNoteCalendar("Lich muon phong");
                 this.iCalendarRepository.save(calendar);
-                return ResponseEntity.ok().body("Create calendar rent room success");
+                return ResponseEntity.ok().body("Tạo lịch mượn phòng thành công");
             }else {
-                throw new  CalendarException("Existed a calendar with day : " +
-                        day + " , Week :"+weekSemester.getWeekStudy()+" Time : [" +
-                        DateUtils.convertToString(weekSemester.getDateBegin())
-                        + "]-["
-                        + DateUtils.convertToString(weekSemester.getDateEnd())
-                        + "]"
-                        + " , PracticeCaseBegin : "
-                        + practiceCase.getNamePracticeCase()
+                throw new CalendarException("Đã tồn tại lịch vào Thứ: " +
+                        day + ", Tuần: " + weekSemester.getWeekStudy() + " Thời gian: [" +
+                        DateUtils.convertToString(weekSemester.getDateBegin()) +
+                        "]-[" +
+                        DateUtils.convertToString(weekSemester.getDateEnd()) +
+                        "]" +
+                        ", Bắt đầu tại ca thực hành: " +
+                        practiceCase.getNamePracticeCase()
                 );
+
             }
 
         }catch (CalendarException e){
@@ -577,7 +664,7 @@ public class CalendarServiceImpl implements ICalendarService {
         Long countPracticeCase = this.iPracticeCaseRepository.count();
         Long allCase = calendar.getAllCase();
         if ( countPracticeCase - practiceCaseNew.getId() + 1 < allCase){
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Number of case must greater than allCase");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Số lượng tiết từ tiết bắt đầu phải lớn hơn tổng tiết");
         }
 
         // check exists
@@ -595,17 +682,18 @@ public class CalendarServiceImpl implements ICalendarService {
                 calendar.setWeekSemester(weekSemesterNew);
                 calendar.setNoteCalendar(noteNew);
                 this.iCalendarRepository.save(calendar);
-                return new ResponseSuccess<>(HttpStatus.OK.value(),"Update calendar success" );
+                return new ResponseSuccess<>(HttpStatus.OK.value(),"Cập nhật lịch thành công" );
             } else {
-                throw new  CalendarException("Existed a calendar with day : " +
-                        dayNew + " , Week : "+weekSemesterNew.getWeekStudy()+" Time : [" +
-                        DateUtils.convertToString(weekSemesterNew.getDateBegin())
-                        + "]-["
-                        + DateUtils.convertToString(weekSemesterNew.getDateEnd())
-                        + "]"
-                        + " , PracticeCaseBegin : "
-                        + practiceCaseNew.getNamePracticeCase()
+                throw new CalendarException("Đã tồn tại lịch vào Thứ: " +
+                        dayNew + ", Tuần: " + weekSemesterNew.getWeekStudy() + " Thời gian: [" +
+                        DateUtils.convertToString(weekSemesterNew.getDateBegin()) +
+                        "]-[" +
+                        DateUtils.convertToString(weekSemesterNew.getDateEnd()) +
+                        "]" +
+                        ", Bắt đầu tại ca thực hành: " +
+                        practiceCaseNew.getNamePracticeCase()
                 );
+
             }
         } catch (CalendarException e) {
             System.out.println("---> ER handleUpdateCalendar :" + e.getMessage());
@@ -631,7 +719,7 @@ public class CalendarServiceImpl implements ICalendarService {
         } catch (CalendarException e) {
             System.out.println("--->ER error delete both" + e.getMessage());
             e.printStackTrace();
-            throw new CalendarException("Can delete calendar Id : " + calendarId);
+            throw new CalendarException("Không thể xóa lịch Id : " + calendarId);
         }
     }
 }

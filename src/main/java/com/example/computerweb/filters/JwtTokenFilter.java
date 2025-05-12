@@ -53,7 +53,7 @@ public class JwtTokenFilter
             // check xem có gửi về token không
             final String authHeader = request.getHeader("Authorization");
             if ( authHeader == null || !authHeader.startsWith("Bearer ")){
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED ,"Unauthorized");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED ,"Không có quyền truy cập ");
                 return;
             }
 
@@ -93,7 +93,7 @@ public class JwtTokenFilter
              }
 
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Không có quyền truy cập");
         }
 
     }

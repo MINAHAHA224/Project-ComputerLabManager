@@ -41,9 +41,9 @@ public class CreditClassServiceImpl implements ICreditClassService {
         List<CreditClassRpPageIndexDto> results = this.iCreditClassRepository.findAllCreditForIndexPage();
         if (results != null && !results.isEmpty()) {
 
-            return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success", results);
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công", results);
         } else {
-            return new ResponseSuccess<>(HttpStatus.OK.value(), "No data", results);
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Không có dữ liệu", results);
         }
 
     }
@@ -52,10 +52,10 @@ public class CreditClassServiceImpl implements ICreditClassService {
     public ResponseData<?> handleGetSubjectForCreditClass() {
         List<SubjectRpDto> listResult = this.iSubjectRepository.findSubjectExistsSoTHH();
         if (listResult!=null && !listResult.isEmpty() ){
-            return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute succees", listResult);
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công", listResult);
         }
         else {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "No data");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Không có dữ liệu");
         }
     }
 
@@ -72,9 +72,9 @@ public class CreditClassServiceImpl implements ICreditClassService {
         }
 
          if ( listAnswer!=null && !listAnswer.isEmpty()){
-             return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" , listAnswer);
+             return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" , listAnswer);
          }else {
-             return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "No data" );
+             return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Không có dữ liệu" );
          }
 
     }
@@ -103,9 +103,9 @@ public class CreditClassServiceImpl implements ICreditClassService {
 
         }
         if ( listResult !=null && !listResult.isEmpty()){
-            return new ResponseSuccess<>(HttpStatus.OK.value(),"Execute success" , listResult);
+            return new ResponseSuccess<>(HttpStatus.OK.value(),"Thực hiện thành công" , listResult);
         }else {
-            return  new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "No data");
+            return  new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Không có dữ liệu");
         }
 
     }
@@ -131,7 +131,7 @@ public class CreditClassServiceImpl implements ICreditClassService {
             newCreditClass.setCredits(creditLTC);
             newCreditClass.setGroup(creditClassRqCreateDto.getGroup());
             if ( creditClassRqCreateDto.getNumberOfStudentLTC() <  numberOfStudents){
-                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Number of student not enough to create credit class");
+                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Số lượng sinh viên không đủ để tạo lớp tín chỉ");
             }
             newCreditClass.setNumberOfStudentsLTC(creditClassRqCreateDto.getNumberOfStudentLTC());
             newCreditClass.setSubject(subject);
@@ -154,12 +154,12 @@ public class CreditClassServiceImpl implements ICreditClassService {
                     this.iCreditClassToRepository.save(newCreditClassTo);
                 }
             }
-            return new ResponseSuccess<>(HttpStatus.OK.value(), "Create creditClass Success");
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Tạo lớp tín chỉ thành công");
 
         } catch (RuntimeException e) {
             System.out.println("--ER save creditClass and creditClassTo" + e.getMessage());
             e.printStackTrace();
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Create creditClass Fail");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Tạo lớp tín chỉ thất bại");
         }
     }
 
@@ -211,7 +211,7 @@ public class CreditClassServiceImpl implements ICreditClassService {
             }
 
         }
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success", creditClassRpDetail);
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công", creditClassRpDetail);
     }
 
     @Override
@@ -230,7 +230,7 @@ public class CreditClassServiceImpl implements ICreditClassService {
        boolean checkCreditClassHaveCalendar = this.iCalendarRepository.existsByCreditClass(creditClass);
        if ( !groupNew.equals(groupCurrent) || !Objects.equals(studentsNew, studentsCurrent) ){
            if(checkCreditClassHaveCalendar){
-               return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Credit class scheduled , can't change students or group");
+               return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Đã lên lịch lớp tín chỉ, không thể thay đổi học viên hoặc nhóm");
            }
        }
         //set teacher
@@ -247,7 +247,7 @@ public class CreditClassServiceImpl implements ICreditClassService {
                 creditClass.setGroup(groupNew);
 
                 this.iCreditClassRepository.save(creditClass);
-                return new ResponseSuccess<>(HttpStatus.OK.value(), "Update credit class success");
+                return new ResponseSuccess<>(HttpStatus.OK.value(), "Cập nhật thành công lớp tín chỉ");
             }catch (RuntimeException e){
                 System.out.println("--ER groupNew != 02 delete  and save creditClass" +e.getMessage());
                 e.printStackTrace();
@@ -280,7 +280,7 @@ public class CreditClassServiceImpl implements ICreditClassService {
                         newCreditClassTo.setMato("0" + i);
                         this.iCreditClassToRepository.save(newCreditClassTo);
                     }
-                    return new ResponseSuccess<>(HttpStatus.OK.value(), "Update credit class success");
+                    return new ResponseSuccess<>(HttpStatus.OK.value(), "Cập nhật thành công lớp tín chỉ");
 
                 }catch (RuntimeException e) {
                     System.out.println("--ER save creditClass after that check groupNew == 02 but " +
@@ -305,14 +305,14 @@ public class CreditClassServiceImpl implements ICreditClassService {
             try {
                 // handle delete
                 this.iCreditClassRepository.deleteById(creditClassId);
-                return  new ResponseSuccess<>(HttpStatus.OK.value(),"Delete credit class success");
+                return  new ResponseSuccess<>(HttpStatus.OK.value(),"Xóa lớp tín chỉ thành công");
             }catch (RuntimeException e){
                 System.out.println("--ER handleDeleteCreditClass " +e.getMessage());
                 e.printStackTrace();
             }
 
         }else {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Credit class scheduled , can't delete");
+            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Đã lên lịch lớp tín chỉ, không thể xóa");
         }
         return null;
     }

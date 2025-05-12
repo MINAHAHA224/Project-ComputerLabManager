@@ -15,28 +15,28 @@ import org.springframework.validation.annotation.Validated;
 public class RoomCreateRqDto {
 
     @JsonProperty("nameRoom")
-    @NotBlank(message = "NameRoom must not be blank")
-    @Size(min = 2, max = 10, message = "NameRoom must be between 2 and 10 characters")
-    @Pattern(regexp = "^[A-Z0-9]+$", message = "NameRoom must only contain uppercase letters and numbers")
+    @NotBlank(message = "Tên phòng không được để trống")
+    @Size(min = 2, max = 10, message = "Tên phòng phải có độ dài từ 2 đến 10 ký tự")
+    @Pattern(regexp = "^[A-Z0-9]+$", message = "Tên phòng chỉ được chứa chữ in hoa và số")
     @Schema(type = "String", example = "2E309")
     private String nameRoom;
 
     @JsonProperty("facility")
-    @NotNull(message = "Facility must not be null")
+    @NotNull(message = "Cơ sở không được để trống")
     @Schema(type = "Long", example = "1")
     private Long facility;
 
     @JsonProperty("numberOfComputer")
-    @NotNull(message = "NumberOfComputer must not be null")
-    @Min(value = 1, message = "NumberOfComputer must be at least 1")
-    @Max(value = 1000, message = "NumberOfComputer cannot exceed 1000")
+    @NotNull(message = "Số lượng máy tính không được để trống")
+    @Min(value = 1, message = "Số lượng máy tính ít nhất phải là 1")
+    @Max(value = 70, message = "Số lượng máy tính không được vượt quá 70")
     @Schema(type = "Long", example = "35")
     private Long numberOfComputer;
 
     @JsonProperty("numberOfComputerError")
-    @NotNull(message = "NumberOfComputerError must not be null")
-    @Min(value = 0, message = "NumberOfComputerError must be at least 0")
-    @Max(value = 1000, message = "NumberOfComputerError cannot exceed 1000")
+    @NotNull(message = "Số lượng máy tính bị lỗi không được để trống")
+    @Min(value = 0, message = "Số lượng máy tính bị lỗi ít nhất phải là 0")
+    @Max(value = 70, message = "Số lượng máy tính bị lỗi không được vượt quá 70")
     @Schema(type = "Long", example = "10")
     private Long numberOfComputerError;
 

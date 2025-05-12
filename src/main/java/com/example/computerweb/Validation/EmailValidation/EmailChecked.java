@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = EmailValidator.class)
 public @interface EmailChecked {
 
-    String message() default "Email must not be blank or wrong format (@ptithcm.edu.vn)";
+    String message() default "Email không được để trống hoặc sai định dạng (@ptithcm.edu.vn)";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

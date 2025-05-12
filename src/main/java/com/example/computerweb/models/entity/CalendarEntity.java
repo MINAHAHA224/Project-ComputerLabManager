@@ -58,7 +58,7 @@ public class CalendarEntity {
     @Column(name = "GhiChu")
     private String noteCalendar ;
 
-    @Column(name = "ToHop")
+    @Column(name = "ToHop_FK")
     private String group;
 
     @OneToMany(mappedBy = "calendar")

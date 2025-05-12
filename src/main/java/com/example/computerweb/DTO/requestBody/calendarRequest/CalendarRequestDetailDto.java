@@ -14,32 +14,32 @@ import lombok.*;
 public class CalendarRequestDetailDto {
     @JsonProperty("groupId")
     @Schema(type = "Long", example = "1")
-    @NotNull(message = "Group ID không được để trống")
+    @NotNull(message = "Tổ hợp không được để trống")
     private Long groupId;
 
     @JsonProperty("weekSemesterId")
     @Schema(type = "Long", example = "1")
-    @NotNull(message = "Week Semester ID không được để trống")
+    @NotNull(message = "Tuần học không được để trống")
     private Long weekSemesterId;
 
     @JsonProperty("dayId")
     @Schema(type = "Long", example = "1")
-    @NotNull(message = "Day ID không được để trống")
+    @NotNull(message = "Thứ không được để trống")
     private Long dayId;
 
     @JsonProperty("practiceCaseBeginId")
     @Schema(type = "Long", example = "1")
-    @NotNull(message = "Practice Case Begin ID không được để trống")
+    @NotNull(message = "Tiết bắt đầu không được để trống")
     private Long practiceCaseBeginId;
 
     @JsonProperty("allCase")
     @Schema(type = "Long", example = "1")
-    @NotNull(message = "All Case ID không được để trống")
+    @NotNull(message = "Tổng tiết không được để trống")
     private Long allCase;
 
 
     @JsonProperty("purposeUse")
     @Schema(type = "String", example = "can be blank")
-    @Size(max = 255, message = "Purpose Use không được vượt quá 255 ký tự")
+    @Size(max = 255, message = "Ghi chú không được vượt quá 255 ký tự")
     private String purposeUse;
 }

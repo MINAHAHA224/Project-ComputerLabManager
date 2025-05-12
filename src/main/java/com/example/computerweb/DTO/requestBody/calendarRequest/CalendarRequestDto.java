@@ -27,12 +27,12 @@ import java.util.List;
 public class CalendarRequestDto {
     @JsonProperty("creditClassId")
     @Schema(type = "Long",  example = "1")
-    @NotNull(message = "Credit Class ID không được để trống")
+    @NotNull(message = "Lớp tín chỉ không được để trống")
     private Long creditClassId;
 
     @JsonProperty("idFacility")
     @Schema(type = "Long",  example = "1")
-    @NotNull(message = "Facility không được để trống")
+    @NotNull(message = "Cơ sở không được để trống")
     private Long idFacility;
 
     @NotEmpty(message = "Danh sách Calendar Detail không được để trống")

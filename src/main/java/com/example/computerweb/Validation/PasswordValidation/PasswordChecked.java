@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = PasswordValidator.class)
 public @interface PasswordChecked {
 
-    String message () default "Password must not be blank or wrong format";
+    String message () default "Mật khẩu không được để trống hoặc định dạng sai";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

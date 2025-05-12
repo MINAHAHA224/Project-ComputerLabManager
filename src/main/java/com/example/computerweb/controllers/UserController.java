@@ -24,7 +24,7 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseData<UserResponseDto> getProfile (){
         UserResponseDto profileResponseDto = this.iUserService.handleGetDataProfile();
-        return new ResponseSuccess<>(HttpStatus.OK.value() , "Execute success" , profileResponseDto);
+        return new ResponseSuccess<>(HttpStatus.OK.value() , "Thực hiện thành công" , profileResponseDto);
     }
     @Operation(summary = "Post profile of user" , description = "just post some field , Not post all field", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/profile")

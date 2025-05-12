@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Target( { ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PhoneChecked {
-    String message() default "Invalid phone number or phone exist";
+    String message() default "Số điện thoại không hợp lệ hoặc không tồn tại số điện thoại";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

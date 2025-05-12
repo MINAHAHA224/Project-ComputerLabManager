@@ -17,39 +17,39 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class CreditClassRqCreateDto {
     @JsonProperty("idSubject")
-    @NotNull(message = "Subject must not be null")
+    @NotNull(message = "Môn học không được để trống")
     @Schema(type = "Long" , example = "2")
     private Long idSubject;
 
 
 
     @JsonProperty("codeCreditClass")
-    @NotBlank(message = "codeCreditClass must be not blank")
+    @NotBlank(message = "Mã lớp tín chỉ không được để trống")
     @Schema(type = "String" , example = "MIX_E22_CLC")
     private String codeCreditClass;
 
     @JsonProperty("idClassroom")
-    @NotNull(message = "Classroom must not be null")
+    @NotNull(message = "Lớp học không được để trống")
     @Schema(type = "Long" , example = "2")
     private Long idClassroom;
 
     @JsonProperty("numberOfStudentLTC")
-    @NotNull(message = "numberOfStudentLTC must not be null")
+    @NotNull(message = "Số lượng sinh viên của lớp tín chỉ không được để trống")
     @Min(value = 15  , message = "Must > 15 , can open class")
     @Schema(type = "Long" , example = "20")
     private Long numberOfStudentLTC ;
 
 
     @JsonProperty("teacherId")
-    @NotNull(message = "teacher must not be null")
+    @NotNull(message = "Giáo viên chưa được chọn")
     @Schema(type = "Long" , example = "7")
     private Long teacherId;
 
 
     @JsonProperty("group")
-    @NotBlank( message = "group must not be blank")
+    @NotBlank( message = "Nhóm lớp tín chỉ không được để trống")
 //    @Pattern(regexp = "^(01|02|03)$", message = "group must be 01, 02, or 03")
-    @Pattern(regexp = "^\\d{2}$", message = "group must be exactly 2 digits")
+    @Pattern(regexp = "^\\d{2}$", message = "Nhóm phải có chính xác 2 chữ số")
     @Schema(type = "String" , example = "02")
     private String group;
 

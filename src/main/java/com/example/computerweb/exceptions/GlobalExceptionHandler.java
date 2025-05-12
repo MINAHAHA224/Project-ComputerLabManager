@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
     ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setTimestamp(new Date());
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorResponse.setError("Duplication calendar");
+        errorResponse.setError("Lịch bị trùng lặp");
         errorResponse.setPath("");
         errorResponse.setMessage(e.getErrorMessage());
 
@@ -89,12 +89,12 @@ public class GlobalExceptionHandler {
             int messageEnd = message.lastIndexOf("]");
             message = message.substring(messageStart + 1 , messageEnd - 1);
         }else if ( e instanceof  HttpMessageNotReadableException ) {
-            message = "expected format String of Json  or  yyyy-MM-dd";
+            message = "Định dạng mong đợi là yyyy-MM-dd.";
         } else if ( e instanceof  ConstraintViolationException )
         {
-            message = "userId must greater than 0";
+            message = "Mã người dùng phải lớn hơn 0";
         } else if ( e  instanceof DataIntegrityViolationException){
-            message = "Email  , CCCD or PhoneNumber have used";
+            message = "Email, CCCD hoặc Số điện thoại đã sử dụng";
         }
         return message;
     }

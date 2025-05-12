@@ -20,46 +20,46 @@ public class UserProfileRequestDto {
 
     @JsonProperty("reset password")
     @Schema(type = "string" , example = "0964515599")
-    @NotBlank(message = "Password must not be blank")
-    @Pattern(regexp = "\\d{6,}", message = "Password must be at least 6 digits")
+    @NotBlank(message = "Mật khẩu không được để trống")
+    @Pattern(regexp = "\\d{6,}", message = "Mật khẩu phải có ít nhất 6 chữ số")
     private String resetPassword;
 
     @JsonProperty("phone")
-    @PhoneChecked(message = "phone invalid format")
+    @PhoneChecked(message = "Số điện thoại không đúng định dạng")
     @Schema(type = "string" , example = "0964515599")
     private String phone ;
 
     @JsonProperty("informationCode")
-    @NotBlank(message = "InformationCode must not be blank")
+    @NotBlank(message = "Mã thông tin không được để trống")
     @Schema(type = "string" , example = "01239129310231")
     private String informationCode;
 
     @JsonProperty("emailPersonal")
-    @NotBlank(message = "Email personal must not be blank")
+    @NotBlank(message = "Email cá nhân không được để trống")
     @Schema(type = "string" , example = "abc@Gmail.com")
     private String emailPersonal;
 
     @JsonProperty("province")
-    @NotBlank(message = "Province must not be blank")
-    @Schema(type = "string" , example = "Tinh Vung Tau")
+    @NotBlank(message = "Tỉnh/Thành phố không được để trống")
+    @Schema(type = "string" , example = "Tỉnh Vũng Tàu")
     private String province;
 
 
     @JsonProperty("district")
-    @NotBlank(message = "District must not be blank")
-    @Schema(type = "string" , example = "TP Ba Ria")
+    @NotBlank(message = "Quận/Huyện không được để trống")
+    @Schema(type = "string" , example = "TP Bà Rịa")
     private String district;
 
 
     @JsonProperty("ward")
-    @NotBlank(message = "Ward must not be blank")
-    @Schema(type = "string" , example = "Phuong 12")
+    @NotBlank(message = "Xã/Phường không được để trống")
+    @Schema(type = "string" , example = "Phường 12")
     private String ward;
 
 
     @JsonProperty("address")
-    @NotBlank(message = "Address must not be blank")
-    @Schema(type = "string" , example = "100 Nguyen Van Cu")
+    @NotBlank(message = "Địa chỉ không được để trống")
+    @Schema(type = "string" , example = "100 Nguyễn Văn Cừ")
     private String address;
 
 }

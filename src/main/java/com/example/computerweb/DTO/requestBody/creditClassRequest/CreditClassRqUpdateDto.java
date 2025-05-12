@@ -20,20 +20,20 @@ public class CreditClassRqUpdateDto {
     private Long creditClassId;
 
     @JsonProperty("numberOfStudentLTC")
-    @NotNull(message = "numberOfStudentLTC must not be null")
-    @Min(value = 15  , message = "Must > 15 , can open class")
+    @NotNull(message = "Số lượng sinh viên lớp tín chỉ không được để trống")
+    @Min(value = 15  , message = "Số lượng sinh viên > 15 , mới có thể mở lớp")
     @Schema(type = "Long" , example = "20")
     private Long numberOfStudentLTC ;
 
     @JsonProperty("teacherId")
-    @NotNull(message = "teacher must not be null")
+    @NotNull(message = "Giáo viên chưa được chọn")
     @Schema(type = "Long" , example = "7")
     private Long teacherId;
 
     @JsonProperty("group")
-    @NotBlank( message = "group must not be blank")
+    @NotBlank( message = "Nhóm không được để trống")
 //    @Pattern(regexp = "^(01|02|03)$", message = "group must be 01, 02, or 03")
-    @Pattern(regexp = "^\\d{2}$", message = "group must be exactly 2 digits")
+    @Pattern(regexp = "^\\d{2}$", message = "Nhóm phải có chính xác 2 chữ số")
     @Schema(type = "String" , example = "02")
     private String group;
 }

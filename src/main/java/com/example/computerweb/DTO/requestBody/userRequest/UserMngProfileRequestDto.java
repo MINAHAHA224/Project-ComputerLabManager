@@ -28,12 +28,12 @@ public class UserMngProfileRequestDto {
     private Long id ;
 
     @JsonProperty("firstName")
-    @NotBlank(message = "FirstName must not be blank")
+    @NotBlank(message = "Họ không được để trống")
     @Schema(type = "string" , example = "Cao Duy")
     private String firstName;
 
     @JsonProperty("lastName")
-    @NotBlank(message = "lastName must not be blank")
+    @NotBlank(message = "Tên không được để trống")
     @Schema(type = "string" , example = "Thái")
     private String lastName;
 
@@ -50,7 +50,7 @@ public class UserMngProfileRequestDto {
     private LocalDate dateOfBirth ;
 
     @JsonProperty("phone")
-    @NotBlank(message = "Phone must not be blank")
+    @NotBlank(message = "Số điện thoại không được để trống")
     @Schema(type = "string" , example = "0964515577")
     private String phone ;
 
@@ -61,7 +61,7 @@ public class UserMngProfileRequestDto {
 
     @JsonProperty("informationCode")
     @Schema(type = "string" , example = "918273483427")
-    @NotBlank(message = "InformationCode must not be blank")
+    @NotBlank(message = "Mã thông tin không được để trống")
     private String informationCode;
 
     @JsonProperty("major")
@@ -69,30 +69,30 @@ public class UserMngProfileRequestDto {
     private String major;
 
     @JsonProperty("address")
-    @NotBlank(message = "Address must not be blank")
+    @NotBlank(message = "Địa chỉ không được để trống")
     @Schema(type = "string" , example = "19 Nguyen Van Cu")
     private String address;
 
     @JsonProperty("emailPersonal")
-    @NotBlank(message = "EmailPersonal must not be blank")
-    @Pattern(message = "EmailPersonal must have standard format" ,
+    @NotBlank(message = "Email cá nhân không được để trống")
+    @Pattern(message = "Email cá nhân phải đúng định dạng",
             regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$")
     @Schema(type = "string" , example = "minahaha@Gmail.com")
     private String emailPersonal;
 
     @JsonProperty("Province")
     @Schema(type = "string" , example = "TP.Vung Tau")
-    @NotBlank(message = "Province must not be blank")
+    @NotBlank(message = "Tỉnh/Thành phố không được để trống")
     private String province;
 
     @JsonProperty("District")
     @Schema(type = "string" , example = "Phuong Phuoc Hai")
-    @NotBlank(message = "District must not be blank")
+    @NotBlank(message = "Quận/Huyện không được để trống")
     private String district;
 
     @JsonProperty("Ward")
     @Schema(type = "string" , example = "Xa vv")
-    @NotBlank(message = "Ward must not be blank")
+    @NotBlank(message = "Xã/Phường không được để trống")
     private String ward;
 
     @Column(name = "AnhDD")

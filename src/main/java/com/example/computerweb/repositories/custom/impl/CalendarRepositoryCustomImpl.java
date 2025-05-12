@@ -46,7 +46,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "\tISNULL(LTC.SoTC,'') AS SoTC ,\n" +
                     "    ISNULL(MH.TenMH,'')  AS TenMH , \n" +
                     "    ISNULL(LTC.Nhom,'')   AS Nhom ,\n" +
-                    "    ISNULL(LTHop.MaTo,'')   AS ToHop , \n" +
+                    "    ISNULL(LTH.ToHop,'')   AS ToHop , \n" +
                     "    PTH.TenPhong, \n" +
                     "    CS.MaCS, \n" +
                     "    LTH.Thu,\n" +
@@ -62,7 +62,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "LEFT JOIN PhongThucHanh PTH ON PTH.PhongID = LTH.PhongID_FK \n" +
                     "LEFT JOIN TietThucHanh TTH ON TTH.TietID = LTH.SoTietBD_FK \n" +
                     "LEFT JOIN CoSo CS ON CS.CoSoID = PTH.CoSo_Fk \n" +
-                    "LEFT JOIN LopTinChi_ToHop LTHop ON LTHop.ToHopID = LTH.ToHop_FK\n" +
+
                     "LEFT JOIN MonHoc MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
                     "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
                     "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +
@@ -77,7 +77,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "\tISNULL(LTC.SoTC,'') AS SoTC ,\n" +
                     "    ISNULL(MH.TenMH,'')  AS TenMH , \n" +
                     "    ISNULL(LTC.Nhom,'')   AS Nhom ,\n" +
-                    "    ISNULL(LTHop.MaTo,'')   AS ToHop , \n" +
+                    "    ISNULL(LTH.ToHop,'')   AS ToHop , \n" +
                     "    PTH.TenPhong, \n" +
                     "    CS.MaCS, \n" +
                     "    LTH.Thu,\n" +
@@ -93,7 +93,6 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "LEFT JOIN PhongThucHanh PTH ON PTH.PhongID = LTH.PhongID_FK \n" +
                     "LEFT JOIN TietThucHanh TTH ON TTH.TietID = LTH.SoTietBD_FK \n" +
                     "LEFT JOIN CoSo CS ON CS.CoSoID = PTH.CoSo_Fk \n" +
-                    "LEFT JOIN LopTinChi_ToHop LTHop ON LTHop.ToHopID = LTH.ToHop_FK\n" +
                     "LEFT JOIN MonHoc MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
                     "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
                     "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +

@@ -22,6 +22,7 @@ import com.example.computerweb.services.MailService;
 import com.example.computerweb.utils.DateUtils;
 import com.example.computerweb.utils.SecurityUtils;
 import jakarta.mail.MessagingException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -112,10 +113,10 @@ public class UserServiceImpl implements IUserService {
             // Error of SQL VD : UNIQUE KEY ==> 403 Forbiden
 
 
-            return ResponseEntity.ok().body("Register success");
+            return ResponseEntity.ok().body("Đăng ký thành công");
         } catch (RuntimeException e) {
             System.out.println("--ER : Can not save Register");
-            return ResponseEntity.badRequest().body("Register Failure");
+            return ResponseEntity.badRequest().body("Đăng ký không thành công");
         }
 
     }
@@ -123,7 +124,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> handleLogin(UserLoginDto userLoginDTO) {
+    public ResponseEntity<String> handleLogin( @Valid  UserLoginDto userLoginDTO) {
         boolean existsEmail = this.iAccountRepository.existsByEmail(userLoginDTO.getEmail());
         if (existsEmail) {
             AccountEntity accountEntity = this.iAccountRepository.findAccountEntityByEmail(userLoginDTO.getEmail()).get();
@@ -165,11 +166,11 @@ public class UserServiceImpl implements IUserService {
                 }
 
             } else {
-                return ResponseEntity.badRequest().body(" Password incorrect");
+                return ResponseEntity.badRequest().body("Mật khẩu không đúng");
             }
         }
 
-        return ResponseEntity.badRequest().body("Email  incorrect");
+        return ResponseEntity.badRequest().body("Email không đúng ");
 
     }
 
@@ -182,13 +183,13 @@ public class UserServiceImpl implements IUserService {
             AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(email).get();
             account.setToken(null);
             this.iAccountRepository.save(account);
-            return  ResponseEntity.ok().body("Logout success");
+            return  ResponseEntity.ok().body("Đăng xuất thành công");
         }catch (RuntimeException e){
             System.out.println("--ER logout set account token = null fail");
             e.printStackTrace();
         }
 
-        return ResponseEntity.badRequest().body("Logout failed");
+        return ResponseEntity.badRequest().body("Đăng xuất không thành công");
     }
 
     @Override
@@ -210,13 +211,13 @@ public class UserServiceImpl implements IUserService {
             // save
             this.iuserRepository.save(userEntity);
 
-            return ResponseEntity.ok().body("Update profile success");
+            return ResponseEntity.ok().body("Cập nhật hồ sơ thành công");
         } catch (Exception e) {
             System.out.println("--ER error save field profile :" + e.getMessage());
             e.printStackTrace();
         }
 
-        return ResponseEntity.badRequest().body("Update profile failed");
+        return ResponseEntity.badRequest().body("Cập nhật hồ sơ không thành công");
     }
 
     @Override
@@ -315,7 +316,7 @@ public class UserServiceImpl implements IUserService {
             userCurrent.setWard(userMngProfileRequestDto.getWard());
             userCurrent.setAddress(userMngProfileRequestDto.getAvatar());
             this.iuserRepository.save(userCurrent);
-            return ResponseEntity.ok().body("Save profile management success");
+            return ResponseEntity.ok().body("Lưu thành công quản lý hồ sơ");
         } catch (Exception e) {
             System.out.println("--ER error save profile management : " + e.getMessage());
             e.printStackTrace();
@@ -387,7 +388,7 @@ public class UserServiceImpl implements IUserService {
         boolean checkExistEmailPersonal = this.iAccountRepository.existsByEmailOfPersonal(email);
         try {
             if ( !checkExistEmail && !checkExistEmailPersonal){
-                return ResponseEntity.badRequest().body("Email not exist. Please try again!!!");
+                return ResponseEntity.badRequest().body("Email không tồn tại. Vui lòng thử lại!!!");
             }else if (checkExistEmail){
                 AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(email).get();
                 String passwordRandom = String.format("%06d", new Random().nextInt(1000000));
@@ -396,9 +397,9 @@ public class UserServiceImpl implements IUserService {
               boolean sendMail=  mailService.sendConfirmLink("caothaiiop1234@gmail.com",passwordRandom,emailLogin);
                if ( sendMail){
                    this.iAccountRepository.save(account);
-                   return ResponseEntity.ok().body("The password has send in your email");
+                   return ResponseEntity.ok().body("Mật khẩu đã được gửi vào email của bạn");
                }else {
-                   return ResponseEntity.badRequest().body("Error send mail");
+                   return ResponseEntity.badRequest().body("Lỗi gửi thư");
                }
 
             }else {
@@ -409,9 +410,9 @@ public class UserServiceImpl implements IUserService {
                 boolean sendMail=  mailService.sendConfirmLink("caothaiiop1234@gmail.com",passwordRandom,emailLogin);
                 if ( sendMail){
                     this.iAccountRepository.save(account);
-                    return ResponseEntity.ok().body("The password has send in your email");
+                    return ResponseEntity.ok().body("Mật khẩu đã được gửi vào email của bạn");
                 }else {
-                    return ResponseEntity.badRequest().body("Error send mail");
+                    return ResponseEntity.badRequest().body("Lỗi gửi thư");
                 }
             }
 

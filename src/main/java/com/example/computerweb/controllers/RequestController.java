@@ -36,13 +36,13 @@ public class RequestController {
     @Operation(summary = "Show all request of GV|CSVC" , description = "Only for GVU|CSVC", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseData<List<TicketRequestOneDto>> getRequestManager (){
         List<TicketRequestOneDto> results = this.iTicketRequestService.handleGetAllDataForRqManagementPage();
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" ,results );
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" ,results );
     }
 
     @GetMapping("/requestManagement/{ticketId}")
     public ResponseData<TicketResponseMgmDto> getDetailRequestManagement (@PathVariable("ticketId") Long ticketId){
         TicketResponseMgmDto data = this.iTicketRequestService.handleGetDetailRequest(ticketId);
-        return new ResponseSuccess<>(HttpStatus.OK.value() , "Execute success" , data);
+        return new ResponseSuccess<>(HttpStatus.OK.value() , "Thực hiện thành công" , data);
     }
     @PostMapping("/requestManagement")
     @Operation(summary = "This feature for GVU|CSVC" , description = "If Approval just post 2 field id,status | " +
@@ -58,7 +58,7 @@ public class RequestController {
     @GetMapping("/requestChangeCalendar/{calendarId}")
     public  ResponseData<?> getCreateTicket (@PathVariable("calendarId") Long calendarId){
         CalendarResponseDto data = this.iTicketRequestService.handleGetCreateTicketChangeCalendar(calendarId);
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" ,data );
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" ,data );
     }
 
 
@@ -74,7 +74,7 @@ public class RequestController {
     @GetMapping("/requestChangeRoom/{calendarId}")
     public  ResponseData<?> getCreateTicketChangeRoom (@PathVariable("calendarId") Long calendarId){
         CalendarResponseDto   data = this.iTicketRequestService.handleGetCreateTicketChangeCalendar(calendarId);
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" ,data );
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" ,data );
     }
 
     @Operation(summary = "This feature only for GV" , description = "When GV filed full input  then post values back", security = @SecurityRequirement(name = "bearerAuth"))
@@ -91,7 +91,7 @@ public class RequestController {
     @GetMapping("/requestRentRoom")
     public  ResponseData<?> getPageRentRoom (){
         CalendarResponseFields calendarResponseFields = this.iCalendarService.handleGetDataForCreateRoomPage();
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success " ,calendarResponseFields);
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" ,calendarResponseFields);
     }
 
     @Operation(summary = "This feature only for GV" , description = "When GV action rent room", security = @SecurityRequirement(name = "bearerAuth"))
@@ -123,7 +123,7 @@ public class RequestController {
     @GetMapping("/requestTickets")
     public ResponseData<List<RequestTicketResponseDto>> getRequestTickets (){
         List<RequestTicketResponseDto> data = this.iTicketRequestService.handleGetAllRequestTicketGV();
-        return  new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" , data);
+        return  new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" , data);
     }
 
     @Operation(summary = "idTicket", security = @SecurityRequirement(name = "bearerAuth"))
@@ -131,7 +131,7 @@ public class RequestController {
     public ResponseData<TicketResponseMgmDto> getOneRequestTickets (@PathVariable("idTicketRequest") Long idTicketRequest){
         TicketResponseMgmDto data = this.iTicketRequestService.handleGetRequestTicketGV(idTicketRequest);
 
-        return  new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" , data);
+        return  new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" , data);
     }
 
     @Operation(summary = "delete ticket", security = @SecurityRequirement(name = "bearerAuth"))
@@ -147,14 +147,14 @@ public class RequestController {
     public ResponseData< List<NotificationResponseDto>> getNotification (){
         List<NotificationResponseDto> dataNote = this.iTicketRequestService.handleGetAllNotificationOfUser();
 
-        return new ResponseSuccess<>(HttpStatus.OK.value() , "Execute success" ,dataNote ) ;
+        return new ResponseSuccess<>(HttpStatus.OK.value() , "Thực hiện thành công" ,dataNote ) ;
     }
 
     @Operation(summary = "notification" , security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/notification/{notificationId}")
     public ResponseData<NotificationDetailResponseDto> postNotification (@PathVariable("notificationId") Long notificationId){
         NotificationDetailResponseDto handleChangeStatus = this.iTicketRequestService.handleChangeStatusNote(notificationId);
-        return new ResponseSuccess<>(HttpStatus.OK.value() , "Execute success" , handleChangeStatus);
+        return new ResponseSuccess<>(HttpStatus.OK.value() , "Thực hiện thành công" , handleChangeStatus);
     }
 
     @Operation(summary = "delete notification" , security = @SecurityRequirement(name = "bearerAuth"))

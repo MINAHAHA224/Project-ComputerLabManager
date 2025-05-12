@@ -105,7 +105,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         if (nameTypeRequest.equals("TDL")  ){
             CalendarEntity calendarOld = ticketRequest.getCalendar();
             WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-            ticket.setWeekSemesterOld("Week: "+weekSemesterEntityOld.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+            ticket.setWeekSemesterOld("Tuần: "+weekSemesterEntityOld.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
             ticket.setDayOld(calendarOld.getDay().toString());
             ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseOld(calendarOld.getAllCase().toString());
@@ -114,7 +114,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
             // new use data on ticket
             WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
-            ticket.setWeekSemesterNew("Week : " +weekSemesterEntityNew.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setWeekSemesterNew("Tuần : " +weekSemesterEntityNew.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
             ticket.setDayNew(ticketRequest.getDay().toString());
             ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
@@ -125,7 +125,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         }else if ( nameTypeRequest.equals("MP")) {
             // rent room
             WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
-            ticket.setWeekSemesterNew("Week : "+weekSemesterEntityNew.getWeekStudy()+ "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setWeekSemesterNew("Tuần : "+weekSemesterEntityNew.getWeekStudy()+ "[Từ " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
             ticket.setDayNew(ticketRequest.getDay().toString());
             ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
@@ -135,7 +135,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         else if ( nameTypeRequest.equals("HUY")){
             CalendarEntity calendarOld = ticketRequest.getCalendar();
             WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-            ticket.setWeekSemesterOld("Week : " + weekSemesterEntityOld.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+            ticket.setWeekSemesterOld("Tuần : " + weekSemesterEntityOld.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
             ticket.setDayOld(calendarOld.getDay().toString());
             ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseOld(calendarOld.getAllCase().toString());
@@ -191,7 +191,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
                 NotificationEntity notificationEntity = new NotificationEntity();
                 notificationEntity.setUser(teacher);
-                notificationEntity.setNameNotification("Change schedule or change room");
+                notificationEntity.setNameNotification("Thay đổi lịch hoặc thay đổi phòng");
                 notificationEntity.setContentNotification(ticketManagementRequestDto.getNoteNotification());
                 notificationEntity.setDateNotification(new Date()); // xử lí date and time
                 notificationEntity.setTicketRequest(ticketRequestEntity);
@@ -202,8 +202,9 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             } catch (Exception e) {
                 System.out.println("--ER : error save ticketRequest" + e.getMessage());
                 e.printStackTrace();
+                throw e;
             }
-            return ResponseEntity.ok().body("Ticket reject had announcement for teacher ");
+            return ResponseEntity.ok().body("Phiếu từ chối đã được gửi");
         } else if (ticketManagementRequestDto.getStatus().equals("APPROVAL")) {
 
             TypeRequestEntity typeRequestMp = this.iTypeRequestRepository.findTypeRequestEntityByNameTypeRequest("MP");
@@ -232,6 +233,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     } catch (Exception e) {
                         System.out.println("--ER : error save calendar practiceCase" + e.getMessage());
                         e.printStackTrace();
+                        throw e;
                     }
                     // save ticket
                     ticketRequestEntity.setStatusGVU(statusApproval);
@@ -251,7 +253,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     notificationEntity.setStatus(statusNotSeen);
                     this.iNotificationRepository.save(notificationEntity);
 
-                    return ResponseEntity.ok().body("Calendar rent room had created success ");
+                    return ResponseEntity.ok().body("Lịch mượn phòng đã tạo thành công");
                 }
                 else if (ticketRequestEntity.getTypeRequest() == typeRequestHUY){
                     try {
@@ -260,6 +262,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     } catch (Exception e) {
                         System.out.println("--ER : error Huy calendar" + e.getMessage());
                         e.printStackTrace();
+                        throw  e;
                     }
                     // save ticket
                     ticketRequestEntity.setCalendar(null);
@@ -273,7 +276,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     // save notification
                     NotificationEntity notificationEntity = new NotificationEntity();
                     notificationEntity.setUser(teacher);
-                    notificationEntity.setNameNotification("Cancel room");
+                    notificationEntity.setNameNotification("Hủy phòng");
                     notificationEntity.setContentNotification(ticketManagementRequestDto.getNoteNotification());
                     notificationEntity.setDateNotification(new Date()); // xử lí date and time
                     notificationEntity.setTicketRequest(ticketRequestEntity);
@@ -282,7 +285,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     this.iNotificationRepository.save(notificationEntity);
 
 
-                    return ResponseEntity.ok().body("Calendar rent room delete success");
+                    return ResponseEntity.ok().body("Lịch mượn phòng xóa thành công");
                 }
                 // type : change calendar ( room , calendar )
                 else if (ticketRequestEntity.getTypeRequest() == typeRequestTdl) {
@@ -308,6 +311,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     } catch (Exception e) {
                         System.out.println("--ER : error save change calendar practiceCase" + e.getMessage());
                         e.printStackTrace();
+                        throw e;
                     }
                     // save ticket
                     ticketRequestEntity.setStatusGVU(statusApproval);
@@ -320,7 +324,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     // save notification
                     NotificationEntity notificationEntity = new NotificationEntity();
                     notificationEntity.setUser(teacher);
-                    notificationEntity.setNameNotification("Change calendar or Change room");
+                    notificationEntity.setNameNotification("Thay đổi lịch hoặc Thay đổi phòng");
                     notificationEntity.setContentNotification(ticketManagementRequestDto.getNoteNotification());
                     notificationEntity.setDateNotification(new Date()); // xử lí date and time
                     notificationEntity.setTicketRequest(ticketRequestEntity);
@@ -328,7 +332,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     notificationEntity.setStatus(statusNotSeen);
                     this.iNotificationRepository.save(notificationEntity);
 
-                    return ResponseEntity.ok().body("Calendar change had been success");
+                    return ResponseEntity.ok().body("Thay đổi lịch đã thành công");
                 }
             } else if (roleUserCurrent.equals("CSVC")) {
                 try {
@@ -341,23 +345,22 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                         ticketRequestEntity.setUserCSVC(userCurrent);
                         this.iTicketRequestRepository.save(ticketRequestEntity);
                     }else {
-                        throw new CalendarException("Existed a calendar with day : " +
-                                dayNew + " , Week : "+weekSemesterNew.getWeekStudy()+" Time : [" +
-                                DateUtils.convertToString(weekSemesterNew.getDateBegin())
-                                + "-"
-                                + DateUtils.convertToString(weekSemesterNew.getDateBegin())
-                                + "]"
-                                + " , PracticeCaseBegin : "
-                                + practiceCaseBeginNew.getNamePracticeCase()
+                        throw new CalendarException("Đã tồn tại lịch vào Thứ: " +
+                                dayNew + ", Tuần: " + weekSemesterNew.getWeekStudy() + " Thời gian: [" +
+                                DateUtils.convertToString(weekSemesterNew.getDateBegin()) +
+                                "-" +
+                                DateUtils.convertToString(weekSemesterNew.getDateBegin()) + // Chỗ này hình như bị lặp, cần kiểm tra lại
+                                "]" +
+                                ", Bắt đầu tại ca thực hành: " +
+                                practiceCaseBeginNew.getNamePracticeCase()
                         );
-
                     }
                 } catch (CalendarException e) {
                     System.out.println("---ER error save doneCSVC" + e.getMessage());
                     e.printStackTrace();
                     throw new CalendarException(e.getMessage());
                 }
-                    return ResponseEntity.ok().body("Approval ticket success (CSVC)");
+                    return ResponseEntity.ok().body("Phiếu chấp thuận thành công (CSVC)");
 
             }
         }
@@ -399,13 +402,14 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
             this.iTicketRequestRepository.save(ticketRequest);
 
-            return ResponseEntity.ok().body("Create ticket delete success");
+            return ResponseEntity.ok().body("Tạo phiếu xóa phòng thành công");
         }catch (Exception e ){
             System.out.println("-----ER error save delete ticket room" + e.getMessage());
             e.printStackTrace();
+
         }
 
-         return ResponseEntity.badRequest().body("Create ticket delete fail");
+         return ResponseEntity.badRequest().body("Tạo phiếu xóa phòng thất bại");
     }
 
     @Override
@@ -470,7 +474,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             newTicket.setStatusGVU(status);
 
             this.iTicketRequestRepository.save(newTicket);
-            return ResponseEntity.ok().body("Request change calendar success");
+            return ResponseEntity.ok().body("Yêu cầu thay đổi lịch thành công");
         }catch (Exception e){
             System.out.println("---ER error save ticketRequest on request GV" + e.getMessage());
             e.printStackTrace();
@@ -517,7 +521,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             newTicket.setStatusGVU(status);
 
             this.iTicketRequestRepository.save(newTicket);
-            return ResponseEntity.ok().body("Request change calendar success");
+            return ResponseEntity.ok().body("Yêu cầu thay đổi lịch thành công");
         }catch (Exception e){
             System.out.println("---ER error save ticketRequest on request GV" + e.getMessage());
             e.printStackTrace();
@@ -596,7 +600,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         }
 
-        return ResponseEntity.ok().body("Delete notification success");
+        return ResponseEntity.ok().body("Xóa thông báo thành công");
     }
 
     @Override
@@ -654,7 +658,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         if (nameTypeRequest.equals("TDL")  ){
             CalendarEntity calendarOld = ticketRequest.getCalendar();
             WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-            ticket.setWeekSemesterOld( "Week : " +weekSemesterEntityOld.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+            ticket.setWeekSemesterOld( "Tuần : " +weekSemesterEntityOld.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
             ticket.setDayOld(calendarOld.getDay().toString());
             ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseOld(calendarOld.getAllCase().toString());
@@ -663,7 +667,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
             // new use data on ticket
             WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
-            ticket.setWeekSemesterNew("Week : "+weekSemesterEntityNew.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setWeekSemesterNew("Tuần : "+weekSemesterEntityNew.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
             ticket.setDayNew(ticketRequest.getDay().toString());
             ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
@@ -674,7 +678,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         }else if ( nameTypeRequest.equals("MP")) {
             // rent room
             WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
-            ticket.setWeekSemesterNew("Week : "+weekSemesterEntityNew.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setWeekSemesterNew("Tuần : "+weekSemesterEntityNew.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
             ticket.setDayNew(ticketRequest.getDay().toString());
             ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
@@ -685,7 +689,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             if (ticketRequest.getCalendar() != null ){
                 CalendarEntity calendarOld = ticketRequest.getCalendar() ;
                 WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-                ticket.setWeekSemesterOld("Week : "+weekSemesterEntityOld.getWeekStudy() + "[From " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " to " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+                ticket.setWeekSemesterOld("Tuần : "+weekSemesterEntityOld.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
                 ticket.setDayOld(calendarOld.getDay().toString());
                 ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
                 ticket.setAllCaseOld(calendarOld.getAllCase().toString());
@@ -717,6 +721,6 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         }
 
 
-        return ResponseEntity.ok().body("Delete request ticket success");
+        return ResponseEntity.ok().body("Xóa phiếu yêu cầu thành công");
     }
 }

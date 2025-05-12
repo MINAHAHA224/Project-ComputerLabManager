@@ -39,7 +39,7 @@ public class AccessController {
       if (handleLogin.getStatusCode() == HttpStatus.OK ){
           Map<String,String> token = new HashMap<>();
           token.put("token" , handleLogin.getBody());
-          return new ResponseSuccess<>(HttpStatus.OK.value(), "Login Success" ,token );
+          return new ResponseSuccess<>(HttpStatus.OK.value(), "Đăng nhập thành công" ,token );
       }
       else {
           return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),handleLogin.getBody());
@@ -59,7 +59,7 @@ public class AccessController {
         Map<String , String> dataUser = this.iUserService.handleGetDataUserCurrent();
         HomeResponseDto homeResponseDto = new HomeResponseDto();
         homeResponseDto.setDataUser(dataUser);
-        return new ResponseData<>(HttpStatus.OK.value() , "Execute Success" , homeResponseDto );
+        return new ResponseData<>(HttpStatus.OK.value() , "Thực hiện thành công" , homeResponseDto );
     }
 
 
