@@ -12,5 +12,5 @@ public class RoomUpdateRpDto {
     private String nameRoom;
     private Long numberOfComputer;
     private Long numberOfComputerError;
-    private String facility;
+    private Long facility;
 }

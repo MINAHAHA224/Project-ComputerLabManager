@@ -11,11 +11,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CalendarRequestOneDto {
-
-    @JsonProperty("calendarId")
-    @Schema(type = "Long",  example = "1")
-    private Long calendarId;
+public class CalendarRequestDetailDto {
+    @JsonProperty("groupId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Group ID không được để trống")
+    private Long groupId;
 
     @JsonProperty("weekSemesterId")
     @Schema(type = "Long", example = "1")
@@ -31,6 +31,12 @@ public class CalendarRequestOneDto {
     @Schema(type = "Long", example = "1")
     @NotNull(message = "Practice Case Begin ID không được để trống")
     private Long practiceCaseBeginId;
+
+    @JsonProperty("allCase")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "All Case ID không được để trống")
+    private Long allCase;
+
 
     @JsonProperty("purposeUse")
     @Schema(type = "String", example = "can be blank")

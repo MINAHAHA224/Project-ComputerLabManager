@@ -9,4 +9,6 @@ public interface IPracticeCaseRepository  extends JpaRepository<PracticeCaseEnti
     PracticeCaseEntity findPracticeCaseEntityById ( Long id);
 
 
+
+
 }

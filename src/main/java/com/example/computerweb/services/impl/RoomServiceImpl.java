@@ -7,7 +7,9 @@ import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.roomRequest.RoomCreateRqDto;
 import com.example.computerweb.DTO.requestBody.roomRequest.RoomUpdateRqDto;
+import com.example.computerweb.models.entity.FacilityEntity;
 import com.example.computerweb.models.entity.RoomEntity;
+import com.example.computerweb.repositories.IFacilityRepository;
 import com.example.computerweb.repositories.IRoomRepository;
 import com.example.computerweb.services.IRoomService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoomServiceImpl  implements IRoomService {
     private final IRoomRepository iRoomRepository;
+    private final IFacilityRepository iFacilityRepository;
     @Override
     public ResponseData<?> handleGetAllDateRoom() {
         List<RoomEntity> roomEntities = this.iRoomRepository.findAll();
@@ -32,7 +35,7 @@ public class RoomServiceImpl  implements IRoomService {
             roomManagementDto.setNameRoom(roomEntity.getNameRoom());
             roomManagementDto.setNumberOfComputers(roomEntity.getNumberOfComputers());
             roomManagementDto.setNumberOfComputerError(roomEntity.getNumberOfComputerError());
-            roomManagementDto.setFacility(roomEntity.getFacility());
+            roomManagementDto.setFacility(roomEntity.getFacility().getNameFacility());
             data.add(roomManagementDto);
         }
         if( data!=null && !data.isEmpty()){
@@ -47,6 +50,7 @@ public class RoomServiceImpl  implements IRoomService {
     @Transactional
     public ResponseData<?> handleCreateRoom(RoomCreateRqDto roomCreateRqDto) {
         boolean checkExistNameRoom = this.iRoomRepository.existsByNameRoom(roomCreateRqDto.getNameRoom().trim());
+        FacilityEntity facility = this.iFacilityRepository.findFacilityEntityById(roomCreateRqDto.getFacility());
         if (checkExistNameRoom ){
             return new ResponseFailure(HttpStatus.BAD_REQUEST.value(),  "Name room is duplicate");
         }
@@ -55,7 +59,7 @@ public class RoomServiceImpl  implements IRoomService {
             room.setNameRoom(roomCreateRqDto.getNameRoom().trim());
             room.setNumberOfComputers(roomCreateRqDto.getNumberOfComputer());
             room.setNumberOfComputerError(roomCreateRqDto.getNumberOfComputerError());
-            room.setFacility(roomCreateRqDto.getFacility().trim());
+            room.setFacility(facility);
 
             this.iRoomRepository.save(room);
 
@@ -77,7 +81,7 @@ public class RoomServiceImpl  implements IRoomService {
         result.setNameRoom(room.getNameRoom().trim());
         result.setNumberOfComputer(room.getNumberOfComputers());
         result.setNumberOfComputerError(room.getNumberOfComputerError());
-        result.setFacility(room.getFacility().trim());
+        result.setFacility(room.getFacility().getId());
 
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Execute success" ,result );
     }
@@ -87,7 +91,7 @@ public class RoomServiceImpl  implements IRoomService {
     public ResponseData<?> handlePostUpdateRoom(RoomUpdateRqDto roomUpdateRqDto) {
 
         RoomEntity roomCurrent = this.iRoomRepository.findRoomEntityById(roomUpdateRqDto.getIdRoom());
-
+        FacilityEntity facility = this.iFacilityRepository.findFacilityEntityById(roomUpdateRqDto.getFacility());
         if ( !roomCurrent.getNameRoom().trim().equals(roomUpdateRqDto.getNameRoom().trim()) ){
             boolean checkNameUnique = this.iRoomRepository.existsByNameRoom(roomUpdateRqDto.getNameRoom().trim());
             if (checkNameUnique ){
@@ -98,7 +102,7 @@ public class RoomServiceImpl  implements IRoomService {
             roomCurrent.setNameRoom(roomUpdateRqDto.getNameRoom().trim());
             roomCurrent.setNumberOfComputers(roomUpdateRqDto.getNumberOfComputer());
             roomCurrent.setNumberOfComputerError(roomUpdateRqDto.getNumberOfComputerError());
-            roomCurrent.setFacility(roomUpdateRqDto.getFacility().trim());
+            roomCurrent.setFacility(facility);
             this.iRoomRepository.save(roomCurrent);
             return new ResponseSuccess<>(HttpStatus.OK.value(), "Update room success");
         }catch (RuntimeException e){

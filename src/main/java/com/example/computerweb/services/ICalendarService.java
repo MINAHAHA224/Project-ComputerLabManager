@@ -3,6 +3,7 @@ package com.example.computerweb.services;
 import com.example.computerweb.DTO.dto.calendarResponse.CalendarManagementDto;
 import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseDto;
 import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseFields;
+import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestOneDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestRoomDto;
@@ -17,16 +18,16 @@ public interface ICalendarService {
 
     CalendarResponseFields handleGetDataForCreatePage ();
 
-    ArrayList<Map<String, String>> handleWeekStudyForCreateCreditClass ( Long codeCreditClass);
+    ArrayList<Map<String, String>> handleWeekStudyForCreateCreditClass ( String semesterYear);
 
 
     CalendarResponseFields handleGetDataForCreateRoomPage ();
     CalendarResponseDto handleGetDataForUpdatePage (Long calendarId);
 
-    ResponseEntity<String> handleCreateCalendar (CalendarRequestDto calendarRequestDto);
+    ResponseData<?> handleCreateCalendar (CalendarRequestDto calendarRequestDto);
     ResponseEntity<String> handleCreateRoom (CalendarRequestRoomDto calendarRequestRoomDto);
 
-    ResponseEntity<String> handleUpdateCalendar ( CalendarRequestOneDto calendarRequestOneDto);
+    ResponseData<?> handleUpdateCalendar ( CalendarRequestOneDto calendarRequestOneDto);
 
     void handleDeleteCalendar (String calendarId);
 

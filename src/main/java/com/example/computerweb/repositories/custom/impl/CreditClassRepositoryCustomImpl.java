@@ -30,10 +30,10 @@ public class CreditClassRepositoryCustomImpl implements CreditClassRepositoryCus
                 "        SUM(ISNULL(LTH.SoTiet, 0)) AS TongSoTietChoTungTo \n" +
                 "    FROM LichThucHanh AS LTH\n" +
                 "    WHERE LTH.LopTinChiID_FK IS NOT NULL \n" +
-                "      AND LTH.ToHop_FK IS NOT NULL \n" +
+                "      AND LTH.ToHop IS NOT NULL \n" +
                 "    GROUP BY \n" +
                 "        LTH.LopTinChiID_FK, \n" +
-                "        LTH.ToHop_FK\n" +
+                "        LTH.ToHop\n" +
                 "),\n" +
                 "CTE_SoTTHDC_Simplified AS (\n" +
                 "    SELECT \n" +

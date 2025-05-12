@@ -15,7 +15,8 @@ public class CalendarResponseFields {
 //    private  ArrayList<Map<String, String>> group;
     private  ArrayList<Map<String, String>> day;
     private  ArrayList<Map<String, String>> practiceCase;
-    private  ArrayList<Map<String, String>> room;
+    private  ArrayList<Map<String, String>> facility;
+    private  ArrayList<Map<String, String>> semesterYear;
 //    private  ArrayList<Map<String, String>> teacher;
   // private Map<String, Map<String, String>> creditClass;
     // data ma  co key thi de  { "key"" : "value" , "key"" : "value"}  ,

@@ -27,6 +27,5 @@ public class CreditClassToEntity {
     @JoinColumn(name = "LopTinChi_FK")
     private CreditClassEntity creditClass;
 
-    @OneToMany(mappedBy = "creditClassTo")
-    private List<CalendarEntity> calendarEntities;
+
 }

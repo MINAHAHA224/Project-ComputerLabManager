@@ -25,6 +25,8 @@ public class FacilityEntity {
     private  String contentFacility;
 
 
+    @OneToMany(mappedBy = "facility")
+    private List<RoomEntity> roomEntities;
 
 
 

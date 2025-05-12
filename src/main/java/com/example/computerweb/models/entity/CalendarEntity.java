@@ -30,9 +30,6 @@ public class CalendarEntity {
 
 
 
-    @ManyToOne
-    @JoinColumn (name = "ToHop_FK")
-    private CreditClassToEntity creditClassTo;
 
 
     @ManyToOne
@@ -60,6 +57,9 @@ public class CalendarEntity {
 
     @Column(name = "GhiChu")
     private String noteCalendar ;
+
+    @Column(name = "ToHop")
+    private String group;
 
     @OneToMany(mappedBy = "calendar")
     private List<TicketRequestEntity> ticketRequestEntities;

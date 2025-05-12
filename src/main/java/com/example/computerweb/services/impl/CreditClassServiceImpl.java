@@ -114,6 +114,7 @@ public class CreditClassServiceImpl implements ICreditClassService {
     @Override
     @Transactional
     public ResponseData<?> handleCreateCreditClass(CreditClassRqCreateDto creditClassRqCreateDto) {
+
         SubjectEntity subject = this.iSubjectRepository.findSubjectEntityById(creditClassRqCreateDto.getIdSubject());
         UserEntity teacher = this.iUserRepository.findUserEntityById(creditClassRqCreateDto.getTeacherId());
         Long students = creditClassRqCreateDto.getNumberOfStudentLTC();

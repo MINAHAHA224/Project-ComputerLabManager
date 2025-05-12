@@ -6,7 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
@@ -24,66 +27,16 @@ import java.util.List;
 public class CalendarRequestDto {
     @JsonProperty("creditClassId")
     @Schema(type = "Long",  example = "1")
+    @NotNull(message = "Credit Class ID không được để trống")
     private Long creditClassId;
 
-//Group 1
-    @JsonProperty("groupId1")
+    @JsonProperty("idFacility")
     @Schema(type = "Long",  example = "1")
-    private Long groupId1;
+    @NotNull(message = "Facility không được để trống")
+    private Long idFacility;
 
-    @JsonProperty("weekSemesterId1")
-    @Schema(type = "Long",  example = "1")
-    private Long weekSemesterId1;
-
-    @JsonProperty("dayId1")
-    @Schema(type = "Long",  example = "1")
-    private Long dayId1;
-
-    @JsonProperty("practiceCaseBeginId1")
-    @Schema(type = "Long",  example = "1")
-    private Long practiceCaseBeginId1;
-
-    @JsonProperty("allCase1")
-    @Schema(type = "Long",  example = "1")
-    private Long allCase1;
-
-    @JsonProperty("roomId1")
-    @Schema(type = "Long",  example = "1")
-    private Long roomId1;
-
-    @JsonProperty("purposeUse1")
-    @Schema(type = "String",  example = "can be blank")
-    private String purposeUse1;
-
-
-//Group 2
-    @JsonProperty("groupId2")
-    @Schema(type = "Long",  example = "1")
-    private Long groupId2;
-
-    @JsonProperty("weekSemesterId2")
-    @Schema(type = "Long",  example = "1")
-    private Long weekSemesterId2;
-
-    @JsonProperty("dayId2")
-    @Schema(type = "Long",  example = "1")
-    private Long dayId2;
-
-    @JsonProperty("practiceCaseBeginId2")
-    @Schema(type = "Long",  example = "1")
-    private Long practiceCaseBeginId2;
-
-    @JsonProperty("allCase2")
-    @Schema(type = "Long",  example = "1")
-    private Long allCase2;
-
-    @JsonProperty("roomId2")
-    @Schema(type = "Long",  example = "1")
-    private Long roomId2;
-
-    @JsonProperty("purposeUse2")
-    @Schema(type = "String",  example = "can be blank")
-    private String purposeUse2;
-
+    @NotEmpty(message = "Danh sách Calendar Detail không được để trống")
+    @Valid // Để kích hoạt validate cho các phần tử bên trong List
+    List<CalendarRequestDetailDto> calendarDetail;
 
 }

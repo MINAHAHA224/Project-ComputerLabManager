@@ -21,11 +21,10 @@ public class RoomUpdateRqDto {
     @Schema(type = "String", example = "2E309")
     private String nameRoom;
 
-    @JsonProperty("nameFacility")
-    @NotBlank(message = "NameFacility must not be blank")
-    @Size(min = 2, max = 50, message = "NameFacility must be between 2 and 50 characters")
-    @Schema(type = "String", example = "Quận 1")
-    private String facility;
+    @JsonProperty("facility")
+    @NotNull(message = "Facility must not be null")
+    @Schema(type = "Long", example = "1")
+    private Long facility;
 
     @JsonProperty("numberOfComputer")
     @NotNull(message = "NumberOfComputer must not be null")
