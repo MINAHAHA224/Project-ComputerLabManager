@@ -33,8 +33,7 @@ public class AccountEntity implements Serializable , UserDetails {
     @Column(name = "MatKhau")
     private String passWord;
 
-    @Column(name = "Token")
-    private String token;
+
 
 
 

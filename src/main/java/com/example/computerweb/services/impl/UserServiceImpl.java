@@ -22,6 +22,8 @@ import com.example.computerweb.services.MailService;
 import com.example.computerweb.utils.DateUtils;
 import com.example.computerweb.utils.SecurityUtils;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -48,7 +52,6 @@ public class UserServiceImpl implements IUserService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final IAccountRepository iAccountRepository;
-
 
 
     @Override
@@ -91,7 +94,7 @@ public class UserServiceImpl implements IUserService {
             String codeUser = roles.getNameRole() + major.getCodeMajor() + amountCode;
             user.setCodeUser(codeUser);
             // save user
-             UserEntity  userEntity =   this.iuserRepository.save(user);
+            UserEntity userEntity = this.iuserRepository.save(user);
 
             AccountEntity account = new AccountEntity();
             // set email
@@ -124,7 +127,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> handleLogin( @Valid  UserLoginDto userLoginDTO) {
+    public ResponseEntity<String> handleLogin(@Valid UserLoginDto userLoginDTO) {
         boolean existsEmail = this.iAccountRepository.existsByEmail(userLoginDTO.getEmail());
         if (existsEmail) {
             AccountEntity accountEntity = this.iAccountRepository.findAccountEntityByEmail(userLoginDTO.getEmail()).get();
@@ -150,14 +153,13 @@ public class UserServiceImpl implements IUserService {
                     // va thang token hien tai cua JWT a minh chi co email, thoi gian het han chu khong co role boi vi role la minh dùng UsernamePasswordAuthenticationToken ket hop securityFilterChain check roi
                     // ==> trong jwt cua minh ko co quyen chi co moi email va thoi gian het han token jwt thoi
                     String token = this.jwtTokenUtil.generateToken(userCurrent);
-                    try {
-                        accountEntity.setToken(token);
-                        this.iAccountRepository.save(accountEntity);
-                    }catch (RuntimeException e){
-                        System.out.println("--ER save account token " + e.getMessage());
-                        e.printStackTrace();
-                    }
 
+                    HttpServletRequest currentRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+                    HttpSession session = currentRequest.getSession(true); // Lấy session hiện tại hoặc tạo mới
+
+                    // ĐẶT TIMEOUT CHO SESSION
+                    session.setMaxInactiveInterval(5 * 60); // 5 phút * 60 giây/phút = 300 giây
+                    session.setAttribute("USER_ACTIVE_JWT", token);
 
                     return ResponseEntity.ok().body(token);
                 } catch (Exception e) {
@@ -180,11 +182,11 @@ public class UserServiceImpl implements IUserService {
         String email = SecurityUtils.getPrincipal();
         // handle set token account = null when logout
         try {
-            AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(email).get();
-            account.setToken(null);
-            this.iAccountRepository.save(account);
-            return  ResponseEntity.ok().body("Đăng xuất thành công");
-        }catch (RuntimeException e){
+            HttpServletRequest currentRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            HttpSession session = currentRequest.getSession(false); // Lấy session hiện tại và không tạo mới
+            session.setAttribute("USER_ACTIVE_JWT", null);
+            return ResponseEntity.ok().body("Đăng xuất thành công");
+        } catch (RuntimeException e) {
             System.out.println("--ER logout set account token = null fail");
             e.printStackTrace();
         }
@@ -230,8 +232,8 @@ public class UserServiceImpl implements IUserService {
         UserEntity userEntity = account.getUser();
         userCurrent.put("userName", userEntity.getFirstName() + " " + userEntity.getLastName());
         userCurrent.put("role", userEntity.getRole().getContentRole());
-        userCurrent.put("userId" , userEntity.getId().toString());
-        userCurrent.put("userCode" , userEntity.getCodeUser());
+        userCurrent.put("userId", userEntity.getId().toString());
+        userCurrent.put("userCode", userEntity.getCodeUser());
         return userCurrent;
     }
 
@@ -248,7 +250,7 @@ public class UserServiceImpl implements IUserService {
         userResponseDto.setEmail(account.getEmail());
         userResponseDto.setFirstName(userCurrent.getFirstName());
         userResponseDto.setLastName(userCurrent.getLastName());
-        userResponseDto.setMajor(userCurrent.getMajor()== null ? "" : userCurrent.getMajor().getCodeMajor() );
+        userResponseDto.setMajor(userCurrent.getMajor() == null ? "" : userCurrent.getMajor().getCodeMajor());
 
         userResponseDto.setGender(userCurrent.getGender());
         userResponseDto.setDateOfBirth(DateUtils.convertToString(userCurrent.getDateOfBirth()));
@@ -280,7 +282,7 @@ public class UserServiceImpl implements IUserService {
             userManagementDto.setPhone(userEntity.getPhone());
             userManagementDto.setEmail(userEntity.getAccountEntity().getEmail());
             userManagementDto.setInformationCode(userEntity.getInfomationCode());
-            userManagementDto.setMajor(userEntity.getMajor()== null ? "" : userEntity.getMajor().getCodeMajor() );
+            userManagementDto.setMajor(userEntity.getMajor() == null ? "" : userEntity.getMajor().getCodeMajor());
             userManagementDto.setAddress(userEntity.getAddress());
             userManagementDto.setEmailPersonal(userEntity.getAccountEntity().getEmailOfPersonal());
             userManagementDto.setProvince(userEntity.getProvince());
@@ -365,7 +367,7 @@ public class UserServiceImpl implements IUserService {
         userResponseDto.setEmail(userCurrent.getAccountEntity().getEmail());
         userResponseDto.setFirstName(userCurrent.getFirstName());
         userResponseDto.setLastName(userCurrent.getLastName());
-        userResponseDto.setMajor(userCurrent.getMajor()== null ? "" : userCurrent.getMajor().getCodeMajor() );
+        userResponseDto.setMajor(userCurrent.getMajor() == null ? "" : userCurrent.getMajor().getCodeMajor());
         userResponseDto.setGender(userCurrent.getGender().toString());
         userResponseDto.setDateOfBirth(dateFormat.format(userCurrent.getDateOfBirth()));
         userResponseDto.setPhone(userCurrent.getPhone());
@@ -387,36 +389,36 @@ public class UserServiceImpl implements IUserService {
         boolean checkExistEmail = this.iAccountRepository.existsByEmail(email);
         boolean checkExistEmailPersonal = this.iAccountRepository.existsByEmailOfPersonal(email);
         try {
-            if ( !checkExistEmail && !checkExistEmailPersonal){
+            if (!checkExistEmail && !checkExistEmailPersonal) {
                 return ResponseEntity.badRequest().body("Email không tồn tại. Vui lòng thử lại!!!");
-            }else if (checkExistEmail){
+            } else if (checkExistEmail) {
                 AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(email).get();
                 String passwordRandom = String.format("%06d", new Random().nextInt(1000000));
                 String emailLogin = account.getEmail();
                 account.setPassWord(passwordEncoder.encode(passwordRandom));
-              boolean sendMail=  mailService.sendConfirmLink("caothaiiop1234@gmail.com",passwordRandom,emailLogin);
-               if ( sendMail){
-                   this.iAccountRepository.save(account);
-                   return ResponseEntity.ok().body("Mật khẩu đã được gửi vào email của bạn");
-               }else {
-                   return ResponseEntity.badRequest().body("Lỗi gửi thư");
-               }
+                boolean sendMail = mailService.sendConfirmLink("caothaiiop1234@gmail.com", passwordRandom, emailLogin);
+                if (sendMail) {
+                    this.iAccountRepository.save(account);
+                    return ResponseEntity.ok().body("Mật khẩu đã được gửi vào email của bạn");
+                } else {
+                    return ResponseEntity.badRequest().body("Lỗi gửi thư");
+                }
 
-            }else {
+            } else {
                 AccountEntity account = this.iAccountRepository.findAccountEntityByEmailOfPersonal(email);
                 String passwordRandom = String.format("%06d", new Random().nextInt(1000000));
                 String emailLogin = account.getEmail();
                 account.setPassWord(passwordEncoder.encode(passwordRandom));
-                boolean sendMail=  mailService.sendConfirmLink("caothaiiop1234@gmail.com",passwordRandom,emailLogin);
-                if ( sendMail){
+                boolean sendMail = mailService.sendConfirmLink("caothaiiop1234@gmail.com", passwordRandom, emailLogin);
+                if (sendMail) {
                     this.iAccountRepository.save(account);
                     return ResponseEntity.ok().body("Mật khẩu đã được gửi vào email của bạn");
-                }else {
+                } else {
                     return ResponseEntity.badRequest().body("Lỗi gửi thư");
                 }
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("---ER error sendMail");
             e.printStackTrace();
         }
