@@ -34,7 +34,7 @@ public class RoomServiceImpl  implements IRoomService {
             roomManagementDto.setId(roomEntity.getId());
             roomManagementDto.setNameRoom(roomEntity.getNameRoom());
             roomManagementDto.setNumberOfComputers(roomEntity.getNumberOfComputers());
-            roomManagementDto.setNumberOfComputerError(roomEntity.getNumberOfComputerError());
+            roomManagementDto.setNumberOfComputerActive(roomEntity.getNumberOfComputerActive());
             roomManagementDto.setFacility(roomEntity.getFacility().getNameFacility());
             data.add(roomManagementDto);
         }
@@ -58,7 +58,7 @@ public class RoomServiceImpl  implements IRoomService {
         try {
             room.setNameRoom(roomCreateRqDto.getNameRoom().trim());
             room.setNumberOfComputers(roomCreateRqDto.getNumberOfComputer());
-            room.setNumberOfComputerError(roomCreateRqDto.getNumberOfComputerError());
+            room.setNumberOfComputerActive(roomCreateRqDto.getNumberOfComputerActive());
             room.setFacility(facility);
 
             this.iRoomRepository.save(room);
@@ -80,7 +80,7 @@ public class RoomServiceImpl  implements IRoomService {
         result.setIdRoom(room.getId());
         result.setNameRoom(room.getNameRoom().trim());
         result.setNumberOfComputer(room.getNumberOfComputers());
-        result.setNumberOfComputerError(room.getNumberOfComputerError());
+        result.setNumberOfComputerActive(room.getNumberOfComputerActive());
         result.setFacility(room.getFacility().getId());
 
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" ,result );
@@ -101,7 +101,7 @@ public class RoomServiceImpl  implements IRoomService {
         try {
             roomCurrent.setNameRoom(roomUpdateRqDto.getNameRoom().trim());
             roomCurrent.setNumberOfComputers(roomUpdateRqDto.getNumberOfComputer());
-            roomCurrent.setNumberOfComputerError(roomUpdateRqDto.getNumberOfComputerError());
+            roomCurrent.setNumberOfComputerActive(roomUpdateRqDto.getNumberOfComputerActive());
             roomCurrent.setFacility(facility);
             this.iRoomRepository.save(roomCurrent);
             return new ResponseSuccess<>(HttpStatus.OK.value(), "Cập nhật phòng thành công");

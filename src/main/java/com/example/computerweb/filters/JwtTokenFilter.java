@@ -1,8 +1,10 @@
 package com.example.computerweb.filters;
 
 import com.example.computerweb.components.JwtTokenUtil;
+import com.example.computerweb.exceptions.ErrorResponse;
 import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.services.UserDetailsServiceCustom;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -286,6 +288,13 @@ private final JwtTokenUtil jwtTokenUtil;
                 status,
                 (status == HttpServletResponse.SC_UNAUTHORIZED ? "Unauthorized" : "Error"),
                 message);
+
+
+//        ErrorResponse errorResponse = new ErrorResponse();
+//        errorResponse.setStatus(status);
+//        errorResponse.setError(status == HttpServletResponse.SC_UNAUTHORIZED ? "Unauthorized" : "Error");
+//        errorResponse.setMessage(message);
+//        String errorJson =
         response.getWriter().write(errorJson);
         response.getWriter().flush();
     }

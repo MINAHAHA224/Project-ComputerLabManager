@@ -17,6 +17,6 @@ public class RoomManagementDto {
     private Long id ;
     private  String nameRoom ;
     private Long numberOfComputers;
-    private Long numberOfComputerError;
+    private Long numberOfComputerActive;
     private String facility;
 }

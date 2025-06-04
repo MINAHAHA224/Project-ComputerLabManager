@@ -24,8 +24,8 @@ public class RoomEntity {
     @Column(name = "SoLuongMay")
     private Long numberOfComputers;
 
-    @Column(name = "SoLuongMayHong")
-    private Long numberOfComputerError;
+    @Column(name = "SoMayHoatDong")
+    private Long numberOfComputerActive;
 
 
     @ManyToOne

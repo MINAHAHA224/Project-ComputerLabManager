@@ -5,6 +5,7 @@ import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseDto;
 import com.example.computerweb.DTO.dto.calendarResponse.CalendarResponseFields;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestDto;
+import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestNoAutoDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestOneDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestRoomDto;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,11 @@ public interface ICalendarService {
     CalendarResponseFields handleGetDataForCreateRoomPage ();
     CalendarResponseDto handleGetDataForUpdatePage (Long calendarId);
 
-    ResponseData<?> handleCreateCalendar (CalendarRequestDto calendarRequestDto);
+    ResponseData<?> handleCreateCalendarAuto (CalendarRequestDto calendarRequestDto);
+
+    ResponseData<?> handleCreateCalendarNoAuto (CalendarRequestNoAutoDto calendarRequestDto);
+
+
     ResponseEntity<String> handleCreateRoom (CalendarRequestRoomDto calendarRequestRoomDto);
 
     ResponseData<?> handleUpdateCalendar ( CalendarRequestOneDto calendarRequestOneDto);

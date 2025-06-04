@@ -7,6 +7,7 @@ import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestDto;
+import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestNoAutoDto;
 import com.example.computerweb.DTO.requestBody.calendarRequest.CalendarRequestOneDto;
 import com.example.computerweb.services.ICalendarService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,9 +67,15 @@ public class CalendarController {
     }
 
     @Operation(summary = "Post info calendar, only of GVU", description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping("/calendarManagement/create")
-    public ResponseData<?> getCreateCalendar(@Valid @RequestBody CalendarRequestDto calendarRequestDto) {
-        return this.iCalendarService.handleCreateCalendar(calendarRequestDto);
+    @PostMapping("/calendarManagement/createAuto")
+    public ResponseData<?> getCreateCalendarAuto(@Valid @RequestBody CalendarRequestDto calendarRequestDto) {
+        return this.iCalendarService.handleCreateCalendarAuto(calendarRequestDto);
+    }
+
+    @Operation(summary = "Post info calendar, only of GVU", description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping("/calendarManagement/createNoAuto")
+    public ResponseData<?> getCreateCalendarNoAuto(@Valid @RequestBody CalendarRequestNoAutoDto calendarRequestNoAutoDto) {
+        return this.iCalendarService.handleCreateCalendarNoAuto(calendarRequestNoAutoDto);
     }
     // Create room
 //    @Operation(summary = "Page create calendar of GVU" , description = "GVU can select field calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
@@ -112,6 +119,14 @@ public class CalendarController {
     public ResponseData<?>  postDeleteCalendar (@PathVariable("calendarId") String calendarId){
         this.iCalendarService.handleDeleteCalendar(calendarId);
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Xóa lịch thành công");
+    }
+
+
+
+    @PostMapping("/calendarManagement/checkRoom")
+    public ResponseData<?> postCheckRoomCanChoose (){
+
+        return null;
     }
 
 

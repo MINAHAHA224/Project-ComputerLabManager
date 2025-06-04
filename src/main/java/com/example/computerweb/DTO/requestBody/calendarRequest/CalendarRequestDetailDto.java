@@ -42,4 +42,9 @@ public class CalendarRequestDetailDto {
     @Schema(type = "String", example = "can be blank")
     @Size(max = 255, message = "Ghi chú không được vượt quá 255 ký tự")
     private String purposeUse;
+
+    @JsonProperty("roomId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Phòng học không được để trống khi xếp lịch thủ công")
+    private Long roomId; // ID của phòng người dùng muốn chọn
 }

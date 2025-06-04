@@ -19,7 +19,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException (Exception e , WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
         errorResponse.setStatus(getStatus(e));
         errorResponse.setError(getError(e));
         errorResponse.setPath(request.getDescription(false).replace("uri=" , ""));
@@ -32,7 +31,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleInternalException (Exception e , WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
         errorResponse.setStatus(getStatus(e));
         errorResponse.setError(getError(e));
         errorResponse.setPath(request.getDescription(false).replace("uri=" , ""));
@@ -45,7 +43,6 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleCalendarException (CalendarException e , WebRequest  request){
     ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setTimestamp(new Date());
         errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         errorResponse.setError("Lịch bị trùng lặp");
         errorResponse.setPath("");

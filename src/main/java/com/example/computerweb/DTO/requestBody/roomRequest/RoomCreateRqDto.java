@@ -33,11 +33,11 @@ public class RoomCreateRqDto {
     @Schema(type = "Long", example = "35")
     private Long numberOfComputer;
 
-    @JsonProperty("numberOfComputerError")
-    @NotNull(message = "Số lượng máy tính bị lỗi không được để trống")
-    @Min(value = 0, message = "Số lượng máy tính bị lỗi ít nhất phải là 0")
-    @Max(value = 70, message = "Số lượng máy tính bị lỗi không được vượt quá 70")
+    @JsonProperty("numberOfComputerActive")
+    @NotNull(message = "Số lượng máy tính hoạt động không được để trống")
+    @Min(value = 0, message = "Số lượng máy tính hoạt động ít nhất phải là 0")
+    @Max(value = 70, message = "Số lượng máy tính hoạt động không được vượt quá 70")
     @Schema(type = "Long", example = "10")
-    private Long numberOfComputerError;
+    private Long numberOfComputerActive;
 
 }
