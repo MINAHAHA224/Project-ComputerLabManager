@@ -134,7 +134,7 @@ public class WebSecurityConfig {
                     request.requestMatchers("/roomManagement" ,"/roomManagement/**" ).hasRole("CSVC");
                     request.requestMatchers("/requestChangeCalendar/**" ,"/requestRentRoom" , "/notification/**"
                             , "/requestTickets" ,"/requestTickets/**" , "/requestRentRoomDelete").hasRole("GV");
-                    request.requestMatchers("/requestManagement").hasAnyRole("GVU" , "CSVC");
+                    request.requestMatchers("/requestManagement").hasAnyRole("GVU" , "CSVC" , "TK");
                     request.requestMatchers("/calendar" , "/home"  , "/profile" , "/access/logout").hasAnyRole("GVU" , "CSVC" , "GV");
                     request.requestMatchers("/actuator/**", "/v3/**", "/webjars/**"
                             , "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**").permitAll();

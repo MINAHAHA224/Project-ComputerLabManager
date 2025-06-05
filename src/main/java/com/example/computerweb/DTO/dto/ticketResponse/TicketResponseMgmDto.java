@@ -23,6 +23,12 @@ public class TicketResponseMgmDto {
     private String created_GVU;
     private String modified_GVU;
 
+    private String doneTK;
+    private String created_TK;
+    private String modified_TK;
+
+    private String statusOverall;
+
 
     // two Side Old - New
     private String weekSemesterOld;

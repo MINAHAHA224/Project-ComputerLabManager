@@ -44,13 +44,6 @@ public class TicketChangeDto {
     private Long caseBeginId;
 
 
-    @JsonProperty("allCase")
-    @Schema(type = "Long" , example = "4")
-    private Long allCase;
-
-    @JsonProperty("roomId")
-    @Schema(type = "Long" , example = "4")
-    private Long roomId;
 
     @NotBlank(message = "PurposeUse must not be blank")
     @JsonProperty("purposeUse")

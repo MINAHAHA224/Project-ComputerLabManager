@@ -21,4 +21,6 @@ public interface ITicketRequestRepository extends JpaRepository<TicketRequestEnt
 
     // for role CSVC
     List<TicketRequestEntity> findAllByUser (UserEntity user);
+
+    List<TicketRequestEntity> findAllByUserOrderByDateRequestDesc(UserEntity currentUser);
 }

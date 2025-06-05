@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -83,12 +84,27 @@ public class TicketRequestEntity {
     private UserEntity userGVU;
 
     @ManyToOne
+    @JoinColumn(name = "DuyetTK")
+    private StatusEntity statusTK;
+
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "CREATED_TK")
+    private Date dateCreateTK;
+
+    @ManyToOne
+    @JoinColumn(name = "MODIFIED_TK")
+    private UserEntity userTK;
+
+
+
+    @ManyToOne
     @JoinColumn(name = "TrangThaiID_FK")
     private StatusEntity statusTicket;
 
 
-    @OneToOne(mappedBy = "ticketRequest" , cascade = CascadeType.ALL)
-    private  NotificationEntity notificationEntity;
+    @OneToMany(mappedBy = "ticketRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NotificationEntity> notifications;
 
 
 

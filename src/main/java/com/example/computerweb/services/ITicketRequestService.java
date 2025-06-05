@@ -5,6 +5,12 @@ import com.example.computerweb.DTO.dto.notificationResponse.NotificationDetailRe
 import com.example.computerweb.DTO.dto.notificationResponse.NotificationResponseDto;
 import com.example.computerweb.DTO.dto.requestTicketResponse.RequestTicketResponseDto;
 import com.example.computerweb.DTO.dto.ticketResponse.TicketResponseMgmDto;
+import com.example.computerweb.DTO.reponseBody.ResponseData;
+import com.example.computerweb.DTO.requestBody.roomRequest.TicketCancelCalendarRequestDto;
+import com.example.computerweb.DTO.requestBody.roomRequest.TicketChangeRoomRequestDto;
+import com.example.computerweb.DTO.requestBody.roomRequest.TicketRentRoomRequestDto;
+import com.example.computerweb.DTO.requestBody.ticketRequest.TicketApprovalDto;
+import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeRequestDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketManagementRequestDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketRentDto;
@@ -20,7 +26,7 @@ public interface ITicketRequestService {
     TicketResponseMgmDto handleGetDetailRequest (Long ticketId);
 
 
-    ResponseEntity<String> HandleTicketRequest (TicketManagementRequestDto ticketManagementRequestDto);
+    ResponseEntity<String> handleTicketRequest (TicketManagementRequestDto ticketManagementRequestDto);
 
     ResponseEntity<String> handleCreateTicketDeleteRoom ( Long calendarId , String message);
 
@@ -43,4 +49,23 @@ public interface ITicketRequestService {
     TicketResponseMgmDto handleGetRequestTicketGV(Long id);
 
     ResponseEntity<String> handleDeleteOneOrMoreTicketRequest ( String  requestTicketId );
+
+    // test changeCalendar
+    ResponseData<?> createChangeCalendarTicket(TicketChangeRequestDto changeRequestDto);
+
+    ResponseData<?> processChangeCalendarTicketApproval(TicketApprovalDto approvalDto);
+
+
+    // testRentRom and cancelRoom
+
+    ResponseData<?> createRentRoomTicket(TicketRentRoomRequestDto rentRequestDto);
+
+    ResponseData<?> processRentRoomTicketApproval(TicketApprovalDto approvalDto); // Xử lý duyệt phiếu mượn phòng
+
+    ResponseData<?> createChangeRoomTicket(TicketChangeRoomRequestDto changeRequestDto);
+    ResponseData<?> processChangeRoomTicketApproval(TicketApprovalDto approvalDto); // Xử lý duyệt phiếu thay phòng
+    ResponseData<?> createCancelCalendarTicket(TicketCancelCalendarRequestDto cancelRequestDto);
+    ResponseData<?> processCancelCalendarTicketApproval(TicketApprovalDto approvalDto); // Xử lý duyệt phiếu hủy lịch
+
+
 }

@@ -7,5 +7,7 @@ import java.util.List;
 public interface TicketRequestCustom {
 
 
-    List<TicketRequestOneDto>  findListTicketRequestForCSVC ();
+
+
+    List<TicketRequestOneDto> findListTicketForRole ( String role);
 }

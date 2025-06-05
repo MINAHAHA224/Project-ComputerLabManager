@@ -40,7 +40,7 @@ public class NotificationEntity {
     private StatusEntity status;
 
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "YeuCauID_FK" )
+    @ManyToOne(fetch = FetchType.LAZY) // LAZY để không load phiếu khi không cần
+    @JoinColumn(name = "YeuCauID_FK", nullable = false) // Khớp với tên cột trong DB
     private TicketRequestEntity ticketRequest;
 }

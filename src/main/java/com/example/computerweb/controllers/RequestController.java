@@ -9,7 +9,11 @@ import com.example.computerweb.DTO.dto.ticketResponse.TicketResponseMgmDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
+import com.example.computerweb.DTO.requestBody.roomRequest.TicketChangeRoomRequestDto;
+import com.example.computerweb.DTO.requestBody.roomRequest.TicketRentRoomRequestDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.*;
+import com.example.computerweb.DTO.requestBody.ticketRequest.TicketApprovalDto;
+import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeRequestDto;
 import com.example.computerweb.services.ICalendarService;
 import com.example.computerweb.services.ITicketRequestService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,13 +48,39 @@ public class RequestController {
         TicketResponseMgmDto data = this.iTicketRequestService.handleGetDetailRequest(ticketId);
         return new ResponseSuccess<>(HttpStatus.OK.value() , "Thực hiện thành công" , data);
     }
-    @PostMapping("/requestManagement")
-    @Operation(summary = "This feature for GVU|CSVC" , description = "If Approval just post 2 field id,status | " +
+//    @PostMapping("/requestManagement")
+//    @Operation(summary = "This feature for GVU|CSVC" , description = "If Approval just post 2 field id,status | " +
+//            "If REJECT post 3 field id , status , noteInformation  ", security = @SecurityRequirement(name = "bearerAuth"))
+//    public ResponseData<?> postRequestManager (@Valid @RequestBody TicketManagementRequestDto ticketManagementRequestDto){
+//        ResponseEntity<String> handleTicketRequest =  this.iTicketRequestService.handleTicketRequest(ticketManagementRequestDto);
+//        return new ResponseSuccess<>(HttpStatus.OK.value(), handleTicketRequest.getBody()  );
+//    }
+//Test
+    @PostMapping("/processChangeCalendar")
+    @Operation(summary = "This feature for TK" , description = "If Approval just post 2 field id,status | " +
             "If REJECT post 3 field id , status , noteInformation  ", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseData<?> postRequestManager (@Valid @RequestBody TicketManagementRequestDto ticketManagementRequestDto){
-        ResponseEntity<String> handleTicketRequest =  this.iTicketRequestService.HandleTicketRequest(ticketManagementRequestDto);
-        return new ResponseSuccess<>(HttpStatus.OK.value(), handleTicketRequest.getBody()  );
+    public ResponseData<?> postProcessChangeCalendar (@Valid @RequestBody TicketApprovalDto approvalDto){
+        ResponseData<?> handleTicketRequest =  this.iTicketRequestService.processChangeCalendarTicketApproval(approvalDto);
+        return handleTicketRequest;
     }
+
+    @PostMapping("/processChangeRoom")
+    @Operation(summary = "This feature for CSVC" , description = "If Approval just post 2 field id,status | " +
+            "If REJECT post 3 field id , status , noteInformation  ", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseData<?> postProcessChangeRoom (@Valid @RequestBody TicketApprovalDto approvalDto){
+        ResponseData<?> handleTicketRequest =  this.iTicketRequestService.processChangeRoomTicketApproval(approvalDto);
+        return handleTicketRequest;
+    }
+
+
+    @PostMapping("/processRentRoom")
+    @Operation(summary = "This feature for GVU" , description = "If Approval just post 2 field id,status | " +
+            "If REJECT post 3 field id , status , noteInformation  ", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseData<?> postProcessRentRoom (@Valid @RequestBody TicketApprovalDto approvalDto){
+        ResponseData<?> handleTicketRequest =  this.iTicketRequestService.processRentRoomTicketApproval(approvalDto);
+        return handleTicketRequest;
+    }
+    //Test
 
 
     // REQUEST CHANGE CALENDAR => lich chinh thuc , lich muon phong
@@ -62,12 +92,23 @@ public class RequestController {
     }
 
 
+//    @Operation(summary = "This feature only for GV" , description = "When GV filed full input  then post values back", security = @SecurityRequirement(name = "bearerAuth"))
+//    @PostMapping("/requestChangeCalendar")
+//    public ResponseData<?> postCreateTicket (@Valid  @RequestBody TicketChangeDto ticketChangeDto){
+//        ResponseEntity<String> handleCreateTicket = this.iTicketRequestService.handlePostCreateTicketChangeCalendar(ticketChangeDto);
+//        return new ResponseSuccess<>(HttpStatus.OK.value(), handleCreateTicket.getBody());
+//    }
+
+    //Test
     @Operation(summary = "This feature only for GV" , description = "When GV filed full input  then post values back", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/requestChangeCalendar")
-    public ResponseData<?> postCreateTicket (@Valid  @RequestBody TicketChangeDto ticketChangeDto){
-        ResponseEntity<String> handleCreateTicket = this.iTicketRequestService.handlePostCreateTicketChangeCalendar(ticketChangeDto);
-        return new ResponseSuccess<>(HttpStatus.OK.value(), handleCreateTicket.getBody());
+    public ResponseData<?>  postCreateTicket (@Valid  @RequestBody TicketChangeRequestDto changeRequestDto){
+            ResponseData<?>  handleCreateTicket = this.iTicketRequestService.createChangeCalendarTicket(changeRequestDto);
+        return  handleCreateTicket;
     }
+
+
+    //Test
 
     // REQUEST CHANGE ROOM => lich chinh thuc , lich muon phong
     @Operation(summary = "This feature only for GV" , description = "When GV action change calendar", security = @SecurityRequirement(name = "bearerAuth"))
@@ -79,9 +120,9 @@ public class RequestController {
 
     @Operation(summary = "This feature only for GV" , description = "When GV filed full input  then post values back", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/requestChangeRoom")
-    public ResponseData<?> postCreateTicketChangeRoom (@Valid  @RequestBody TicketChangeDto ticketChangeDto){
-        ResponseEntity<String> handleCreateTicket = this.iTicketRequestService.handlePostCreateTicketChangeCalendar(ticketChangeDto);
-        return new ResponseSuccess<>(HttpStatus.OK.value(), handleCreateTicket.getBody());
+    public ResponseData<?> postCreateTicketChangeRoom (@Valid  @RequestBody TicketChangeRoomRequestDto changeRequestDto){
+        ResponseData<?> handleCreateTicket = this.iTicketRequestService.createChangeRoomTicket(changeRequestDto);
+        return handleCreateTicket;
     }
 
 
@@ -99,6 +140,13 @@ public class RequestController {
     public ResponseData<?> postRequestRentRoom (@Valid @RequestBody TicketRentDto ticketRentDto){
         ResponseEntity<String> handleCreateRentRoom = this.iTicketRequestService.handlePostCreateTicketRentRoom(ticketRentDto);
         return new ResponseSuccess<>(HttpStatus.OK.value(),  handleCreateRentRoom.getBody());
+    }
+
+    @Operation(summary = "This feature only for GV" , description = "When GV action rent room", security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping("/requestRentRoomTest")
+    public ResponseData<?> postRequestRentRoomTest (@Valid @RequestBody TicketRentRoomRequestDto rentRequestDto){
+        ResponseData<?> handleCreateRentRoom = this.iTicketRequestService.createRentRoomTicket(rentRequestDto);
+        return handleCreateRentRoom;
     }
 
     // REQUEST DELETE ROOM RENT
@@ -130,7 +178,6 @@ public class RequestController {
     @GetMapping("/requestTickets/{idTicketRequest}")
     public ResponseData<TicketResponseMgmDto> getOneRequestTickets (@PathVariable("idTicketRequest") Long idTicketRequest){
         TicketResponseMgmDto data = this.iTicketRequestService.handleGetRequestTicketGV(idTicketRequest);
-
         return  new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" , data);
     }
 

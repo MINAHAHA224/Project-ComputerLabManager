@@ -14,6 +14,9 @@ public class RequestTicketResponseDto {
     private String userSent;
     private String statusCSVC;
     private String statusGVU;
+    private String statusTK;
+
+    private String statusOverall;
 
 
 }

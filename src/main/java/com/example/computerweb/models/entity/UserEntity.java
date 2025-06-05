@@ -107,4 +107,8 @@ public class UserEntity extends AbstractEntity implements   Serializable {
     @OneToMany(mappedBy = "userGVU")
     private List<TicketRequestEntity> ticketRequestGVUs;
 
+
+    @OneToMany(mappedBy = "userTK")
+    private List<TicketRequestEntity> ticketRequestTKs;
+
 }

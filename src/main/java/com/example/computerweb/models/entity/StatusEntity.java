@@ -33,6 +33,9 @@ public class StatusEntity {
     @OneToMany(mappedBy = "statusGVU")
     private List<TicketRequestEntity> ticketRequestDoneGVU;
 
+    @OneToMany(mappedBy = "statusTK")
+    private List<TicketRequestEntity> ticketRequestDoneTK;
+
     @OneToMany(mappedBy = "statusTicket")
     private List<TicketRequestEntity> ticketRequests;
 

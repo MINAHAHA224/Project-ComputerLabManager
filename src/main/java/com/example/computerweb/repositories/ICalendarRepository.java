@@ -24,6 +24,7 @@ public interface ICalendarRepository extends JpaRepository<CalendarEntity , Long
         boolean existsByCreditClass ( CreditClassEntity creditClass);
         void deleteById( Long id);
 
+        int countCalendarEntityByStatus ( StatusEntity status);
 
         List<CalendarEntity> findAllByWeekSemesterAndDayAndRoomAndStatus(
                 WeekSemesterEntity weekSemester,
