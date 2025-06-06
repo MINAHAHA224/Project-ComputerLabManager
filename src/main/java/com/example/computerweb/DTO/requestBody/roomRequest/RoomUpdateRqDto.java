@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class RoomUpdateRqDto {
-
+    @Schema(type = "Long" , example = "10")
     private Long idRoom;
 
     @JsonProperty("nameRoom")

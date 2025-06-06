@@ -77,25 +77,6 @@ public class CalendarController {
     public ResponseData<?> getCreateCalendarNoAuto(@Valid @RequestBody CalendarRequestNoAutoDto calendarRequestNoAutoDto) {
         return this.iCalendarService.handleCreateCalendarNoAuto(calendarRequestNoAutoDto);
     }
-    // Create room
-//    @Operation(summary = "Page create calendar of GVU" , description = "GVU can select field calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
-//    @GetMapping("/calendarManagement/createRoom")
-//    public ResponseData<CalendarResponseFields> getCreateRoomCalendarManagement (){
-//        CalendarResponseFields data = this.iCalendarService.handleGetDataForCreateRoomPage();
-//        return new ResponseSuccess<>(HttpStatus.OK.value(),"Execute data success" ,data );
-//    }
-//
-//    @Operation(summary = "Post info calendar, only of GVU" , description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
-//    @PostMapping("/calendarManagement/createRoom")
-//    public ResponseData<?> getCreateRoom (@RequestBody CalendarRequestRoomDto calendarRequestRoomDto){
-//        ResponseEntity<String> createRoom =  this.iCalendarService.handleCreateRoom(calendarRequestRoomDto);
-//        if ( createRoom.getStatusCode() == HttpStatus.BAD_REQUEST){
-//            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), createRoom.getBody());
-//        }else {
-//            return new ResponseSuccess<>(HttpStatus.OK.value(), createRoom.getBody());
-//        }
-//
-//    }
 
     // UPDATE BOTH lich chinh thuc , lich muon phong
     @Operation(summary = "Show info calendar of user" , description = "GVU can update info calendar of user on this page", security = @SecurityRequirement(name = "bearerAuth"))
@@ -123,11 +104,6 @@ public class CalendarController {
 
 
 
-    @PostMapping("/calendarManagement/checkRoom")
-    public ResponseData<?> postCheckRoomCanChoose (){
-
-        return null;
-    }
 
 
     

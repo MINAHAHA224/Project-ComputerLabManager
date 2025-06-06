@@ -1635,13 +1635,5 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Xử lý Thay đổi phòng thành công. " + notificationContent);
     }
 
-    @Override
-    public ResponseData<?> createCancelCalendarTicket(TicketCancelCalendarRequestDto cancelRequestDto) {
-        return null;
-    }
 
-    @Override
-    public ResponseData<?> processCancelCalendarTicketApproval(TicketApprovalDto approvalDto) {
-        return null;
-    }
 }

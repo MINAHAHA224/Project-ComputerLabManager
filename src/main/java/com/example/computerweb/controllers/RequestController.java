@@ -48,13 +48,7 @@ public class RequestController {
         TicketResponseMgmDto data = this.iTicketRequestService.handleGetDetailRequest(ticketId);
         return new ResponseSuccess<>(HttpStatus.OK.value() , "Thực hiện thành công" , data);
     }
-//    @PostMapping("/requestManagement")
-//    @Operation(summary = "This feature for GVU|CSVC" , description = "If Approval just post 2 field id,status | " +
-//            "If REJECT post 3 field id , status , noteInformation  ", security = @SecurityRequirement(name = "bearerAuth"))
-//    public ResponseData<?> postRequestManager (@Valid @RequestBody TicketManagementRequestDto ticketManagementRequestDto){
-//        ResponseEntity<String> handleTicketRequest =  this.iTicketRequestService.handleTicketRequest(ticketManagementRequestDto);
-//        return new ResponseSuccess<>(HttpStatus.OK.value(), handleTicketRequest.getBody()  );
-//    }
+
 //Test
     @PostMapping("/processChangeCalendar")
     @Operation(summary = "This feature for TK" , description = "If Approval just post 2 field id,status | " +
@@ -92,12 +86,7 @@ public class RequestController {
     }
 
 
-//    @Operation(summary = "This feature only for GV" , description = "When GV filed full input  then post values back", security = @SecurityRequirement(name = "bearerAuth"))
-//    @PostMapping("/requestChangeCalendar")
-//    public ResponseData<?> postCreateTicket (@Valid  @RequestBody TicketChangeDto ticketChangeDto){
-//        ResponseEntity<String> handleCreateTicket = this.iTicketRequestService.handlePostCreateTicketChangeCalendar(ticketChangeDto);
-//        return new ResponseSuccess<>(HttpStatus.OK.value(), handleCreateTicket.getBody());
-//    }
+
 
     //Test
     @Operation(summary = "This feature only for GV" , description = "When GV filed full input  then post values back", security = @SecurityRequirement(name = "bearerAuth"))
@@ -135,35 +124,18 @@ public class RequestController {
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công" ,calendarResponseFields);
     }
 
-    @Operation(summary = "This feature only for GV" , description = "When GV action rent room", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping("/requestRentRoom")
-    public ResponseData<?> postRequestRentRoom (@Valid @RequestBody TicketRentDto ticketRentDto){
-        ResponseEntity<String> handleCreateRentRoom = this.iTicketRequestService.handlePostCreateTicketRentRoom(ticketRentDto);
-        return new ResponseSuccess<>(HttpStatus.OK.value(),  handleCreateRentRoom.getBody());
-    }
+
 
     @Operation(summary = "This feature only for GV" , description = "When GV action rent room", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping("/requestRentRoomTest")
-    public ResponseData<?> postRequestRentRoomTest (@Valid @RequestBody TicketRentRoomRequestDto rentRequestDto){
+    @PostMapping("/requestRentRoom")
+    public ResponseData<?> postRequestRentRoom (@Valid @RequestBody TicketRentRoomRequestDto rentRequestDto){
         ResponseData<?> handleCreateRentRoom = this.iTicketRequestService.createRentRoomTicket(rentRequestDto);
         return handleCreateRentRoom;
     }
 
     // REQUEST DELETE ROOM RENT
 
-    @Operation(summary = "This feature only for GV" , description = "When GV action rent room", security = @SecurityRequirement(name = "bearerAuth"))
-    @PostMapping("/requestRentRoomDelete")
-    public  ResponseData<?> postDeleteRentRoom (@RequestBody TicketDeleteRentRoomDto ticketDeleteRentRoomDto){
-        ResponseEntity<String>   handleCreateTicketDeleteRoom = this.iTicketRequestService.handleCreateTicketDeleteRoom(ticketDeleteRentRoomDto.getCalendarId() , ticketDeleteRentRoomDto.getMessage());
-        if ( handleCreateTicketDeleteRoom.getStatusCode() == HttpStatus.OK){
-            return new ResponseSuccess<>(handleCreateTicketDeleteRoom.getStatusCode().value(),  handleCreateTicketDeleteRoom.getBody());
 
-        }else {
-            return new ResponseFailure(handleCreateTicketDeleteRoom.getStatusCode().value(), handleCreateTicketDeleteRoom.getBody() );
-        }
-
-
-    }
 
 
 

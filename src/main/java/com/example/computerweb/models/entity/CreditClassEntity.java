@@ -26,8 +26,7 @@ public class CreditClassEntity implements Serializable {
     private Long credits;
 
 
-    @Column(name = "SoTcDc")
-    private Long creditSelected;
+
 
     @Column(name = "Nhom")
     private String group;

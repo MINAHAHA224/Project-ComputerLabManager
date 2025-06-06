@@ -1,8 +1,10 @@
 package com.example.computerweb.DTO.reponseBody;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ResponseData<T> {
+    @Schema(type = "int" , example = "200")
     private final int status;
     private final String message;
 

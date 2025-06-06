@@ -64,8 +64,7 @@ public interface ITicketRequestService {
 
     ResponseData<?> createChangeRoomTicket(TicketChangeRoomRequestDto changeRequestDto);
     ResponseData<?> processChangeRoomTicketApproval(TicketApprovalDto approvalDto); // Xử lý duyệt phiếu thay phòng
-    ResponseData<?> createCancelCalendarTicket(TicketCancelCalendarRequestDto cancelRequestDto);
-    ResponseData<?> processCancelCalendarTicketApproval(TicketApprovalDto approvalDto); // Xử lý duyệt phiếu hủy lịch
+
 
 
 }

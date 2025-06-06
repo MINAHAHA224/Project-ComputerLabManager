@@ -154,12 +154,12 @@ public class UserServiceImpl implements IUserService {
                     // ==> trong jwt cua minh ko co quyen chi co moi email va thoi gian het han token jwt thoi
                     String token = this.jwtTokenUtil.generateToken(userCurrent);
 
-                    HttpServletRequest currentRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-                    HttpSession session = currentRequest.getSession(true); // Lấy session hiện tại hoặc tạo mới
-
-                    // ĐẶT TIMEOUT CHO SESSION
-                    session.setMaxInactiveInterval(5 * 60); // 5 phút * 60 giây/phút = 300 giây
-                    session.setAttribute("USER_ACTIVE_JWT", token);
+//                    HttpServletRequest currentRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+//                    HttpSession session = currentRequest.getSession(true); // Lấy session hiện tại hoặc tạo mới
+//
+//                    // ĐẶT TIMEOUT CHO SESSION
+//                    session.setMaxInactiveInterval(5 * 60); // 5 phút * 60 giây/phút = 300 giây
+//                    session.setAttribute("USER_ACTIVE_JWT", token);
 
                     return ResponseEntity.ok().body(token);
                 } catch (Exception e) {
