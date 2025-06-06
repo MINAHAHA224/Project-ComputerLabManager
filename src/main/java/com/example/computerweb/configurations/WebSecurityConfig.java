@@ -130,10 +130,11 @@ public class WebSecurityConfig {
                     request.requestMatchers(
                             "/access/login" , "/access/forgotPassword"  ).permitAll();
                     request.requestMatchers(
-                            "/calendarManagement/**" , "/userManagement/**" , "/creditClassManagement/**" ,"/creditClassManagement" ).hasRole("GVU");
-                    request.requestMatchers("/roomManagement" ,"/roomManagement/**" ).hasRole("CSVC");
-                    request.requestMatchers("/requestChangeCalendar/**" ,"/requestRentRoom" , "/notification/**"
-                            , "/requestTickets" ,"/requestTickets/**" , "/requestRentRoomDelete").hasRole("GV");
+                            "/calendarManagement/**" , "/userManagement/**" , "/creditClassManagement/**" ,"/creditClassManagement" , "/processRentRoom" ).hasRole("GVU");
+                    request.requestMatchers("/processChangeCalendar").hasRole("TK");
+                    request.requestMatchers("/roomManagement" ,"/roomManagement/**" , "/processChangeRoom" ).hasRole("CSVC");
+                    request.requestMatchers("/requestChangeCalendar/**","/requestChangeRoom/**" ,"/requestRentRoom" , "/notification/**"
+                            , "/requestTickets" ,"/requestTickets/**" ).hasRole("GV");
                     request.requestMatchers("/requestManagement").hasAnyRole("GVU" , "CSVC" , "TK");
                     request.requestMatchers("/calendar" , "/home"  , "/profile" , "/access/logout").hasAnyRole("GVU" , "CSVC" , "GV");
                     request.requestMatchers("/actuator/**", "/v3/**", "/webjars/**"
