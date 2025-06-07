@@ -16,4 +16,6 @@ public interface IRoomRepository  extends JpaRepository<RoomEntity , Long> , Roo
     List<RoomEntity> findRoomEntitiesByFacility (FacilityEntity facility);
 
     boolean existsByNameRoom ( String nameRoom);
+
+
 }

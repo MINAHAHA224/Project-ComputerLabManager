@@ -7,9 +7,10 @@ import com.example.computerweb.DTO.requestBody.roomRequest.RoomUpdateRqDto;
 import com.example.computerweb.services.IRoomService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.Getter;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,9 +26,15 @@ public class RoomController {
         return this.iRoomService.handleGetAllDateRoom();
     }
 
+//    @PostMapping (value = "/roomManagement/create")
+//    public ResponseEntity<ResponseData<?>>  postCreateRoom (@Valid  @RequestBody RoomCreateRqDto roomCreateRqDto){
+//        ResponseData<?> response = this.iRoomService.handleCreateRoom(roomCreateRqDto);
+//        return  ResponseEntity.status(response.getStatus()).body(response);
+//    }
+
     @PostMapping (value = "/roomManagement/create")
-    public ResponseData<?> postCreateRoom (@Valid  @RequestBody RoomCreateRqDto roomCreateRqDto){
-        return this.iRoomService.handleCreateRoom(roomCreateRqDto);
+    public ResponseData<?>  postCreateRoom (@Valid  @RequestBody RoomCreateRqDto roomCreateRqDto){
+        return  this.iRoomService.handleCreateRoom(roomCreateRqDto);
     }
 
     @GetMapping(value = "/roomManagement/update/{idRoom}")
