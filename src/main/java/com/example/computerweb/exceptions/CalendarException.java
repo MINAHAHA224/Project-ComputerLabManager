@@ -1,5 +1,8 @@
 package com.example.computerweb.exceptions;
 
+import lombok.Getter;
+
+@Getter
 public class CalendarException extends  RuntimeException{
     private final String errorMessage;
 
@@ -8,7 +11,4 @@ public class CalendarException extends  RuntimeException{
         this.errorMessage = message;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
 }
