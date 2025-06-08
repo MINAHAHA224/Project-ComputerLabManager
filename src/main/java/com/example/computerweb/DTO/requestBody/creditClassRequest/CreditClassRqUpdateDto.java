@@ -36,4 +36,8 @@ public class CreditClassRqUpdateDto {
     @Pattern(regexp = "^\\d{2}$", message = "Nhóm phải có chính xác 2 chữ số")
     @Schema(type = "String" , example = "02")
     private String group;
+
+    @JsonProperty("isPractice")
+    @NotNull(message = "Vui lòng chọn nhóm có phải là nhóm thực hành hay không")
+    private boolean isPractice;
 }

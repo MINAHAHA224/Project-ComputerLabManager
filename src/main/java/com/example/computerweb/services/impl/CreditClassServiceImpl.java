@@ -188,14 +188,12 @@ public ResponseData<?> handleCreateCreditClass(CreditClassRqCreateDto creditClas
     // Ném ra các exception nghiệp vụ cụ thể nếu vi phạm.
 
     // Ví dụ: Kiểm tra sĩ số lớp tín chỉ không được lớn hơn sĩ số của lớp học chính quy.
-    if (creditClassRqCreateDto.getNumberOfStudentLTC().compareTo(classroom.getNumberOfStudents()) > 0) {
-        throw new DataConflictException(String.format(
-                "Sĩ số lớp tín chỉ (%d) không được lớn hơn sĩ số lớp học chính quy '%s' (%d).",
-                creditClassRqCreateDto.getNumberOfStudentLTC(),
-                classroom.getNameClassroom(),
-                classroom.getNumberOfStudents()
-        ));
+    if (creditClassRqCreateDto.getNumberOfStudentLTC() < 15) {
+        throw new DataConflictException("Số lượng sinh viên phải ít nhất 15 mới có thể mở lớp tín chỉ");
     }
+
+
+
 
     // Có thể thêm các quy tắc khác ở đây, ví dụ:
     // if (iCreditClassRepository.existsByNameCreditClass(creditClassRqCreateDto.getCodeCreditClass())) {
@@ -217,9 +215,9 @@ public ResponseData<?> handleCreateCreditClass(CreditClassRqCreateDto creditClas
     CreditClassEntity savedCreditClass = iCreditClassRepository.save(newCreditClass);
 
     // === BƯỚC 4: TẠO CÁC TỔ HỢP (NẾU CẦN) ===
-    String group = creditClassRqCreateDto.getGroup().trim();
+   boolean isPractice = creditClassRqCreateDto.isPractice();
     // Logic tạo tổ hợp chỉ áp dụng khi nhóm là '02' (hoặc các nhóm thực hành khác)
-    if ("02".equals(group)) {
+    if (isPractice) {
         createCombinationsForClass(savedCreditClass);
     }
 
@@ -361,7 +359,7 @@ public ResponseData<?> handleCreateCreditClass(CreditClassRqCreateDto creditClas
 @Override
 @Transactional
 public ResponseData<?> handleUpdateCreditClassDetail(CreditClassRqUpdateDto creditClassRqUpdateDto) {
-    // === BƯỚC 1: VALIDATE SỰ TỒN TẠI CỦA CÁC THỰC THỂ LIÊN QUAN ===
+    // === BƯỚC 1: VALIDATE ===
     Long creditClassId = creditClassRqUpdateDto.getCreditClassId();
     CreditClassEntity creditClass = iCreditClassRepository.findById(creditClassId)
             .orElseThrow(() -> new DataNotFoundException("Không tìm thấy Lớp tín chỉ với ID: " + creditClassId));
@@ -369,42 +367,48 @@ public ResponseData<?> handleUpdateCreditClassDetail(CreditClassRqUpdateDto cred
     UserEntity newTeacher = iUserRepository.findById(creditClassRqUpdateDto.getTeacherId())
             .orElseThrow(() -> new DataNotFoundException("Không tìm thấy Giáo viên với ID: " + creditClassRqUpdateDto.getTeacherId()));
 
-    // === BƯỚC 2: KIỂM TRA CÁC QUY TẮC NGHIỆP VỤ ===
+    // === BƯỚC 2: KIỂM TRA NGHIỆP VỤ ===
     Long newStudents = creditClassRqUpdateDto.getNumberOfStudentLTC();
     String newGroup = creditClassRqUpdateDto.getGroup().trim();
+    boolean newIsPractice = creditClassRqUpdateDto.isPractice();
 
-    boolean isGroupOrStudentChanged = !creditClass.getGroup().trim().equals(newGroup) ||
-            !creditClass.getNumberOfStudentsLTC().equals(newStudents);
+    // Suy luận trạng thái isPractice hiện tại từ việc có tổ hợp hay không
+    boolean currentIsPractice = !creditClass.getCreditClassToEntities().isEmpty();
 
-    // Nếu sĩ số hoặc nhóm thay đổi, phải kiểm tra xem lớp đã được xếp lịch chưa.
-    if (isGroupOrStudentChanged) {
+    // === THAY ĐỔI LOGIC CHÍNH Ở ĐÂY ===
+    // Điều kiện tái tạo tổ hợp được mở rộng: thay đổi sĩ số, nhóm, HOẶC trạng thái thực hành
+    boolean needsCombinationUpdate = !creditClass.getGroup().trim().equals(newGroup) ||
+            !creditClass.getNumberOfStudentsLTC().equals(newStudents) ||
+            currentIsPractice != newIsPractice;
+
+    if (needsCombinationUpdate) {
+        // Nếu có bất kỳ thay đổi nào ảnh hưởng đến tổ hợp, kiểm tra xem lớp đã có lịch chưa
         boolean hasCalendar = iCalendarRepository.existsByCreditClass(creditClass);
         if (hasCalendar) {
-            throw new DataConflictException("Lớp tín chỉ đã được xếp lịch, không thể thay đổi sĩ số hoặc nhóm thực hành.");
+            throw new DataConflictException("Lớp tín chỉ đã được xếp lịch, không thể thay đổi thông tin thực hành (sĩ số, nhóm, trạng thái thực hành).");
         }
     }
 
-    // (Optional) Kiểm tra sĩ số mới có hợp lệ so với lớp chính quy không
     if (newStudents < 15) {
         throw new DataConflictException("Số lượng sinh viên phải ít nhất 15 mới có thể mở lớp tín chỉ");
     }
 
     // === BƯỚC 3: CẬP NHẬT THÔNG TIN LỚP TÍN CHỈ ===
-    creditClass.setUser(newTeacher); // Luôn cho phép cập nhật giáo viên
+    creditClass.setUser(newTeacher);
     creditClass.setNumberOfStudentsLTC(newStudents);
     creditClass.setGroup(newGroup);
 
     // Lưu các thay đổi cơ bản vào DB
     CreditClassEntity updatedCreditClass = iCreditClassRepository.save(creditClass);
 
-    // === BƯỚC 4: TÁI TẠO CÁC TỔ HỢP NẾU CẦN ===
-    // Nếu sĩ số hoặc nhóm thay đổi, ta cần tái tạo lại danh sách tổ hợp
-    if (isGroupOrStudentChanged) {
+    // === BƯỚC 4: TÁI TẠO TỔ HỢP DỰA TRÊN ĐIỀU KIỆN MỚI ===
+    if (needsCombinationUpdate) {
         // Xóa tất cả các tổ hợp cũ
         iCreditClassToRepository.deleteByCreditClass(updatedCreditClass);
+        iCreditClassToRepository.flush(); // Đảm bảo câu lệnh DELETE được thực thi trước các câu lệnh INSERT tiếp theo trong cùng transaction
 
-        // Tạo lại các tổ hợp mới dựa trên thông tin mới
-        if ("02".equals(newGroup)) { // Hoặc logic khác để xác định nhóm thực hành
+        // Tạo lại tổ hợp mới chỉ khi isPractice là true
+        if (newIsPractice) {
             createCombinationsForClass(updatedCreditClass);
         }
     }

@@ -59,5 +59,8 @@ public class CreditClassRqCreateDto {
 //    @Schema(type = "String" , example = "4")
 //    private Long creditLTC;
 
+    @JsonProperty("isPractice")
+    @NotNull(message = "Vui lòng chọn nhóm có phải là nhóm thực hành hay không")
+    private boolean isPractice;
 
 }
