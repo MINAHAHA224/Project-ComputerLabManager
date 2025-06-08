@@ -26,7 +26,27 @@ public class CalendarRequestNoAutoDto {
     @NotNull(message = "Cơ sở không được để trống")
     private Long idFacility;
 
+    @JsonProperty("allCase")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Tổng tiết không được để trống")
+    private Long allCase;
+
+    @JsonProperty("practiceCaseBeginId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Tiết bắt đầu không được để trống")
+    private Long practiceCaseBeginId;
+
+    @JsonProperty("weekSemesterId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Tuần học không được để trống")
+    private Long weekSemesterId;
+
+    @JsonProperty("dayId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Thứ không được để trống")
+    private Long dayId;
+
     @NotEmpty(message = "Danh sách Calendar Detail không được để trống")
     @Valid // Để kích hoạt validate cho các phần tử bên trong List
-    List<CalendarRequestDetailDto> calendarDetail;
+    List<CalendarRequestDetailNoAutoDto> calendarDetail;
 }

@@ -39,16 +39,14 @@ public class CalendarController {
     @Operation(summary = "Show all calendar" , description = "If GVU show all data , " +
             "If CSVC show some fields ex : Date,Room, PracticeCase , Time , " +
             "If GV only show data calendar of GV ", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseData<List<CalendarManagementDto>> getCalendar (){
-        List<CalendarManagementDto> data = this.iCalendarService.handleGetAllDataCalendar();
-
-        return new ResponseData<>(HttpStatus.OK.value() , "Thực hiện thành công" , data );
+    public ResponseData<?> getCalendar (){
+        return this.iCalendarService.handleGetAllDataCalendar();
     }
+
     @Operation(summary = "Show all data calendar admin page" , description = "GVU can setting update|delete on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement")
-    public ResponseData<List<CalendarManagementDto>> getCalendarManagement (){
-       List<CalendarManagementDto> data = this.iCalendarService.handleGetAllDataCalendar();
-            return new ResponseData<>(HttpStatus.OK.value() , "Thực hiện thành công" , data );
+    public ResponseData<?> getCalendarManagement (){
+        return this.iCalendarService.handleGetAllDataCalendar();
     }
 
     // Create Calendar
@@ -62,8 +60,7 @@ public class CalendarController {
     @Operation(summary = "GVU Choose WeekStudy" , description = "GVU Choose WeekStudy when choose CreditClass", security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/calendarManagement/{semesterYear}")
     public ResponseData<?> getWeekStudyForCreateCreditClass(@PathVariable("semesterYear") String semesterYear){
-        ArrayList<Map<String, String>> data = this.iCalendarService.handleWeekStudyForCreateCreditClass(semesterYear);
-        return new ResponseSuccess<>(HttpStatus.OK.value(),"Thực hiện thành công" ,data );
+        return this.iCalendarService.handleWeekStudyForCreateCreditClass(semesterYear);
     }
 
     @Operation(summary = "Post info calendar, only of GVU", description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
@@ -71,6 +68,7 @@ public class CalendarController {
     public ResponseData<?> getCreateCalendarAuto(@Valid @RequestBody CalendarRequestDto calendarRequestDto) {
         return this.iCalendarService.handleCreateCalendarAuto(calendarRequestDto);
     }
+
 
     @Operation(summary = "Post info calendar, only of GVU", description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/calendarManagement/createNoAuto")
@@ -98,13 +96,18 @@ public class CalendarController {
     @Operation(summary = "Feature delete of GVU" , security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping  ("/calendarManagement/delete/{calendarId}")
     public ResponseData<?>  postDeleteCalendar (@PathVariable("calendarId") String calendarId){
-        this.iCalendarService.handleDeleteCalendar(calendarId);
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Xóa lịch thành công");
+        return  this.iCalendarService.handleDeleteCalendar(calendarId);
     }
 
 
 
 
-
+    // === API ĐÃ ĐƯỢC ĐƠN GIẢN HÓA ===
+    @Operation(summary = "Feature delete a whole session (cluster) based on one calendar ID", security = @SecurityRequirement(name = "bearerAuth"))
+    @DeleteMapping("/calendarManagement/delete-cluster/{calendarId}") // Dùng PathVariable cho gọn
+    public ResponseData<?> deleteCalendarCluster(@PathVariable Long calendarId) {
+        iCalendarService.handleDeleteCalendarCluster(calendarId);
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Xóa cụm lịch thành công");
+    }
     
 }

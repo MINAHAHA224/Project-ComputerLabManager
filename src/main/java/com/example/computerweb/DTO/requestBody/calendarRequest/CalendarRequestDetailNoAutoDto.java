@@ -1,0 +1,34 @@
+package com.example.computerweb.DTO.requestBody.calendarRequest;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class CalendarRequestDetailNoAutoDto {
+    @JsonProperty("groupId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Tổ hợp không được để trống")
+    private Long groupId;
+
+
+
+
+
+
+    @JsonProperty("purposeUse")
+    @Schema(type = "String", example = "can be blank")
+    @Size(max = 255, message = "Ghi chú không được vượt quá 255 ký tự")
+    private String purposeUse;
+
+    @JsonProperty("roomId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Phòng học không được để trống khi xếp lịch thủ công")
+    private Long roomId; // ID của phòng người dùng muốn chọn
+}

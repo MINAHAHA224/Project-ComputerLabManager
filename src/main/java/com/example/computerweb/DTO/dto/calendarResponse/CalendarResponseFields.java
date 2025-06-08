@@ -13,6 +13,7 @@ public class CalendarResponseFields {
     private  ArrayList<Map<String, String>> creditClass;
 //    private  ArrayList<Map<String, String>> weekSemester;
 //    private  ArrayList<Map<String, String>> group;
+private  ArrayList<Map<String, String>> room;
     private  ArrayList<Map<String, String>> day;
     private  ArrayList<Map<String, String>> practiceCase;
     private  ArrayList<Map<String, String>> facility;

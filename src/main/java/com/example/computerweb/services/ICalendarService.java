@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 public interface ICalendarService {
-    List<CalendarManagementDto> handleGetAllDataCalendar ();
+    ResponseData<?> handleGetAllDataCalendar ();
 
     CalendarResponseFields handleGetDataForCreatePage ();
 
-    ArrayList<Map<String, String>> handleWeekStudyForCreateCreditClass ( String semesterYear);
+    ResponseData<?> handleWeekStudyForCreateCreditClass ( String semesterYear);
 
 
     CalendarResponseFields handleGetDataForCreateRoomPage ();
@@ -34,12 +34,12 @@ public interface ICalendarService {
 
     ResponseData<?> handleUpdateCalendar ( CalendarRequestOneDto calendarRequestOneDto);
 
-    void handleDeleteCalendar (String calendarId);
+    ResponseData<?> handleDeleteCalendar (String calendarId);
 
     // check 2 round , first is existPracticeCaseDateUser , second is calendarRoom
 
     // check 1 round , first is calendarRoom
 
-
-
+    // Phương thức mới
+    void handleDeleteCalendarCluster(Long anyCalendarIdInCluster);
 }

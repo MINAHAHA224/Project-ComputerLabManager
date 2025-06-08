@@ -8,13 +8,13 @@ import java.util.TreeMap;
 
 @Getter
 public enum Day {
-    MONDAY(2, "Monday"),
-    TUESDAY(3, "Tuesday"),
-    WEDNESDAY(4, "Wednesday"),
-    THURSDAY(5, "Thursday"),
-    FRIDAY(6, "Friday"),
-    SATURDAY(7, "Saturday"),
-    SUNDAY(8, "Sunday");
+    MONDAY(2, "Thứ 2"),
+    TUESDAY(3, "Thứ 3"),
+    WEDNESDAY(4, "Thứ 4"),
+    THURSDAY(5, "Thứ 5"),
+    FRIDAY(6, "Thứ 6"),
+    SATURDAY(7, "Thứ 7"),
+    SUNDAY(8, "Chủ nhật");
 
     private final int number;
     private final String displayName;

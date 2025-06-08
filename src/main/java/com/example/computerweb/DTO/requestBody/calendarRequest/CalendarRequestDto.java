@@ -36,7 +36,7 @@ public class CalendarRequestDto { // Đổi tên cho phù hợp nếu đây là 
     @NotNull(message = "Cơ sở không được để trống")
     private Long idFacility;
 
-    @JsonProperty("weekSemesterId") // Tuần bắt đầu cho buổi học ĐẦU TIÊN
+    @JsonProperty("startWeekSemesterId") // Tuần bắt đầu cho buổi học ĐẦU TIÊN
     @Schema(type = "Long", example = "13")
     @NotNull(message = "Tuần học bắt đầu không được để trống")
     private Long startWeekSemesterId; // Đổi tên để rõ nghĩa hơn
@@ -51,7 +51,7 @@ public class CalendarRequestDto { // Đổi tên cho phù hợp nếu đây là 
     @NotNull(message = "Tiết bắt đầu không được để trống")
     private Long practiceCaseBeginId;
 
-    @JsonProperty("allCase") // Số tiết mỗi buổi học
+    @JsonProperty("allCasePerSession") // Số tiết mỗi buổi học
     @Schema(type = "Long", example = "2")
     @NotNull(message = "Tổng số tiết mỗi buổi không được để trống")
     private Long allCasePerSession; // Đổi tên để rõ nghĩa

@@ -5,6 +5,7 @@ import com.example.computerweb.models.entity.*;
 import com.example.computerweb.repositories.custom.CalendarRepositoryCustom;
 import org.springframework.data.domain.Example;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -53,5 +54,13 @@ public interface ICalendarRepository extends JpaRepository<CalendarEntity , Long
                 @Param("status") StatusEntity status,
                 @Param("newPracticeCaseBeginId") Long newPracticeCaseBeginId, // ID của practiceCaseNew
                 @Param("newPracticeCaseEndId") Long newPracticeCaseEndId     // ID của practiceCaseNew + allCase - 1
+        );
+
+        List<CalendarEntity> findAllByCreditClassAndWeekSemesterAndDayAndPracticeCase(
+                CreditClassEntity creditClass, WeekSemesterEntity weekSemester, Long day, PracticeCaseEntity practiceCase
+        );
+
+        List<CalendarEntity> findAllByUserAndWeekSemesterAndDayAndPracticeCase(
+                UserEntity user, WeekSemesterEntity weekSemester, Long day, PracticeCaseEntity practiceCase
         );
 }

@@ -191,7 +191,11 @@ public ResponseData<?> handleCreateCreditClass(CreditClassRqCreateDto creditClas
     if (creditClassRqCreateDto.getNumberOfStudentLTC() < 15) {
         throw new DataConflictException("Số lượng sinh viên phải ít nhất 15 mới có thể mở lớp tín chỉ");
     }
+    boolean isPractice = creditClassRqCreateDto.isPractice();
+    if (isPractice && subject.getSoTTH() <= 0) {
 
+        throw new DataConflictException("Môn học không có tiết thực hành , không thể phần nhóm thực hành");
+    }
 
 
 
@@ -215,7 +219,7 @@ public ResponseData<?> handleCreateCreditClass(CreditClassRqCreateDto creditClas
     CreditClassEntity savedCreditClass = iCreditClassRepository.save(newCreditClass);
 
     // === BƯỚC 4: TẠO CÁC TỔ HỢP (NẾU CẦN) ===
-   boolean isPractice = creditClassRqCreateDto.isPractice();
+
     // Logic tạo tổ hợp chỉ áp dụng khi nhóm là '02' (hoặc các nhóm thực hành khác)
     if (isPractice) {
         createCombinationsForClass(savedCreditClass);

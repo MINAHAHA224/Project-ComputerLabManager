@@ -124,7 +124,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     data.setLesson( result[11].toString());
                     data.setLessonBegin( result[12].toString());
                     data.setNameTeacher( result[13].toString());
-                    data.setNote( result[14].toString());
+                    data.setNote(result[14] == null ? "": result[14].toString());
                     data.setDate(DateUtils.convertToString((Date) result[15]) );
                     data.setStatusCalendar(result[16].toString());
                     datas.add(data);

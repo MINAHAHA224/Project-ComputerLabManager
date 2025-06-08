@@ -32,10 +32,10 @@ public enum PracticeCase {
         this.displayName = displayName;
     }
 
-    public static Map<String, String> getPracticeCaseE (){
-        Map<String , String> data = new TreeMap<>();
+    public static Map<Integer, String> getPracticeCaseE (){
+        Map<Integer , String> data = new TreeMap<>();
         for ( PracticeCase key : PracticeCase.values()){
-            data.put(String.valueOf(key.getNumber()) , key.getDisplayName());
+            data.put(key.getNumber() , key.getDisplayName());
         }
 
         return data;
