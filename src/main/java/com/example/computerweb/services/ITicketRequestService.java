@@ -48,7 +48,7 @@ public interface ITicketRequestService {
 
     TicketResponseMgmDto handleGetRequestTicketGV(Long id);
 
-    ResponseEntity<String> handleDeleteOneOrMoreTicketRequest ( String  requestTicketId );
+    ResponseEntity<String> handleDeleteOneOrMoreTicketRequest ( Long  requestTicketId );
 
     // test changeCalendar
     ResponseData<?> createChangeCalendarTicket(TicketChangeRequestDto changeRequestDto);

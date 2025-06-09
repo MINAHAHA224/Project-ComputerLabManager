@@ -37,7 +37,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
         Long idUser = userCurrent.getId();
 
         String sql = null;
-        if (userCurrent.getRole().getNameRole().equals("GVU") || userCurrent.getRole().getNameRole().equals("CSVC")) {
+        if (userCurrent.getRole().getNameRole().equals("GVU") || userCurrent.getRole().getNameRole().equals("CSVC")||  userCurrent.getRole().getNameRole().equals("TK")) {
             sql = "SELECT \n" +
                     "    LTH.LichID, \n" +
                     "    ISNULL(LTC.LopTinChiID,'') AS LopTinChiID ,\n" +

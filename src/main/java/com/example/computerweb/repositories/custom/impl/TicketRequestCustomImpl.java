@@ -98,13 +98,13 @@ public class TicketRequestCustomImpl implements TicketRequestCustom {
             sql.append("WHERE pyc.TrangThaiID_FK = :statusWaitingFacilities ");
 //            sql.append("OR (pyc.DuyetCSVC =  1 ) ");
         } else if (roleMaQuyen.equals("TK")) { // Giả sử "TK" là MaQuyen
-            sql.append("WHERE pyc.TrangThaiID_FK = :statusWaitingDean ");
+            sql.append("WHERE pyc.TrangThaiID_FK = ").append(statusWaitingDeanId);
 //            sql.append("OR (pyc.DuyetTK IS NOT NULL   ) ");
         } else {
             // Vai trò không xác định hoặc không có quyền xem phiếu quản lý
             return new ArrayList<>();
         }
-        sql.append("ORDER BY pyc.NgayGui DESC");
+        sql.append(" ORDER BY pyc.NgayGui DESC");
 
         Query query = entityManager.createNativeQuery(sql.toString());
 
@@ -120,10 +120,11 @@ public class TicketRequestCustomImpl implements TicketRequestCustom {
         } else if (roleMaQuyen.equals("CSVC")) {
             query.setParameter("statusWaitingFacilities", statusWaitingFacilitiesId);
             // query.setParameter("currentUserIdParam", currentUserId);
-        } else if (roleMaQuyen.equals("TK")) {
-            query.setParameter("statusWaitingDean", statusWaitingDeanId);
-            // query.setParameter("currentUserIdParam", currentUserId);
         }
+//        else if (roleMaQuyen.equals("TK")) {
+//            query.setParameter("statusWaitingDean", statusWaitingDeanId);
+//            // query.setParameter("currentUserIdParam", currentUserId);
+//        }
         // Xóa :currentUserIdParam nếu không dùng đến điều kiện đó
         // Hiện tại, để đơn giản, query chỉ lấy các phiếu đang chờ vai trò đó.
         // Bạn cần thêm logic lấy UserID hiện tại và truyền vào query nếu muốn mở rộng điều kiện WHERE

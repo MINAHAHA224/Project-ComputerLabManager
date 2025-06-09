@@ -19,7 +19,10 @@ import com.example.computerweb.DTO.requestBody.ticketRequest.TicketChangeDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketManagementRequestDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketRentDto;
 import com.example.computerweb.DTO.requestBody.ticketRequest.TicketRequestOneDto;
+import com.example.computerweb.exceptions.AuthenticationException;
 import com.example.computerweb.exceptions.CalendarException;
+import com.example.computerweb.exceptions.DataConflictException;
+import com.example.computerweb.exceptions.DataNotFoundException;
 import com.example.computerweb.models.entity.*;
 import com.example.computerweb.models.enums.StatusEnum;
 import com.example.computerweb.repositories.*;
@@ -28,6 +31,7 @@ import com.example.computerweb.services.ITicketRequestService;
 import com.example.computerweb.utils.DateUtils;
 import com.example.computerweb.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketRequestServiceImpl implements ITicketRequestService {
@@ -138,7 +142,10 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
     @Override
     public List<TicketRequestOneDto> handleGetAllDataForRqManagementPage() {
         StatusEntity statusPending = this.iStatusRepository.findStatusEntityById(1L);
+
         StatusEntity statusApproval = this.iStatusRepository.findStatusEntityById(2L);
+
+
         List<TicketRequestOneDto> data = new ArrayList<>();
 
         String email = SecurityUtils.getPrincipal();
@@ -688,67 +695,62 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> handleDeleteOneOrMoreTicketRequest(String requestTicketIds) {
+    public ResponseEntity<String> handleDeleteOneOrMoreTicketRequest(Long  requestTicketIds) {
         String emailCurrentUser = SecurityUtils.getPrincipal();
         AccountEntity account = iAccountRepository.findAccountEntityByEmail(emailCurrentUser)
-                .orElseThrow(() -> new RuntimeException("Lỗi xác thực: Không tìm thấy người dùng."));
+                .orElseThrow(() -> new AuthenticationException("Lỗi xác thực: Không tìm thấy người dùng."));
 
         UserEntity currentUser = account.getUser();
-        List<String> idsToDelete = new ArrayList<>();
-        if (requestTicketIds.contains(",")) {
-            idsToDelete.addAll(Arrays.asList(requestTicketIds.split(",")));
-        } else {
-            idsToDelete.add(requestTicketIds);
-        }
 
-        int deletedCount = 0;
         List<String> errors = new ArrayList<>();
 
-        for (String idStr : idsToDelete) {
+
             try {
-                Long ticketId = Long.valueOf(idStr.trim());
-                Optional<TicketRequestEntity> ticketOpt = iTicketRequestRepository.findById(ticketId);
+
+                Optional<TicketRequestEntity> ticketOpt = iTicketRequestRepository.findById(requestTicketIds);
                 if (ticketOpt.isPresent()) {
                     TicketRequestEntity ticket = ticketOpt.get();
                     // Kiểm tra quyền: Chỉ GV tạo phiếu mới được xóa, và chỉ khi phiếu ở trạng thái nhất định (ví dụ: PENDING, REJECTED)
                     if (!ticket.getUser().getId().equals(currentUser.getId())) {
-                        errors.add("Phiếu ID " + ticketId + ": Không có quyền xóa.");
-                        continue;
+                        throw  new AuthenticationException("Phiếu ID " + requestTicketIds + ": Không có quyền xóa.");
+
                     }
+                    String typeTicket = ticket.getTypeRequest().getNameTypeRequest();
                     // Ví dụ: Chỉ cho xóa phiếu đang chờ hoặc đã bị từ chối
-                    String maTrangThaiPhieu = ticket.getStatusTicket() != null ? ticket.getStatusTicket().getNameStatus() : "";
-                    if (maTrangThaiPhieu.equals("PENDING") /*Thêm các mã trạng thái cho phép xóa*/) {
+                    String maTrangThaiPhieu = ticket.getStatusTicket() != null ? ticket.getStatusTicket().getNameStatus().trim() : "";
+                    if (typeTicket.equals("TDL") && maTrangThaiPhieu.equals(StatusEnum.WAITING_DEAN_APPROVAL.getCode()) /*Thêm các mã trạng thái cho phép xóa*/) {
 
                         // Trước khi xóa phiếu, có thể cần xóa thông báo liên quan (nếu ON DELETE CASCADE không được thiết lập)
                         // NotificationEntity notification = iNotificationRepository.findByTicketRequest(ticket);
                         // if (notification != null) { iNotificationRepository.delete(notification); }
 
-                        iTicketRequestRepository.delete(ticket);
-                        deletedCount++;
-                    } else {
-                        errors.add("Phiếu ID " + ticketId + ": Không thể xóa phiếu ở trạng thái '" + ticket.getStatusTicket().getNameStatus() + "'.");
+                        iTicketRequestRepository.deleteTicketRequestEntityById(requestTicketIds);
+
+                    } else if (typeTicket.equals("TDP") && maTrangThaiPhieu.equals(StatusEnum.WAITING_FACILITIES_APPROVAL.getCode())) {
+                        iTicketRequestRepository.deleteTicketRequestEntityById(requestTicketIds);
+
+                    } else if (typeTicket.equals("MP") && maTrangThaiPhieu.equals(StatusEnum.WAITING_REGISTRAR_PROCESSING.getCode())){
+                        iTicketRequestRepository.deleteTicketRequestEntityById(requestTicketIds);
+
+                    }else {
+                      throw new DataNotFoundException("Phiếu ID " + requestTicketIds + ": Không thể xóa phiếu ở trạng thái '" + ticket.getStatusTicket().getNameStatus() + "'.") ;
                     }
                 } else {
-                    errors.add("Không tìm thấy phiếu với ID: " + ticketId);
+                    throw new DataNotFoundException("Không tìm thấy phiếu với ID: " + requestTicketIds);
                 }
             } catch (NumberFormatException e) {
-                errors.add("ID phiếu không hợp lệ: " + idStr);
-            } catch (Exception e) {
-                errors.add("Lỗi khi xóa phiếu ID " + idStr + ": " + e.getMessage());
-                // Log lỗi chi tiết
-                System.err.println("Lỗi khi xóa phiếu ID " + idStr + ": " + e);
-            }
-        }
+                log.error(" ER handleDeleteOneOrMoreTicketRequest = {} " , requestTicketIds , e);
+                throw new DataConflictException("ID phiếu không hợp lệ: " + requestTicketIds);
 
-        if (errors.isEmpty() && deletedCount > 0) {
-            return ResponseEntity.ok("Đã xóa thành công " + deletedCount + " phiếu yêu cầu.");
-        } else if (deletedCount > 0) {
-            return ResponseEntity.status(HttpStatus.MULTI_STATUS).body("Đã xóa " + deletedCount + " phiếu. Các lỗi: " + String.join("; ", errors));
-        } else {
-            if (errors.isEmpty())
-                return ResponseEntity.badRequest().body("Không có phiếu nào được chỉ định để xóa hoặc không tìm thấy.");
-            return ResponseEntity.badRequest().body("Không có phiếu nào được xóa. Lỗi: " + String.join("; ", errors));
-        }
+            } catch (Exception e) {
+                log.error(" ER handleDeleteOneOrMoreTicketRequest = {} " , requestTicketIds , e);
+                throw new DataConflictException("Lỗi khi xóa phiếu ID " + requestTicketIds + ": " + e.getMessage());
+                // Log lỗi chi tiết
+
+            }
+
+        return ResponseEntity.ok("Đã xóa thành công  phiếu yêu cầu.");
+
     }
 
     @Override
@@ -819,12 +821,16 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         // Ví dụ sử dụng cấu trúc duyệt bạn đã có:
         StatusEntity statusTKEntity = ticketRequest.getStatusTK();
         if (statusTKEntity != null) {
-            ticketDto.setDoneTK(statusTKEntity.getNameStatus()); // Giả sử TicketResponseMgmDto có trường này
+            ticketDto.setDoneTK(statusTKEntity.getContentStatus()); // Giả sử TicketResponseMgmDto có trường này
             if (ticketRequest.getUserTK() != null) {
                 ticketDto.setModified_TK(ticketRequest.getUserTK().getFirstName() + " " + ticketRequest.getUserTK().getLastName());
+            }else {
+                ticketDto.setModified_TK("");
             }
             if (ticketRequest.getDateCreateTK() != null) {
                 ticketDto.setCreated_TK(DateUtils.dateTimeConvertToString(ticketRequest.getDateCreateTK()));
+            }else {
+                ticketDto.setCreated_TK("");
             }
             // ticketDto.setNoteTK(ticketRequest.getGhiChuTK()); // Nếu có trường ghi chú của TK
         }
@@ -832,24 +838,32 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         StatusEntity statusCSVCentity = ticketRequest.getStatusCSVC();
         if (statusCSVCentity != null) {
-            ticketDto.setDoneCSVC(statusCSVCentity.getNameStatus());
+            ticketDto.setDoneCSVC(statusCSVCentity.getContentStatus());
             if (ticketRequest.getUserCSVC() != null) {
                 ticketDto.setModified_CSVC(ticketRequest.getUserCSVC().getFirstName() + " " + ticketRequest.getUserCSVC().getLastName());
+            }else {
+                ticketDto.setModified_CSVC("");
             }
             if (ticketRequest.getDateCreateCSVC() != null) {
                 ticketDto.setCreated_CSVC(DateUtils.dateTimeConvertToString(ticketRequest.getDateCreateCSVC()));
+            }else {
+                ticketDto.setCreated_CSVC("");
             }
             // ticketDto.setNoteCSVC(ticketRequest.getGhiChuCSVC()); // Nếu có
         }
 
         StatusEntity statusGVUentity = ticketRequest.getStatusGVU();
         if (statusGVUentity != null) {
-            ticketDto.setDoneGVU(statusGVUentity.getNameStatus());
+            ticketDto.setDoneGVU(statusGVUentity.getContentStatus());
             if (ticketRequest.getUserGVU() != null) {
                 ticketDto.setModified_GVU(ticketRequest.getUserGVU().getFirstName() + " " + ticketRequest.getUserGVU().getLastName());
+            }else {
+                ticketDto.setModified_GVU("");
             }
             if (ticketRequest.getDateCreateGVU() != null) {
                 ticketDto.setCreated_GVU(DateUtils.dateTimeConvertToString(ticketRequest.getDateCreateGVU()));
+            }else {
+                ticketDto.setCreated_GVU("");
             }
             // ticketDto.setNoteGVU(ticketRequest.getGhiChuGVU()); // Nếu có
         }
@@ -880,7 +894,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         // Hiển thị trạng thái chung của phiếu
         if (ticketRequest.getStatusTicket() != null) {
-            ticketDto.setStatusOverall(ticketRequest.getStatusTicket().getNameStatus()); // Thêm trường này vào TicketResponseMgmDto nếu cần
+            ticketDto.setStatusOverall(ticketRequest.getStatusTicket().getContentStatus()); // Thêm trường này vào TicketResponseMgmDto nếu cần
         }
 
 
@@ -897,6 +911,19 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         String emailCurrentUser = SecurityUtils.getPrincipal();
         AccountEntity accountCurrent = iAccountRepository.findAccountEntityByEmail(emailCurrentUser) // Giả sử có phương thức này
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với email: " + emailCurrentUser));
+
+        // chi co phieu yeu cau da duoc xu ly het thi moi tao duoc lich
+        List<String> statusCodes = Arrays.asList(
+                StatusEnum.WAITING_DEAN_APPROVAL.getCode(),
+                StatusEnum.WAITING_REGISTRAR_PROCESSING.getCode(),
+                StatusEnum.WAITING_FACILITIES_APPROVAL.getCode()
+        );
+        List<StatusEntity> statuses = iStatusRepository.findStatusEntitiesByNameStatusIn(statusCodes);
+
+        boolean exists = iTicketRequestRepository.existsByStatusTicketIn(statuses);
+        if (exists) {
+            throw new DataConflictException("Đang còn tồn tại phiếu yêu cầu chưa được xử lý. Không thể tạo thêm phiếu yêu cầu");
+        }
 
         // 2. Lấy lịch gốc cần thay đổi
         CalendarEntity calendarToChange = iCalendarRepository.findById(changeRequestDto.getCalendarIdToChange())
@@ -972,7 +999,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         // Thiết lập trạng thái ban đầu của phiếu và luồng duyệt
         // Ví dụ: "Thay đổi lịch" cần Trưởng Khoa duyệt trước
-        StatusEntity statusChoTKDuyet = iStatusRepository.findStatusEntityByNameStatus(StatusEnum.WAITING_FACILITIES_APPROVAL.getCode()); // Giả sử có mã trạng thái này
+        StatusEntity statusChoTKDuyet = iStatusRepository.findStatusEntityByNameStatus(StatusEnum.WAITING_DEAN_APPROVAL.getCode()); // Giả sử có mã trạng thái này
         if (statusChoTKDuyet == null) {
             throw new RuntimeException("Không tìm thấy trạng thái 'CHO_TK_DUYET'.");
         }
@@ -1031,8 +1058,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         }
 
 
-
-        if ( !ticket.getStatusTicket().getNameStatus().equals(StatusEnum.WAITING_DEAN_APPROVAL.getCode())){
+        if (!ticket.getStatusTicket().getNameStatus().equals(StatusEnum.WAITING_DEAN_APPROVAL.getCode())) {
             return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Phiếu này không ở trạng thái chờ TK xử lý.");
         }
 
@@ -1047,7 +1073,6 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         if (statusRejected == null) {
             throw new RuntimeException("Không tìm thấy trạng thái 'TU_CHOI'.");
         }
-
 
 
         StatusEntity statusThanhCong = iStatusRepository.findStatusEntityByNameStatus(StatusEnum.PROCESSED_SUCCESSFULLY.getCode());
@@ -1071,7 +1096,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         String notificationTitle = "Phản hồi yêu cầu thay đổi lịch (ID: " + ticket.getId() + ")";
         String notificationContent;
 
-        if (approverRole.equals("TK") && approver.getMajor() == majorOfCreditClass ) { // Giả sử "TK" là mã quyền của Trưởng Khoa
+        if (approverRole.equals("TK") && approver.getMajor() == majorOfCreditClass) { // Giả sử "TK" là mã quyền của Trưởng Khoa
             if (!ticket.getStatusTicket().getNameStatus().equals(StatusEnum.WAITING_DEAN_APPROVAL.getCode())) {
                 return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Phiếu này không ở trạng thái chờ Trưởng Khoa duyệt.");
             }
@@ -1207,6 +1232,22 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         String emailCurrentUser = SecurityUtils.getPrincipal();
         AccountEntity account = iAccountRepository.findAccountEntityByEmail(emailCurrentUser)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với email: " + emailCurrentUser));
+
+
+    // chi co phieu yeu cau da duoc xu ly het thi moi tao duoc lich
+        List<String> statusCodes = Arrays.asList(
+                StatusEnum.WAITING_DEAN_APPROVAL.getCode(),
+                StatusEnum.WAITING_REGISTRAR_PROCESSING.getCode(),
+                StatusEnum.WAITING_FACILITIES_APPROVAL.getCode()
+        );
+        List<StatusEntity> statuses = iStatusRepository.findStatusEntitiesByNameStatusIn(statusCodes);
+
+        boolean exists = iTicketRequestRepository.existsByStatusTicketIn(statuses);
+        if (exists) {
+            throw new DataConflictException("Đang còn tồn tại phiếu yêu cầu chưa được xử lý. Không thể tạo thêm phiếu yêu cầu");
+        }
+
+
         UserEntity userRequesting = account.getUser();
         WeekSemesterEntity proposedWeek = iWeekSemesterRepository.findById(rentRequestDto.getWeekSemesterId())
                 .orElseThrow(() -> new CalendarException("Không tìm thấy Tuần-Học kỳ với ID: " + rentRequestDto.getWeekSemesterId()));
@@ -1455,6 +1496,19 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với email: " + emailCurrentUser));
         UserEntity userRequesting = account.getUser();
 
+        // chi co phieu yeu cau da duoc xu ly het thi moi tao duoc lich
+        List<String> statusCodes = Arrays.asList(
+                StatusEnum.WAITING_DEAN_APPROVAL.getCode(),
+                StatusEnum.WAITING_REGISTRAR_PROCESSING.getCode(),
+                StatusEnum.WAITING_FACILITIES_APPROVAL.getCode()
+        );
+        List<StatusEntity> statuses = iStatusRepository.findStatusEntitiesByNameStatusIn(statusCodes);
+
+        boolean exists = iTicketRequestRepository.existsByStatusTicketIn(statuses);
+        if (exists) {
+            throw new DataConflictException("Đang còn tồn tại phiếu yêu cầu chưa được xử lý. Không thể tạo thêm phiếu yêu cầu");
+        }
+
 
         CalendarEntity calendarForRent = this.iCalendarRepository.findCalendarEntityById(changeRequestDto.getCalendarId());
         if (calendarForRent == null) {
@@ -1506,7 +1560,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         TicketRequestEntity ticket = iTicketRequestRepository.findById(approvalDto.getTicketId())
                 .orElseThrow(() -> new CalendarException("Không tìm thấy phiếu yêu cầu với ID: " + approvalDto.getTicketId()));
         CalendarEntity calendarForChange = ticket.getCalendar();
-        if (calendarForChange == null ){
+        if (calendarForChange == null) {
             throw new RuntimeException("Không tìm thấy lịch id");
         }
         if (!ticket.getTypeRequest().getNameTypeRequest().equals("TDP")) {
@@ -1554,9 +1608,6 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             Long proposedAllCase = calendarForChange.getAllCase();
 
 
-
-
-
             // --- LOGIC CHỌN PHÒNG TỰ ĐỘNG ---
             // (Tương tự như logic trong handleCreateCalendarAuto, nhưng đơn giản hơn vì không có nhiều nhóm/iter)
             RoomEntity selectedRoomForRent = null;
@@ -1585,7 +1636,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     // Có thể thêm kiểm tra số máy hoạt động nếu biết số lượng người mượn
                     if (roomCandidate.getNumberOfComputerActive() == 35) { // studentsForRent cần được xác định rõ
                         suitableRooms.add(roomCandidate);
-                    } else  { // Nếu không quan tâm sĩ số (ví dụ mượn phòng họp)
+                    } else { // Nếu không quan tâm sĩ số (ví dụ mượn phòng họp)
                         suitableRooms.add(roomCandidate);
                     }
                 }

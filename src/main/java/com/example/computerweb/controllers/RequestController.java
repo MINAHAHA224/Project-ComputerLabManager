@@ -155,7 +155,7 @@ public class RequestController {
 
     @Operation(summary = "delete ticket", security = @SecurityRequirement(name = "bearerAuth"))
     @DeleteMapping("/requestTickets/delete/{idTicketRequest}")
-    public ResponseData<?> deleteRequestTickets (@PathVariable("idTicketRequest") String idTicketRequest){
+    public ResponseData<?> deleteRequestTickets (@PathVariable("idTicketRequest") Long idTicketRequest){
         ResponseEntity<String> handleDelete = this.iTicketRequestService.handleDeleteOneOrMoreTicketRequest(idTicketRequest);
 
         return  new ResponseSuccess<>(HttpStatus.OK.value(), handleDelete.getBody() );

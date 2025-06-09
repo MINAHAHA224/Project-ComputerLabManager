@@ -4,11 +4,13 @@ import com.example.computerweb.models.entity.StatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface IStatusRepository extends JpaRepository<StatusEntity , Long> {
 
     StatusEntity findStatusEntityById ( Long id);
 
+    List<StatusEntity> findStatusEntitiesByNameStatusIn(List<String> listName);
    StatusEntity  findStatusEntityByNameStatus (String nameStt);
 }
