@@ -21,9 +21,13 @@ public interface ICalendarService {
 
     ResponseData<?> handleWeekStudyForCreateCreditClass ( String semesterYear);
 
+    ResponseData<?> handleGetWeekUpdateOne ( Long semesterYear);
+
 
     CalendarResponseFields handleGetDataForCreateRoomPage ();
     CalendarResponseDto handleGetDataForUpdatePage (Long calendarId);
+
+
 
     ResponseData<?> handleCreateCalendarAuto (CalendarRequestDto calendarRequestDto);
 

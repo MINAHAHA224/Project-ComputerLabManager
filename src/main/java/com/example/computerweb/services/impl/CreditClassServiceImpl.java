@@ -3,6 +3,7 @@ package com.example.computerweb.services.impl;
 import com.example.computerweb.DTO.dto.classroomResponse.ClassroomRpDto;
 import com.example.computerweb.DTO.dto.creditClassResponse.CreditClassRpDetail;
 import com.example.computerweb.DTO.dto.creditClassResponse.CreditClassRpPageIndexDto;
+import com.example.computerweb.DTO.dto.creditClassResponse.CreditClassScheduleDto;
 import com.example.computerweb.DTO.dto.semesterResponse.WeekSemesterRpDto;
 import com.example.computerweb.DTO.dto.subjectResponse.SubjectRpDto;
 import com.example.computerweb.DTO.dto.userResponse.TeacherRpDto;
@@ -11,20 +12,27 @@ import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.creditClassRequest.CreditClassRqCreateDto;
 import com.example.computerweb.DTO.requestBody.creditClassRequest.CreditClassRqUpdateDto;
+import com.example.computerweb.exceptions.AuthenticationException;
 import com.example.computerweb.exceptions.DataConflictException;
 import com.example.computerweb.exceptions.DataNotFoundException;
 import com.example.computerweb.models.entity.*;
 import com.example.computerweb.repositories.*;
 import com.example.computerweb.services.ICreditClassService;
+import com.example.computerweb.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,6 +47,7 @@ public class CreditClassServiceImpl implements ICreditClassService {
     private final ICreditClassRepository iCreditClassRepository;
     private final IClassroomRepository  iClassroomRepository;
     private final ISubjectRepository iSubjectRepository;
+    private final IAccountRepository iAccountRepository;
 
     @Override
     public ResponseData<?> handleGetDataForCreditIndexPage() {
@@ -449,6 +458,78 @@ public ResponseData<?> handleUpdateCreditClassDetail(CreditClassRqUpdateDto cred
         }
     }
 
+    @Override
+    public List<CreditClassScheduleDto> getCreditClassSchedules() {
+
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String userEmail = authentication.getName();
+//
+//        // Mặc định lấy tất cả các lớp tín chỉ
+//        List<CreditClassEntity> creditClasses = iCreditClassRepository.findAll();
+//
+//        // Kiểm tra vai trò của người dùng
+//        // Nếu là GV, chỉ lấy các lớp tín chỉ do GV đó phụ trách
+//        boolean isGv = authentication.getAuthorities().stream()
+//                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_GV"));
+
+        // Lấy thông tin xác thực của người dùng hiện tại
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String userEmail = SecurityUtils.getPrincipal();
+        AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(userEmail).orElseThrow(
+                () -> new AuthenticationException("Lỗi xác thực người dùng")
+        );
+        UserEntity currentUser = account.getUser();
+        // Lấy tất cả các Lớp tín chỉ
+
+        List<CreditClassEntity> creditClasses = iCreditClassRepository.findAll();
+        List<CreditClassScheduleDto> result = new ArrayList<>();
+        // Nếu là GV, chỉ lấy các lớp tín chỉ do GV đó phụ trách
+        boolean isGv = (currentUser.getRole().getNameRole().equals("GV"));
+
+        if (isGv) {
+
+
+            creditClasses = this.iCreditClassRepository.findAllByUser(currentUser);
+        }
+
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yy");
+
+        for (CreditClassEntity cc : creditClasses) {
+            CreditClassScheduleDto dto = new CreditClassScheduleDto();
+            dto.setMaMh(cc.getSubject().getCodeSubject());
+            dto.setTenMh(cc.getSubject().getNameSubject());
+            dto.setNhomTo(cc.getGroup().trim()); // Giả sử nhóm tổ chung
+            dto.setSoTinChi(cc.getCredits().intValue());
+            dto.setLop(cc.getClassroom().getNameClassroom());
+
+            // Tìm tất cả lịch thực hành cho lớp tín chỉ này
+            List<CalendarEntity> schedules = cc.getCalendarEntities();
+            if (schedules != null && !schedules.isEmpty()) {
+                List<CreditClassScheduleDto.ScheduleDetailDto> details = schedules.stream().map(cal -> {
+                    CreditClassScheduleDto.ScheduleDetailDto detailDto = new CreditClassScheduleDto.ScheduleDetailDto();
+                    detailDto.setThu(cal.getDay().toString());
+                    detailDto.setTietBatDau(cal.getPracticeCase().getNamePracticeCase());
+                    detailDto.setSoTiet(cal.getAllCase().intValue());
+                    detailDto.setPhong(cal.getRoom().getNameRoom());
+                    detailDto.setGiangVien(cc.getUser().getLastName()); // Lấy tên GV của LTC
+
+                    // Xử lý định dạng ngày tháng
+                    String startDate = cal.getWeekSemester().getDateBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(dtf);
+                    String endDate = cal.getWeekSemester().getDateEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(dtf);
+                    detailDto.setThoiGianHoc(startDate + " đến " + endDate);
+
+                    return detailDto;
+                }).collect(Collectors.toList());
+                dto.setScheduleDetails(details);
+            } else {
+                dto.setScheduleDetails(new ArrayList<>());
+            }
+            result.add(dto);
+        }
+        return result;
+    }
 
 
     private void createCombinationsForClass(CreditClassEntity creditClass) {

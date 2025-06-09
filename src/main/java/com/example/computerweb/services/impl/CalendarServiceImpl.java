@@ -184,6 +184,36 @@ public class CalendarServiceImpl implements ICalendarService {
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công", arrayWeekTime);
     }
 
+    @Override
+    public ResponseData<?> handleGetWeekUpdateOne(Long calendarId) {
+        if ( calendarId == null){
+            throw  new  DataNotFoundException("Không tìm thấy ID lịch để lấy tuần học cập nhật");
+        }
+        CalendarEntity calendar = this.iCalendarRepository.findCalendarEntityById(calendarId);
+        if ( calendar == null){
+            throw  new  DataNotFoundException("Không tìm thấy  lịch với ID : " + calendarId);
+        }
+        WeekSemesterEntity weekSemester = calendar.getWeekSemester();
+        String semester = weekSemester.getSemesterStudy().toString();
+        String yearStudy = weekSemester.getYearStudy();
+        String keyFind = semester+"-"+yearStudy;
+        // week_semester  on 2024-2025
+        List<WeekTimeDto> listResult = this.iWeekSemesterRepository.findAllWeekTimeOfSemesterYear(keyFind);
+        ArrayList<Map<String, String>> arrayWeekTime = new ArrayList<>();
+        if (listResult != null && !listResult.isEmpty()) {
+            for (WeekTimeDto result : listResult) {
+                Map<String, String> resultDetails = new TreeMap<>();
+                resultDetails.put("idWeekTime", result.getIdWeekTime());
+                resultDetails.put("time", "Tuần " + result.getWeek() + " [Từ " + DateUtils.convertToString(result.getTimeBegin()) + " đến " + DateUtils.convertToString(result.getTimeEnd()) + "]");
+                arrayWeekTime.add(resultDetails);
+            }
+        } else {
+            log.warn(" List<WeekTimeDto> listResult đang bị null ");
+        }
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Thực hiện thành công", arrayWeekTime);
+    }
+
+
 
     @Override
     public CalendarResponseFields handleGetDataForCreateRoomPage() {
@@ -1014,11 +1044,11 @@ public class CalendarServiceImpl implements ICalendarService {
         Map<String, List<long[]>> tempOccupiedSlots = new HashMap<>();
 
         for (CalendarRequestDetailNoAutoDto detail : calendarRequestNoAutoDto.getCalendarDetail()) {
-            WeekSemesterEntity weekSemester = iWeekSemesterRepository.findById(calendarRequestNoAutoDto.getWeekSemesterId())
-                    .orElseThrow(() -> new DataNotFoundException("Nhóm " + detail.getGroupId() + ": Không tìm thấy Tuần-Học kỳ với ID: " + calendarRequestNoAutoDto.getWeekSemesterId()));
+            WeekSemesterEntity weekSemester = iWeekSemesterRepository.findById(detail.getWeekSemesterId())
+                    .orElseThrow(() -> new DataNotFoundException("Nhóm " + detail.getGroupId() + ": Không tìm thấy Tuần-Học kỳ với ID: " + detail.getWeekSemesterId()));
 
-            PracticeCaseEntity practiceCaseBegin = iPracticeCaseRepository.findById(calendarRequestNoAutoDto.getPracticeCaseBeginId())
-                    .orElseThrow(() -> new DataNotFoundException("Nhóm " + detail.getGroupId() + ": Không tìm thấy Tiết bắt đầu với ID: " + calendarRequestNoAutoDto.getPracticeCaseBeginId()));
+            PracticeCaseEntity practiceCaseBegin = iPracticeCaseRepository.findById(detail.getPracticeCaseBeginId())
+                    .orElseThrow(() -> new DataNotFoundException("Nhóm " + detail.getGroupId() + ": Không tìm thấy Tiết bắt đầu với ID: " + detail.getPracticeCaseBeginId()));
 
             RoomEntity room = iRoomRepository.findById(detail.getRoomId())
                     .orElseThrow(() -> new DataNotFoundException("Nhóm " + detail.getGroupId() + ": Không tìm thấy phòng với ID: " + detail.getRoomId()));
@@ -1034,12 +1064,12 @@ public class CalendarServiceImpl implements ICalendarService {
             }
 
             // Kiểm tra lịch trùng trong DB
-            if (iCalendarRepository.existsOverlappingCalendar(null, room, weekSemester, calendarRequestNoAutoDto.getDayId(), statusActive, startPcId, endPcId)) {
+            if (iCalendarRepository.existsOverlappingCalendar(null, room, weekSemester, detail.getDayId(), statusActive, startPcId, endPcId)) {
                 throw new DataConflictException(String.format("Nhóm %d: Lịch bị trùng. Phòng '%s' đã được sử dụng vào thời điểm này.", detail.getGroupId(), room.getNameRoom()));
             }
 
             // Kiểm tra lịch trùng ngay trong các chi tiết của request này
-            String slotKey = room.getId() + "_" + weekSemester.getId() + "_" + calendarRequestNoAutoDto.getDayId();
+            String slotKey = room.getId() + "_" + weekSemester.getId() + "_" + detail.getDayId();
             List<long[]> occupiedIntervals = tempOccupiedSlots.getOrDefault(slotKey, new ArrayList<>());
             for (long[] interval : occupiedIntervals) {
                 if (Math.max(startPcId, interval[0]) <= Math.min(endPcId, interval[1])) {
@@ -1054,7 +1084,7 @@ public class CalendarServiceImpl implements ICalendarService {
             CalendarEntity newCalendar = new CalendarEntity();
             newCalendar.setCreditClass(creditClass);
             newCalendar.setWeekSemester(weekSemester);
-            newCalendar.setDay(calendarRequestNoAutoDto.getDayId());
+            newCalendar.setDay(detail.getDayId());
             newCalendar.setPracticeCase(practiceCaseBegin);
             newCalendar.setAllCase(allCase); // Sử dụng `allCase` chung
             newCalendar.setNoteCalendar(detail.getPurposeUse());
@@ -1223,25 +1253,25 @@ public class CalendarServiceImpl implements ICalendarService {
     @Override
     @Transactional
     public ResponseData<?> handleDeleteCalendar(String calendarId) {
-        if (calendarId == null || calendarId.isBlank()) {
-            throw new CalendarException("Không tìm thấy lịch để xóa");
-        }
-
         try {
+            // Nếu chuỗi chứa dấu phẩy, nó là một danh sách ID
             if (calendarId.contains(",")) {
                 String[] arrayCalendarId = calendarId.split(",");
                 for (String id : arrayCalendarId) {
-                    this.iCalendarRepository.deleteById(Long.valueOf(id));
+                    // Chuyển đổi sang Long và xóa
+                    this.iCalendarRepository.deleteById(Long.valueOf(id.trim()));
                 }
             } else {
-                this.iCalendarRepository.deleteById(Long.valueOf(calendarId));
+                // Nếu không, nó là một ID đơn lẻ
+                this.iCalendarRepository.deleteById(Long.valueOf(calendarId.trim()));
             }
-
-        } catch (DataIntegrityViolationException e) {
-            log.error("--ER handleDeleteCalendar : {}", e.getMessage(), e);
-            throw new DataConflictException("Không thể xóa lịch.");
+        } catch (Exception e) {
+            // Bắt lỗi chung và ném ra exception nghiệp vụ
+            log.error("Lỗi khi xóa lịch với ID(s): {}", calendarId, e);
+            throw new DataConflictException("Không thể xóa (các) lịch này, có thể chúng đang được tham chiếu.");
         }
-        return new ResponseSuccess<>(HttpStatus.OK.value(), "Xóa lịch thành công");
+
+        return new ResponseSuccess<>(HttpStatus.OK.value(),"Xóa lịch thành công");
     }
 
     @Override

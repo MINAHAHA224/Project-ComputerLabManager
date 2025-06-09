@@ -1,5 +1,6 @@
 package com.example.computerweb.services;
 
+import com.example.computerweb.DTO.dto.creditClassResponse.CreditClassScheduleDto;
 import com.example.computerweb.DTO.dto.subjectResponse.SubjectRpDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.requestBody.creditClassRequest.CreditClassRqCreateDto;
@@ -25,4 +26,8 @@ public interface ICreditClassService {
     ResponseData<?> handleUpdateCreditClassDetail (CreditClassRqUpdateDto creditClassRqUpdateDto);
 
     ResponseData<?> handleDeleteCreditClass (Long creditClassId);
+
+    // them tinh nang
+    List<CreditClassScheduleDto> getCreditClassSchedules();
+
 }

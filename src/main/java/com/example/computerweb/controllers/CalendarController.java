@@ -63,6 +63,12 @@ public class CalendarController {
         return this.iCalendarService.handleWeekStudyForCreateCreditClass(semesterYear);
     }
 
+    @Operation(summary = "GVU Choose WeekStudy" , description = "GVU Choose WeekStudy when choose CreditClass", security = @SecurityRequirement(name = "bearerAuth"))
+    @GetMapping("/calendarManagement/getWeekUpdate/{calendarId}")
+    public ResponseData<?> getWeekUpdateOne(@PathVariable("calendarId") Long calendarId){
+        return this.iCalendarService.handleGetWeekUpdateOne(calendarId);
+    }
+
     @Operation(summary = "Post info calendar, only of GVU", description = "GVU create calendar on this page", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/calendarManagement/createAuto")
     public ResponseData<?> getCreateCalendarAuto(@Valid @RequestBody CalendarRequestDto calendarRequestDto) {

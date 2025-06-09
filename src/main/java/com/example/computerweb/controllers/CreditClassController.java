@@ -1,5 +1,6 @@
 package com.example.computerweb.controllers;
 
+import com.example.computerweb.DTO.dto.creditClassResponse.CreditClassScheduleDto;
 import com.example.computerweb.DTO.dto.subjectResponse.SubjectRpDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,5 +71,12 @@ public class CreditClassController {
     @PostMapping("/creditClassManagement/delete/{creditClassId}")
     public ResponseData<?> postDeleteCreditClass (@PathVariable("creditClassId") Long creditClassId){
         return  this.iCreditClassService.handleDeleteCreditClass(creditClassId);
+    }
+
+    @GetMapping("/creditClassManagement/schedules")
+
+    public ResponseData<?> getFullSchedules() {
+        List<CreditClassScheduleDto> data = iCreditClassService.getCreditClassSchedules();
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Lấy dữ liệu thành công", data);
     }
 }

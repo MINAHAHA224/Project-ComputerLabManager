@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal; // Sử dụng BigDecimal để nhận kết quả từ SUM
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,66 +23,145 @@ public class CreditClassRepositoryCustomImpl implements CreditClassRepositoryCus
     @PersistenceContext
     EntityManager entityManager;
 
+    //    @Override
+//    public List<CreditClassEligibleDto> findAllCreditClassEligible() {
+//
+//        String sql = "WITH BuoiHocThucHanhDaXep AS (\n" +
+//                "    -- 1. Xác định các \"buổi học thực hành\" duy nhất đã được xếp cho mỗi lớp tín chỉ.\n" +
+//                "    SELECT DISTINCT\n" +
+//                "        LTH.LopTinChiID_FK,\n" +
+//                "        LTH.TuanHoc_KiHoc_Id_FK,\n" +
+//                "        LTH.Thu,\n" +
+//                "        LTH.SoTietBD_FK,\n" +
+//                "        LTH.SoTiet -- Đây là số tiết của buổi học đó\n" +
+//                "    FROM LichThucHanh AS LTH\n" +
+//                "    WHERE LTH.LopTinChiID_FK IS NOT NULL\n" +
+//                "      AND LTH.TrangThai_FK = 6 -- Chỉ tính các lịch có trạng thái active (hoặc trạng thái phù hợp khác)\n" +
+//                "),\n" +
+//                "TongSoTietThucHanhDaCo AS (\n" +
+//                "    -- 2. Tính tổng số tiết thực hành đã có cho mỗi lớp tín chỉ\n" +
+//                "    -- bằng cách cộng dồn SoTiet của các \"buổi học thực hành\" duy nhất đã xác định ở trên.\n" +
+//                "    SELECT\n" +
+//                "        BHTHDX.LopTinChiID_FK,\n" +
+//                "        SUM(ISNULL(BHTHDX.SoTiet, 0)) AS TongTietDaXepThucTe -- Đổi tên cột để rõ ràng hơn\n" +
+//                "    FROM BuoiHocThucHanhDaXep AS BHTHDX\n" +
+//                "    GROUP BY\n" +
+//                "        BHTHDX.LopTinChiID_FK\n" +
+//                ")\n" +
+//                "SELECT\n" +
+//                "    LTC.LopTinChiID,\n" +
+//                "    LTC.tenLopTinChi,\n" +
+//                "    MH.TenMH,\n" +
+//                "    LTC.SoLuongSVLTC,\n" +
+//                "    ISNULL(MH.SoTTH, 0) AS SoTTHC,  -- Số tiết thực hành chuẩn của môn học\n" +
+//                "    CASE\n" +
+//                "        -- Nếu tổng tiết đã xếp > số tiết chuẩn VÀ số tiết chuẩn > 0, thì lấy số tiết chuẩn\n" +
+//                "        WHEN ISNULL(TSTHDC.TongTietDaXepThucTe, 0) > ISNULL(MH.SoTTH, 0) AND ISNULL(MH.SoTTH, 0) > 0\n" +
+//                "            THEN ISNULL(MH.SoTTH, 0)\n" +
+//                "        -- Ngược lại, lấy tổng số tiết đã xếp (bao gồm cả trường hợp chưa xếp gì, hoặc đã xếp ít hơn/bằng số tiết chuẩn)\n" +
+//                "        ELSE ISNULL(TSTHDC.TongTietDaXepThucTe, 0)\n" +
+//                "    END AS SoTTHDC -- Số tiết thực hành đã được phân công (đã giới hạn bởi SoTTHC)\n" +
+//                "FROM LopTinChi AS LTC\n" +
+//                "INNER JOIN MonHoc AS MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
+//                "LEFT JOIN TongSoTietThucHanhDaCo AS TSTHDC ON TSTHDC.LopTinChiID_FK = LTC.LopTinChiID\n" +
+//                "WHERE ISNULL(MH.SoTTH, 0) > 0 -- Chỉ hiển thị các lớp tín chỉ của môn có tiết thực hành\n" +
+//                "ORDER BY LTC.LopTinChiID ";
+//
+//        Query query = entityManager.createNativeQuery(sql);
+//        List<Object[]> results = query.getResultList();
+//        List<CreditClassEligibleDto> data = new ArrayList<>();
+//
+//        for ( Object[] result : results ){
+//            CreditClassEligibleDto creditClassEligibleDto = new CreditClassEligibleDto();
+//            creditClassEligibleDto.setCreditClassId( result[0].toString());
+//            creditClassEligibleDto.setCodeCreditClass( result[1].toString());
+//            creditClassEligibleDto.setNameSubject(result[2].toString());
+//
+//            creditClassEligibleDto.setStudentClassroom( result[3].toString());
+//            creditClassEligibleDto.setLessonSum(result[4].toString());
+//            creditClassEligibleDto.setLessonHave( result[5].toString());
+//            data.add(creditClassEligibleDto);
+//        }
+//
+//        return data;
+//    }
+
+
+
+
     @Override
     public List<CreditClassEligibleDto> findAllCreditClassEligible() {
 
-        String sql = "WITH BuoiHocThucHanhDaXep AS (\n" +
-                "    -- 1. Xác định các \"buổi học thực hành\" duy nhất đã được xếp cho mỗi lớp tín chỉ.\n" +
-                "    SELECT DISTINCT\n" +
-                "        LTH.LopTinChiID_FK,\n" +
-                "        LTH.TuanHoc_KiHoc_Id_FK,\n" +
-                "        LTH.Thu,\n" +
-                "        LTH.SoTietBD_FK,\n" +
-                "        LTH.SoTiet -- Đây là số tiết của buổi học đó\n" +
-                "    FROM LichThucHanh AS LTH\n" +
-                "    WHERE LTH.LopTinChiID_FK IS NOT NULL\n" +
-                "      AND LTH.TrangThai_FK = 6 -- Chỉ tính các lịch có trạng thái active (hoặc trạng thái phù hợp khác)\n" +
-                "),\n" +
-                "TongSoTietThucHanhDaCo AS (\n" +
-                "    -- 2. Tính tổng số tiết thực hành đã có cho mỗi lớp tín chỉ\n" +
-                "    -- bằng cách cộng dồn SoTiet của các \"buổi học thực hành\" duy nhất đã xác định ở trên.\n" +
-                "    SELECT\n" +
-                "        BHTHDX.LopTinChiID_FK,\n" +
-                "        SUM(ISNULL(BHTHDX.SoTiet, 0)) AS TongTietDaXepThucTe -- Đổi tên cột để rõ ràng hơn\n" +
-                "    FROM BuoiHocThucHanhDaXep AS BHTHDX\n" +
-                "    GROUP BY\n" +
-                "        BHTHDX.LopTinChiID_FK\n" +
-                ")\n" +
-                "SELECT\n" +
-                "    LTC.LopTinChiID,\n" +
-                "    LTC.tenLopTinChi,\n" +
-                "    MH.TenMH,\n" +
-                "    LTC.SoLuongSVLTC,\n" +
-                "    ISNULL(MH.SoTTH, 0) AS SoTTHC,  -- Số tiết thực hành chuẩn của môn học\n" +
-                "    CASE\n" +
-                "        -- Nếu tổng tiết đã xếp > số tiết chuẩn VÀ số tiết chuẩn > 0, thì lấy số tiết chuẩn\n" +
-                "        WHEN ISNULL(TSTHDC.TongTietDaXepThucTe, 0) > ISNULL(MH.SoTTH, 0) AND ISNULL(MH.SoTTH, 0) > 0\n" +
-                "            THEN ISNULL(MH.SoTTH, 0)\n" +
-                "        -- Ngược lại, lấy tổng số tiết đã xếp (bao gồm cả trường hợp chưa xếp gì, hoặc đã xếp ít hơn/bằng số tiết chuẩn)\n" +
-                "        ELSE ISNULL(TSTHDC.TongTietDaXepThucTe, 0)\n" +
-                "    END AS SoTTHDC -- Số tiết thực hành đã được phân công (đã giới hạn bởi SoTTHC)\n" +
-                "FROM LopTinChi AS LTC\n" +
-                "INNER JOIN MonHoc AS MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
-                "LEFT JOIN TongSoTietThucHanhDaCo AS TSTHDC ON TSTHDC.LopTinChiID_FK = LTC.LopTinChiID\n" +
-                "WHERE ISNULL(MH.SoTTH, 0) > 0 -- Chỉ hiển thị các lớp tín chỉ của môn có tiết thực hành\n" +
-                "ORDER BY LTC.LopTinChiID ";
+        // === LOGIC QUERY MỚI - CHÍNH XÁC THEO YÊU CẦU "TỔNG TIẾT / SỐ TỔ" ===
+        // 1. CTE `TongTietTho`: Tính tổng số tiết thô từ bảng LichThucHanh.
+        // 2. CTE `SoToThucHanh`: Đếm số lượng tổ từ bảng LopTinChi_ToHop.
+        // 3. LEFT JOIN cả hai vào và thực hiện phép chia.
+
+        String sql =
+                "WITH TongTietTho AS ( " +
+                        "    SELECT " +
+                        "        LopTinChiID_FK, " +
+                        "        SUM(CAST(SoTiet AS FLOAT)) AS TongTiet " +
+                        "    FROM LichThucHanh " +
+                        "    WHERE LopTinChiID_FK IS NOT NULL AND TrangThai_FK = 6 " +
+                        "    GROUP BY LopTinChiID_FK " +
+                        "), " +
+                        "SoToThucHanh AS ( " +
+                        "    SELECT " +
+                        "        LopTinChi_FK, " +
+                        "        COUNT(ToHopID) AS SoLuongTo " +
+                        "    FROM LopTinChi_ToHop " +
+                        "    GROUP BY LopTinChi_FK " +
+                        ") " +
+                        "SELECT " +
+                        "    ltc.LopTinChiID, " +
+                        "    ltc.tenLopTinChi, " +
+                        "    mh.TenMH, " +
+                        "    ltc.SoLuongSvLTC, " +
+                        "    ISNULL(mh.SoTTH, 0) AS SoTietThucHanhChuan, " +
+                        "    ISNULL( " +
+
+                        "        CASE " +
+
+                        "            WHEN sth.SoLuongTo IS NOT NULL AND sth.SoLuongTo > 0 THEN ttlh.TongTiet / sth.SoLuongTo " +
+
+                        "            ELSE 0 " +
+                        "        END, " +
+                        "    0) AS TongTietDaXep " +
+                        "FROM LopTinChi ltc " +
+                        "JOIN MonHoc mh ON ltc.MonHoc_FK = mh.MonHocID " +
+                        "LEFT JOIN TongTietTho ttlh ON ltc.LopTinChiID = ttlh.LopTinChiID_FK " +
+                        "LEFT JOIN SoToThucHanh sth ON ltc.LopTinChiID = sth.LopTinChi_FK " +
+                        "WHERE ISNULL(mh.SoTTH, 0) > 0 " +
+                        "ORDER BY ltc.LopTinChiID";
 
         Query query = entityManager.createNativeQuery(sql);
         List<Object[]> results = query.getResultList();
         List<CreditClassEligibleDto> data = new ArrayList<>();
 
-        for ( Object[] result : results ){
-            CreditClassEligibleDto creditClassEligibleDto = new CreditClassEligibleDto();
-            creditClassEligibleDto.setCreditClassId( result[0].toString());
-            creditClassEligibleDto.setCodeCreditClass( result[1].toString());
-            creditClassEligibleDto.setNameSubject(result[2].toString());
+        for (Object[] result : results) {
+            CreditClassEligibleDto dto = new CreditClassEligibleDto();
+            dto.setCreditClassId(result[0].toString());
+            dto.setCodeCreditClass(result[1].toString());
+            dto.setNameSubject(result[2].toString());
+            dto.setStudentClassroom(result[3].toString());
+            dto.setLessonSum(result[4].toString());
 
-            creditClassEligibleDto.setStudentClassroom( result[3].toString());
-            creditClassEligibleDto.setLessonSum(result[4].toString());
-            creditClassEligibleDto.setLessonHave( result[5].toString());
-            data.add(creditClassEligibleDto);
+            Object sumResult = result[5];
+            if (sumResult instanceof Double) {
+                dto.setLessonHave(String.valueOf(Math.round((Double) sumResult)));
+            } else if (sumResult instanceof BigDecimal) {
+                dto.setLessonHave(((BigDecimal) sumResult).stripTrailingZeros().toPlainString());
+            } else if (sumResult instanceof Number) {
+                dto.setLessonHave(String.valueOf(((Number) sumResult).longValue()));
+            } else if (sumResult != null) {
+                dto.setLessonHave(sumResult.toString());
+            } else {
+                dto.setLessonHave("0");
+            }
+
+            data.add(dto);
         }
-
         return data;
     }
 
@@ -118,20 +199,20 @@ public class CreditClassRepositoryCustomImpl implements CreditClassRepositoryCus
                 "        NguoiDung.Ten,\n" +
                 "        LopTinChi.Nhom,\n" +
                 "        LopTinChi.SoTC ,\n" +
-                "\t\tLop.MaLop" ;
+                "\t\tLop.MaLop";
         Query query = entityManager.createNativeQuery(sql);
         List<Object[]> results = query.getResultList();
         List<CreditClassRpPageIndexDto> answers = new ArrayList<>();
-        for ( Object[] result : results){
+        for (Object[] result : results) {
             CreditClassRpPageIndexDto answer = new CreditClassRpPageIndexDto();
-            answer.setCreditClassId( Long.valueOf(result[0].toString()));
+            answer.setCreditClassId(Long.valueOf(result[0].toString()));
             answer.setCodeCreditClass(result[1].toString());
             answer.setNumberOfStudentLTC(result[2].toString());
             answer.setCodeSubject(result[3].toString());
             answer.setTeacher(result[4].toString());
             answer.setGroup(result[5].toString().trim());
-            answer.setCombination(result[6] != null ? result[6].toString() : "") ;
-            answer.setCredit(Long.valueOf(result[7].toString()) );
+            answer.setCombination(result[6] != null ? result[6].toString() : "");
+            answer.setCredit(Long.valueOf(result[7].toString()));
             answer.setClassroom(result[8].toString());
             answers.add(answer);
         }

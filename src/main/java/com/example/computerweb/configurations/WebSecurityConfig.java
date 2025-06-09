@@ -82,6 +82,7 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers(
                             "/access/login" , "/access/forgotPassword"  ).permitAll();
+                    request.requestMatchers("/creditClassManagement/schedules").hasAnyRole("GVU", "TK", "GV");
                     request.requestMatchers(
                             "/calendarManagement/**" , "/userManagement/**" , "/creditClassManagement/**" ,"/creditClassManagement" , "/processRentRoom" ).hasRole("GVU");
                     request.requestMatchers("/processChangeCalendar").hasRole("TK");
@@ -89,7 +90,6 @@ public class WebSecurityConfig {
                     request.requestMatchers("/requestChangeCalendar/**","/requestChangeRoom/**" ,"/requestRentRoom" , "/notification/**"
                             , "/requestTickets" ,"/requestTickets/**" ).hasRole("GV");
                     request.requestMatchers("/requestManagement", "/api/reports/**").hasAnyRole("GVU" , "CSVC" , "TK");
-
                     request.requestMatchers("/calendar" , "/home"  , "/profile" , "/access/logout").hasAnyRole("GVU" , "CSVC" , "GV");
                     request.requestMatchers("/actuator/**", "/v3/**", "/webjars/**"
                             , "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**").permitAll();

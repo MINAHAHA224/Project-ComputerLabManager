@@ -18,7 +18,20 @@ public class CalendarRequestDetailNoAutoDto {
     private Long groupId;
 
 
+    @JsonProperty("practiceCaseBeginId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Tiết bắt đầu không được để trống")
+    private Long practiceCaseBeginId;
 
+    @JsonProperty("weekSemesterId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Tuần học không được để trống")
+    private Long weekSemesterId;
+
+    @JsonProperty("dayId")
+    @Schema(type = "Long", example = "1")
+    @NotNull(message = "Thứ không được để trống")
+    private Long dayId;
 
 
 

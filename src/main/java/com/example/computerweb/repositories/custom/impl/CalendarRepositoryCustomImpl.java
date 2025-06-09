@@ -66,7 +66,8 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "LEFT JOIN MonHoc MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
                     "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
                     "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +
-                    "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK ";
+                    "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK " ;
+
 
         } else if (userCurrent.getRole().getNameRole().equals("GV")) {
             sql = "SELECT \n" +
@@ -97,7 +98,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
                     "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +
                     "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK\n" +
-                    "WHERE ND1.UserID = "+idUser+" OR ND2.UserID = " + idUser;
+                    "WHERE ND1.UserID = "+idUser+" OR ND2.UserID = " + idUser ;
         }
 
 

@@ -5,6 +5,8 @@ import com.example.computerweb.models.entity.RoleEntity;
 import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.repositories.custom.UserRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,4 +29,7 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> , UserR
 
 
     boolean existsByPhone(String phone);
+
+    @Query("SELECT u FROM UserEntity u JOIN u.accountEntity a WHERE a.email = :email")
+    Optional<UserEntity> findUserEntityByAccountEmail(@Param("email") String email);
 }
