@@ -2,17 +2,27 @@ package com.example.computerweb.controllers;
 
 import com.example.computerweb.DTO.dto.userResponse.UserResponseDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
+import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.userRequest.UserProfileRequestDto;
+import com.example.computerweb.models.entity.AccountEntity;
+import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.services.IUserService;
+import com.example.computerweb.utils.SecurityUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,10 +38,17 @@ public class UserController {
     }
     @Operation(summary = "Post profile of user" , description = "just post some field , Not post all field", security = @SecurityRequirement(name = "bearerAuth"))
     @PostMapping("/profile")
-    public  ResponseData<?> postProfile (@RequestBody UserProfileRequestDto userProfileDto){
+    public  ResponseData<?> postProfile ( @Valid  @RequestBody UserProfileRequestDto userProfileDto){
         ResponseEntity<String> handleUpdateProfile = this.iUserService.handleUpdateFieldProfile(userProfileDto);
         return new ResponseSuccess<>(HttpStatus.OK.value(),handleUpdateProfile.getBody());
     }
+
+    @PostMapping("/profile/upload-avatar")
+
+    public ResponseData<?> uploadAvatar(@RequestParam("image") MultipartFile imageFile) {
+        return this.iUserService.handleUploadAvatar (imageFile);
+    }
+
 //    @Operation(summary = "Show all information of User" , description = "Only for GVU", security = @SecurityRequirement(name = "bearerAuth"))
 //    @GetMapping("/userManagement")
 //    public ResponseData<List<UserManagementDto>> getUserManagement (){

@@ -20,10 +20,7 @@ public class PhoneValidator implements ConstraintValidator<PhoneChecked, String>
         if(phoneNo == null || phoneNo.isEmpty()){
             return false;
         }
-        boolean checkPhoneExist = this.iUserService.checkPhoneExist(phoneNo);
-        if (checkPhoneExist ){
-            return false;
-        }
+
         //validate phone numbers of format "0902345345"
         if (phoneNo.matches("\\d{10}")) return true;
             //validating phone number with -, . or spaces: 090-234-4567

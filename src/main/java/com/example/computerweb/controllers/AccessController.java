@@ -46,11 +46,11 @@ public class AccessController {
       }
     }
 
-    @Operation(summary = "logout User" , description = "When logout delete token")
-    @PostMapping("/access/logout")
-    public ResponseEntity<String> getLogout (){
-        return this.iUserService.handleLogout();
-    }
+//    @Operation(summary = "logout User" , description = "When logout delete token")
+//    @PostMapping("/access/logout")
+//    public ResponseEntity<String> getLogout (){
+//        return this.iUserService.handleLogout();
+//    }
 
     @Operation(summary = "Home page" , description = "Show Information and Role of user" , security = @SecurityRequirement(name = "bearerAuth"))
     @GetMapping("/home")

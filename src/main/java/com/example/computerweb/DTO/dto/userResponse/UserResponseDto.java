@@ -18,6 +18,7 @@ public class UserResponseDto {
     private String gender;
     private String major;
     private String dateOfBirth ;
+    private String avatar;
 
 
     private String informationCode;

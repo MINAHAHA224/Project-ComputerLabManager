@@ -175,7 +175,9 @@ private final JwtTokenUtil jwtTokenUtil;
                 requestURI.startsWith("/webjars")) {
             return true;
         }
-
+        if (requestURI.startsWith("/avatars")) {
+            return true;
+        }
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
                 Pair.of("/access/login", "POST"),
                 Pair.of("/access/forgotPassword", "POST")

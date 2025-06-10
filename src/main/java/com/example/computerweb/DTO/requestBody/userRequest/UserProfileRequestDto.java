@@ -18,10 +18,8 @@ public class UserProfileRequestDto {
     @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("reset password")
-    @Schema(type = "string" , example = "0964515599")
-    @NotBlank(message = "Mật khẩu không được để trống")
-    @Pattern(regexp = "\\d{6,}", message = "Mật khẩu phải có ít nhất 6 chữ số")
+    @JsonProperty("resetPassword")
+
     private String resetPassword;
 
     @JsonProperty("phone")

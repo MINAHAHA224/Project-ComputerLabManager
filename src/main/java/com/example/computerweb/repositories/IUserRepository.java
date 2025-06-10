@@ -30,6 +30,8 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> , UserR
 
     boolean existsByPhone(String phone);
 
+    boolean existsByInfomationCode ( String informationCode);
+
     @Query("SELECT u FROM UserEntity u JOIN u.accountEntity a WHERE a.email = :email")
     Optional<UserEntity> findUserEntityByAccountEmail(@Param("email") String email);
 }

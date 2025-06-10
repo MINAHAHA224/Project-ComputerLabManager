@@ -4,11 +4,15 @@ import com.example.computerweb.DTO.dto.userResponse.ProfileResponseDto;
 import com.example.computerweb.DTO.dto.userResponse.UserResponseDto;
 import com.example.computerweb.DTO.dto.userResponse.UserCreateMgnDto;
 import com.example.computerweb.DTO.dto.userResponse.UserManagementDto;
+import com.example.computerweb.DTO.reponseBody.ResponseData;
+import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
 import com.example.computerweb.DTO.requestBody.userRequest.UserMngProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.userRequest.UserProfileRequestDto;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserRegisterDto;
 import com.example.computerweb.components.JwtTokenUtil;
+import com.example.computerweb.exceptions.AuthenticationException;
+import com.example.computerweb.exceptions.DataConflictException;
 import com.example.computerweb.models.entity.AccountEntity;
 import com.example.computerweb.models.entity.MajorEntity;
 import com.example.computerweb.models.entity.RoleEntity;
@@ -19,6 +23,7 @@ import com.example.computerweb.repositories.IRoleRepository;
 import com.example.computerweb.repositories.IUserRepository;
 import com.example.computerweb.services.IUserService;
 import com.example.computerweb.services.MailService;
+import com.example.computerweb.services.UploadService;
 import com.example.computerweb.utils.DateUtils;
 import com.example.computerweb.utils.SecurityUtils;
 import jakarta.mail.MessagingException;
@@ -27,6 +32,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
@@ -52,12 +59,10 @@ public class UserServiceImpl implements IUserService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
     private final IAccountRepository iAccountRepository;
+    private final UploadService uploadService;
 
 
-    @Override
-    public boolean checkPhoneExist(String phone) {
-        return this.iuserRepository.existsByPhone(phone);
-    }
+
 
 
     @Transactional
@@ -177,21 +182,21 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    @Transactional
+
     public ResponseEntity<String> handleLogout() {
         String email = SecurityUtils.getPrincipal();
         // handle set token account = null when logout
-        try {
-            HttpServletRequest currentRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-            HttpSession session = currentRequest.getSession(false); // Lấy session hiện tại và không tạo mới
-            session.setAttribute("USER_ACTIVE_JWT", null);
-            return ResponseEntity.ok().body("Đăng xuất thành công");
-        } catch (RuntimeException e) {
-            System.out.println("--ER logout set account token = null fail");
-            e.printStackTrace();
-        }
+//        try {
+//            HttpServletRequest currentRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+//            HttpSession session = currentRequest.getSession(false); // Lấy session hiện tại và không tạo mới
+//            session.setAttribute("USER_ACTIVE_JWT", null);
+//            return ResponseEntity.ok().body("Đăng xuất thành công");
+//        } catch (RuntimeException e) {
+//            System.out.println("--ER logout set account token = null fail");
+//            e.printStackTrace();
+//        }
 
-        return ResponseEntity.badRequest().body("Đăng xuất không thành công");
+            return ResponseEntity.ok().body("Đăng xuất thành công");
     }
 
     @Override
@@ -200,26 +205,52 @@ public class UserServiceImpl implements IUserService {
         try {
 
             UserEntity userEntity = this.iuserRepository.findUserEntityById(userProfileDto.getId());
+            if (userEntity == null ){
+                throw  new AuthenticationException("Lỗi xác thực người dùng");
+            }
 
-            userEntity.setPhone(userProfileDto.getPhone());
-            userEntity.setProvince(userProfileDto.getProvince());
-            userEntity.setDistrict(userProfileDto.getDistrict());
-            userEntity.setWard(userProfileDto.getWard());
-            userEntity.setAddress(userProfileDto.getAddress());
-            userEntity.setInfomationCode(userProfileDto.getInformationCode());
+            if ( !userEntity.getPhone().equals(userProfileDto.getPhone().trim())){
+                boolean checkPhoneExist = this.iuserRepository.existsByPhone(userProfileDto.getPhone().trim());
+                if (checkPhoneExist ){
+                    throw  new DataConflictException("Số điện thoai đã được sử dụng");
+                }else {
+                    userEntity.setPhone(userProfileDto.getPhone().trim());
+                }
+            }
+
+            if ( !userEntity.getInfomationCode().equals(userProfileDto.getInformationCode().trim())){
+                boolean checkInformationCodeExist = this.iuserRepository.existsByInfomationCode(userProfileDto.getInformationCode().trim());
+                if (checkInformationCodeExist ){
+                    throw  new DataConflictException("Sai định dạng CCCD hoặc CCCD đã được sử dụng");
+                }else {
+                    userEntity.setInfomationCode(userProfileDto.getInformationCode().trim());
+                }
+            }
+
+
+
+            userEntity.setProvince(userProfileDto.getProvince().trim());
+            userEntity.setDistrict(userProfileDto.getDistrict().trim());
+            userEntity.setWard(userProfileDto.getWard().trim());
+            userEntity.setAddress(userProfileDto.getAddress().trim());
+
             // save account password
             userEntity.getAccountEntity().setEmailOfPersonal(userProfileDto.getEmailPersonal());
-            userEntity.getAccountEntity().setPassWord(passwordEncoder.encode(userProfileDto.getResetPassword()));
+            if (userProfileDto.getResetPassword() != null && !userProfileDto.getResetPassword().isBlank() && userProfileDto.getResetPassword().trim().length() >= 6 ){
+                userEntity.getAccountEntity().setPassWord(passwordEncoder.encode(userProfileDto.getResetPassword()));
+
+            }else {
+                throw  new DataConflictException("Mật khẩu chưa đủ điều kiện tối thiếu 6 chữ số và không chưa khoảng trắng");
+            }
             // save
             this.iuserRepository.save(userEntity);
 
-            return ResponseEntity.ok().body("Cập nhật hồ sơ thành công");
         } catch (Exception e) {
-            System.out.println("--ER error save field profile :" + e.getMessage());
-            e.printStackTrace();
+            log.error("--ER error save field profile = {}", e.getMessage() , e);
+
         }
 
-        return ResponseEntity.badRequest().body("Cập nhật hồ sơ không thành công");
+        return ResponseEntity.ok().body("Cập nhật hồ sơ thành công");
     }
 
     @Override
@@ -234,6 +265,7 @@ public class UserServiceImpl implements IUserService {
         userCurrent.put("role", userEntity.getRole().getContentRole());
         userCurrent.put("userId", userEntity.getId().toString());
         userCurrent.put("userCode", userEntity.getCodeUser());
+        userCurrent.put("avatar", userEntity.getAvatar());
         return userCurrent;
     }
 
@@ -261,6 +293,7 @@ public class UserServiceImpl implements IUserService {
         userResponseDto.setProvince(userCurrent.getProvince());
         userResponseDto.setDistrict(userCurrent.getDistrict());
         userResponseDto.setWard(userCurrent.getWard());
+        userResponseDto.setAvatar(userCurrent.getAvatar());
 
 
         return userResponseDto;
@@ -424,6 +457,34 @@ public class UserServiceImpl implements IUserService {
         }
 
         return null;
+    }
+
+    @Override
+    @Transactional
+    public ResponseData<?> handleUploadAvatar(MultipartFile file) {
+        // Lấy thông tin người dùng đang đăng nhập
+        String email = SecurityUtils.getPrincipal();
+        AccountEntity account = this.iAccountRepository.findAccountEntityByEmail(email).orElseThrow(
+                ()-> new AuthenticationException("Không thể xác thực người dùng.")
+        );
+        UserEntity currentUser = account.getUser(); // Bạn cần thêm hàm này vào IUserService
+
+
+
+        // Gọi service để lưu file
+        String newAvatarFileName = uploadService.handleUploadFile(file, "avatars");
+
+        if (newAvatarFileName.isEmpty()) {
+            throw  new DataConflictException( "Tải ảnh lên thất bại.");
+        }
+
+        // Cập nhật đường dẫn avatar trong CSDL
+        currentUser.setAvatar(newAvatarFileName);
+        this.iuserRepository.save(currentUser);
+
+        Map<String, String> responseData = new HashMap<>();
+        responseData.put("filePath", "/resources/images/avatars/" + newAvatarFileName);
+        return new ResponseSuccess<>(HttpStatus.OK.value(), "Tải ảnh đại diện thành công.", responseData);
     }
 
 

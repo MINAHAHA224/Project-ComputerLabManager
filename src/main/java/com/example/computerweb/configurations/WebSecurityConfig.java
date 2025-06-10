@@ -33,7 +33,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 //@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
-@EnableWebMvc
+//@EnableWebMvc
 @RequiredArgsConstructor
 @EnableMethodSecurity // <<< THÊM ANNOTATION NÀY
 public class WebSecurityConfig {
@@ -79,9 +79,9 @@ public class WebSecurityConfig {
                 // minh addFilterBefore bởi vì mình muốn check JWT truoc , va trong cong doan check JWT a
                 // minh da add thong tin vo UsernamePasswordAuthenticationFilter  de phuc vu cho minh dich doan code tiep theo ne .hasRole()
                 // do la check quyen
-                .authorizeHttpRequests(request -> {
-                    request.requestMatchers(
-                            "/access/login" , "/access/forgotPassword"  ).permitAll();
+                    .authorizeHttpRequests(request -> {
+                        request.requestMatchers(
+                                "/access/login" ,"/access/logout" , "/access/forgotPassword" , "/avatars/**"  ).permitAll();
                     request.requestMatchers("/creditClassManagement/schedules" , "/calendarManagement/getWeekUpdate/**").hasAnyRole("GVU", "TK", "GV");
                     request.requestMatchers(
                             "/calendarManagement/**" , "/userManagement/**" , "/creditClassManagement/**" ,"/creditClassManagement" , "/processRentRoom" ).hasRole("GVU");
@@ -90,7 +90,7 @@ public class WebSecurityConfig {
                     request.requestMatchers("/requestChangeCalendar/**","/requestChangeRoom/**" ,"/requestRentRoom" , "/notification/**"
                             , "/requestTickets" ,"/requestTickets/**" ).hasRole("GV");
                     request.requestMatchers("/requestManagement", "/api/reports/**").hasAnyRole("GVU" , "CSVC" , "TK");
-                    request.requestMatchers("/calendar" , "/home"  , "/profile" ).hasAnyRole("GVU" , "CSVC" , "GV","TK");
+                    request.requestMatchers("/calendar" , "/home"  , "/profile" ,"/profile/**" ).hasAnyRole("GVU" , "CSVC" , "GV","TK");
                     request.requestMatchers("/actuator/**", "/v3/**", "/webjars/**"
                             , "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**").permitAll();
                     request.anyRequest().authenticated();
