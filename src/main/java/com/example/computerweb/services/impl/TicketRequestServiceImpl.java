@@ -28,6 +28,7 @@ import com.example.computerweb.models.enums.StatusEnum;
 import com.example.computerweb.repositories.*;
 import com.example.computerweb.services.ICalendarService;
 import com.example.computerweb.services.ITicketRequestService;
+import com.example.computerweb.services.MailService;
 import com.example.computerweb.utils.DateUtils;
 import com.example.computerweb.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 @Slf4j
 @Service
@@ -57,6 +60,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
     private final IAccountRepository iAccountRepository;
     private final IUserRepository iUserRepository;
     private final ICreditClassRepository iCreditClassRepository;
+    private final MailService mailService; // <<== THÊM MAIL SERVICE VÀO
 
     private boolean doIntervalsOverlap(long startIdA, long endIdA, long startIdB, long endIdB) {
         if (startIdA > endIdA || startIdB > endIdB) return false;
@@ -173,6 +177,12 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         Date dateCreateGVU = ticketRequest.getDateCreateGVU();
         UserEntity userGVU = ticketRequest.getUserGVU();
 
+        StatusEntity doneTK = ticketRequest.getStatusTK();
+        Date dateCreateTK= ticketRequest.getDateCreateTK();
+        UserEntity userTK = ticketRequest.getUserTK();
+
+        StatusEntity doneStatusOverall = ticketRequest.getStatusTicket();
+
         ticket.setDoneCSVC(doneCSVC != null ? doneCSVC.getNameStatus() : null);
         ticket.setCreated_CSVC(dateCreateCSVC != null ? DateUtils.convertToString(dateCreateCSVC) : null);
         ticket.setModified_CSVC(userCSVC != null ? userCSVC.getFirstName() + " " + userCSVC.getLastName() : null);
@@ -181,7 +191,11 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         ticket.setCreated_GVU(dateCreateGVU != null ? DateUtils.convertToString(dateCreateGVU) : null);
         ticket.setModified_GVU(userGVU != null ? userGVU.getFirstName() + " " + userGVU.getLastName() : null);
 
+        ticket.setDoneTK(doneTK != null ? doneTK.getNameStatus() : null);
+        ticket.setCreated_GVU(dateCreateTK != null ? DateUtils.convertToString(dateCreateTK) : null);
+        ticket.setModified_GVU(userTK != null ? userTK.getFirstName() + " " + userTK.getLastName() : null);
 
+        ticket.setStatusOverall(doneStatusOverall != null ? doneStatusOverall.getNameStatus() : null);
         String nameTypeRequest = ticketRequest.getTypeRequest().getNameTypeRequest();
 
 
@@ -214,15 +228,24 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
             ticket.setRoomNew(ticketRequest.getRoom().getNameRoom());
             ticket.setNoteNew(ticketRequest.getNoteTicket());
-        } else if (nameTypeRequest.equals("HUY")) {
+        } else if (nameTypeRequest.equals("TDP")) {
             CalendarEntity calendarOld = ticketRequest.getCalendar();
             WeekSemesterEntity weekSemesterEntityOld = calendarOld.getWeekSemester();
-            ticket.setWeekSemesterOld("Tuần : " + weekSemesterEntityOld.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
+            ticket.setWeekSemesterOld("Tuần: " + weekSemesterEntityOld.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityOld.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityOld.getDateEnd()) + "]");
             ticket.setDayOld(calendarOld.getDay().toString());
             ticket.setPracticeCaseBeginOld(calendarOld.getPracticeCase().getNamePracticeCase());
             ticket.setAllCaseOld(calendarOld.getAllCase().toString());
             ticket.setRoomOld(calendarOld.getRoom().getNameRoom());
             ticket.setNoteOld(calendarOld.getNoteCalendar());
+
+            // new use data on ticket
+            WeekSemesterEntity weekSemesterEntityNew = ticketRequest.getWeekSemester();
+            ticket.setWeekSemesterNew("Tuần : " + weekSemesterEntityNew.getWeekStudy() + "[Từ " + DateUtils.convertToString(weekSemesterEntityNew.getDateBegin()) + " Đến " + DateUtils.convertToString(weekSemesterEntityNew.getDateEnd()) + "]");
+            ticket.setDayNew(ticketRequest.getDay().toString());
+            ticket.setPracticeCaseBeginNew(ticketRequest.getPracticeCase().getNamePracticeCase());
+            ticket.setAllCaseNew(ticketRequest.getAllCase().toString());
+            ticket.setRoomNew(null);
+            ticket.setNoteNew(ticketRequest.getNoteTicket());
         }
 
 
@@ -821,7 +844,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         // Ví dụ sử dụng cấu trúc duyệt bạn đã có:
         StatusEntity statusTKEntity = ticketRequest.getStatusTK();
         if (statusTKEntity != null) {
-            ticketDto.setDoneTK(statusTKEntity.getContentStatus()); // Giả sử TicketResponseMgmDto có trường này
+            ticketDto.setDoneTK(statusTKEntity.getNameStatus()); // Giả sử TicketResponseMgmDto có trường này
             if (ticketRequest.getUserTK() != null) {
                 ticketDto.setModified_TK(ticketRequest.getUserTK().getFirstName() + " " + ticketRequest.getUserTK().getLastName());
             }else {
@@ -838,7 +861,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         StatusEntity statusCSVCentity = ticketRequest.getStatusCSVC();
         if (statusCSVCentity != null) {
-            ticketDto.setDoneCSVC(statusCSVCentity.getContentStatus());
+            ticketDto.setDoneCSVC(statusCSVCentity.getNameStatus());
             if (ticketRequest.getUserCSVC() != null) {
                 ticketDto.setModified_CSVC(ticketRequest.getUserCSVC().getFirstName() + " " + ticketRequest.getUserCSVC().getLastName());
             }else {
@@ -854,7 +877,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         StatusEntity statusGVUentity = ticketRequest.getStatusGVU();
         if (statusGVUentity != null) {
-            ticketDto.setDoneGVU(statusGVUentity.getContentStatus());
+            ticketDto.setDoneGVU(statusGVUentity.getNameStatus());
             if (ticketRequest.getUserGVU() != null) {
                 ticketDto.setModified_GVU(ticketRequest.getUserGVU().getFirstName() + " " + ticketRequest.getUserGVU().getLastName());
             }else {
@@ -894,7 +917,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         // Hiển thị trạng thái chung của phiếu
         if (ticketRequest.getStatusTicket() != null) {
-            ticketDto.setStatusOverall(ticketRequest.getStatusTicket().getContentStatus()); // Thêm trường này vào TicketResponseMgmDto nếu cần
+            ticketDto.setStatusOverall(ticketRequest.getStatusTicket().getNameStatus()); // Thêm trường này vào TicketResponseMgmDto nếu cần
         }
 
 
@@ -920,7 +943,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         );
         List<StatusEntity> statuses = iStatusRepository.findStatusEntitiesByNameStatusIn(statusCodes);
 
-        boolean exists = iTicketRequestRepository.existsByStatusTicketIn(statuses);
+        boolean exists = iTicketRequestRepository.existsByUserAndStatusTicketIn(accountCurrent.getUser() ,statuses);
         if (exists) {
             throw new DataConflictException("Đang còn tồn tại phiếu yêu cầu chưa được xử lý. Không thể tạo thêm phiếu yêu cầu");
         }
@@ -929,6 +952,9 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         CalendarEntity calendarToChange = iCalendarRepository.findById(changeRequestDto.getCalendarIdToChange())
                 .orElseThrow(() -> new CalendarException("Không tìm thấy lịch gốc với ID: " + changeRequestDto.getCalendarIdToChange()));
 
+        if (calendarToChange.getStatus().getNameStatus().equals(StatusEnum.OFF.getCode()) ){
+            throw    new CalendarException("lịch này hiện không hoạt động , đã có lịch bù , hiện không thể thao tác với lịch này ");
+        }
         //3.Số lịch nghỉ bù chỉ được phép = lịch chính thức
         StatusEntity statusOff = this.iStatusRepository.findStatusEntityByNameStatus(StatusEnum.OFF.getCode());
         if (statusOff == null) {
@@ -977,6 +1003,8 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         // 4. Tạo PhieuYeuCau
         TicketRequestEntity ticket = new TicketRequestEntity();
+
+
         TypeRequestEntity typeTDL = iTypeRequestRepository.findTypeRequestEntityByNameTypeRequest("TDL"); // Giả sử mã là "TDL"
         if (typeTDL == null) {
             throw new RuntimeException("Không tìm thấy loại yêu cầu 'TDL'.");
@@ -1054,12 +1082,12 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         // Kiểm tra loại phiếu có phải là "Thay đổi lịch" không
         if (!ticket.getTypeRequest().getNameTypeRequest().equals("TDL")) {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Phiếu yêu cầu này không phải là loại 'Thay đổi lịch'.");
+            throw  new CalendarException("Phiếu yêu cầu này không phải là loại 'Thay đổi lịch'.");
         }
 
 
         if (!ticket.getStatusTicket().getNameStatus().equals(StatusEnum.WAITING_DEAN_APPROVAL.getCode())) {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Phiếu này không ở trạng thái chờ TK xử lý.");
+            throw  new CalendarException( "Phiếu này không ở trạng thái chờ TK xử lý.");
         }
 
         // 3. Lấy các trạng thái cần thiết
@@ -1098,7 +1126,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         if (approverRole.equals("TK") && approver.getMajor() == majorOfCreditClass) { // Giả sử "TK" là mã quyền của Trưởng Khoa
             if (!ticket.getStatusTicket().getNameStatus().equals(StatusEnum.WAITING_DEAN_APPROVAL.getCode())) {
-                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Phiếu này không ở trạng thái chờ Trưởng Khoa duyệt.");
+                throw  new CalendarException( "Phiếu này không ở trạng thái chờ Trưởng Khoa duyệt.");
             }
             if (approvalDto.getApprovalStatus().equalsIgnoreCase(StatusEnum.AGREE.getCode())) {
 
@@ -1138,10 +1166,11 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 //                    notificationContent = "Yêu cầu thay đổi lịch của bạn bị từ chối do phòng đã có lịch khác vào thời gian đề xuất mới.";
 //                    // Tạo thông báo cho người gửi
 //                    createNotificationForUser(ticket.getUser(), notificationTitle, notificationContent, ticket, approver);
-                    return new ResponseFailure(HttpStatus.CONFLICT.value(), "Phòng đã có lịch khác vào thời gian đề xuất mới. Yêu cầu bị từ chối.");
+                    throw  new DataConflictException( "Phòng đã có lịch khác vào thời gian đề xuất mới. Yêu cầu bị từ chối.");
                 }
 
                 // Hủy lịch cũ (đặt trạng thái là DA_HUY)
+
                 calendarToChange.setStatus(statusDaHuy);
                 iCalendarRepository.save(calendarToChange);
 
@@ -1156,7 +1185,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                 newCalendar.setAllCase(newAllCase);
                 newCalendar.setRoom(roomForNewCalendar);
                 newCalendar.setStatus(statusActive); // Lịch mới được active
-                newCalendar.setNoteCalendar(newNote);
+                newCalendar.setNoteCalendar("Lịch dạy bù");
                 iCalendarRepository.save(newCalendar);
 
 
@@ -1178,17 +1207,18 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                 notificationContent = "Yêu cầu thay đổi lịch của bạn đã bị Trưởng Khoa từ chối. Lý do: " + approvalDto.getApproverNote();
 
             } else {
-                return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Trạng thái duyệt không hợp lệ: " + approvalDto.getApprovalStatus());
+                throw  new CalendarException( "Trạng thái duyệt không hợp lệ: " + approvalDto.getApprovalStatus());
             }
         } else {
-            return new ResponseFailure(HttpStatus.FORBIDDEN.value(), "Bạn không có quyền duyệt phiếu này hoặc Không phải trưởng khoa của khoa ." + majorOfCreditClass.getContentMajor());
+            throw  new CalendarException( "Bạn không có quyền duyệt phiếu này hoặc Không phải trưởng khoa của khoa ." + majorOfCreditClass.getContentMajor());
         }
 
         iTicketRequestRepository.save(ticket);
 
         // Tạo thông báo cho người gửi phiếu
         createNotificationForUser(ticket.getUser(), notificationTitle, notificationContent, ticket, approver);
-
+// === GỌI HÀM GỬI MAIL Ở ĐÂY ===
+        sendApprovalEmail(ticket, approver, approvalDto.getApproverNote());
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Xử lý phiếu yêu cầu thành công. ");
     }
 
@@ -1242,7 +1272,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         );
         List<StatusEntity> statuses = iStatusRepository.findStatusEntitiesByNameStatusIn(statusCodes);
 
-        boolean exists = iTicketRequestRepository.existsByStatusTicketIn(statuses);
+        boolean exists = iTicketRequestRepository.existsByUserAndStatusTicketIn(account.getUser(), statuses);
         if (exists) {
             throw new DataConflictException("Đang còn tồn tại phiếu yêu cầu chưa được xử lý. Không thể tạo thêm phiếu yêu cầu");
         }
@@ -1485,6 +1515,8 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
 
         iTicketRequestRepository.save(ticket);
         createNotificationForUser(ticket.getUser(), notificationTitle, notificationContent, ticket, approver);
+
+//        sendApprovalEmail(ticket, approver, approvalDto.getApproverNote());
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Xử lý phiếu mượn phòng thành công. " + notificationContent);
     }
 
@@ -1504,7 +1536,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         );
         List<StatusEntity> statuses = iStatusRepository.findStatusEntitiesByNameStatusIn(statusCodes);
 
-        boolean exists = iTicketRequestRepository.existsByStatusTicketIn(statuses);
+        boolean exists = iTicketRequestRepository.existsByUserAndStatusTicketIn( userRequesting ,statuses);
         if (exists) {
             throw new DataConflictException("Đang còn tồn tại phiếu yêu cầu chưa được xử lý. Không thể tạo thêm phiếu yêu cầu");
         }
@@ -1514,26 +1546,32 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         if (calendarForRent == null) {
             throw new RuntimeException("Không tìm thấy lịch id");
         }
+        if (calendarForRent.getStatus().getNameStatus().equals(StatusEnum.OFF.getCode()) ){
+            throw    new CalendarException("lịch này hiện không hoạt động , đã có lịch bù , hiện không thể thao tác với lịch này ");
+        }
+
         StatusEntity statusPendingApproval = this.iStatusRepository.findStatusEntityByNameStatus(StatusEnum.PENDING_APPROVAL.getCode());
         if (statusPendingApproval == null) {
-            throw new RuntimeException("Không tìm thấy status statusPendingApproval");
+            throw new CalendarException("Không tìm thấy status statusPendingApproval");
         }
         StatusEntity statusNotRequired = this.iStatusRepository.findStatusEntityByNameStatus(StatusEnum.NOT_REQUIRED.getCode());
         if (statusNotRequired == null) {
-            throw new RuntimeException("Không tìm thấy status statusNotRequired");
+            throw new CalendarException("Không tìm thấy status statusNotRequired");
         }
 
         StatusEntity statusWaitCSVC = this.iStatusRepository.findStatusEntityByNameStatus(StatusEnum.WAITING_FACILITIES_APPROVAL.getCode());
         if (statusWaitCSVC == null) {
-            throw new RuntimeException("Không tìm thấy status statusWaitCSVC");
+            throw new CalendarException("Không tìm thấy status statusWaitCSVC");
         }
         TypeRequestEntity typeTDP = iTypeRequestRepository.findTypeRequestEntityByNameTypeRequest("TDP"); // Giả sử mã là "MP"
         if (typeTDP == null) {
-            throw new RuntimeException("Không tìm thấy loại yêu cầu 'TDP'.");
+            throw new CalendarException("Không tìm thấy loại yêu cầu 'TDP'.");
         }
 
         TicketRequestEntity ticket = new TicketRequestEntity();
         ticket.setTypeRequest(typeTDP);
+        ticket.setDateRequest(new Date());
+        ticket.setUser(userRequesting); // Người tạo phiếu
         ticket.setCalendar(calendarForRent);
         ticket.setStatusGVU(statusNotRequired);
         ticket.setStatusTK(statusNotRequired);
@@ -1541,9 +1579,20 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
         ticket.setNoteTicket(changeRequestDto.getPurposeUse()); // DeXuat_GhiChu
         // ticket.setCreditClass(creditClassForRent); // Nếu PhieuYeuCau có trường DeXuat_LopTinChiID_FK
         // Hoặc lưu thông tin này vào GhiChu nếu không có trường riêng
+        // Lưu thông tin lịch đề xuất
+        ticket.setWeekSemester(calendarForRent.getWeekSemester()); // DeXuat_TuanHoc_KiHoc_Id_FK
+        ticket.setDay(calendarForRent.getDay());                   // DeXuat_Thu
+        ticket.setPracticeCase(calendarForRent.getPracticeCase()); // DeXuat_SoTietBD_FK
+        ticket.setAllCase(calendarForRent.getAllCase());      // DeXuat_SoTiet (giữ nguyên từ lịch gốc)
+        ticket.setRoom(null); // DeXuat_PhongID_FK (giữ nguyên phòng từ lịch gốc)
+
         ticket.setStatusTicket(statusWaitCSVC);
 
-        return new ResponseSuccess<>(HttpStatus.CREATED.value(), "Đã gửi yêu cầu thay phòng thành công. Vui lòng chờ CSVC xử lý.", ticket.getId());
+            this.iTicketRequestRepository.save(ticket);
+
+
+
+        return new ResponseSuccess<>(HttpStatus.CREATED.value(), "Đã gửi yêu cầu thay phòng thành công. Vui lòng chờ Nhân viên cơ sở vật chất xử lý.");
     }
 
 
@@ -1552,7 +1601,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
     public ResponseData<?> processChangeRoomTicketApproval(TicketApprovalDto approvalDto) {
         String emailCurrentUser = SecurityUtils.getPrincipal();
         AccountEntity account = iAccountRepository.findAccountEntityByEmail(emailCurrentUser)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng duyệt với email: " + emailCurrentUser));
+                .orElseThrow(() -> new CalendarException("Không tìm thấy người dùng duyệt với email: " + emailCurrentUser));
         UserEntity approver = account.getUser();
         String approverRole = approver.getRole().getNameRole();
 
@@ -1561,37 +1610,37 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                 .orElseThrow(() -> new CalendarException("Không tìm thấy phiếu yêu cầu với ID: " + approvalDto.getTicketId()));
         CalendarEntity calendarForChange = ticket.getCalendar();
         if (calendarForChange == null) {
-            throw new RuntimeException("Không tìm thấy lịch id");
+            throw new DataNotFoundException("Không tìm thấy lịch id");
         }
         if (!ticket.getTypeRequest().getNameTypeRequest().equals("TDP")) {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Phiếu yêu cầu này không phải là loại 'Thay đổi phòng'.");
+            throw new DataNotFoundException( "Phiếu yêu cầu này không phải là loại 'Thay đổi phòng'.");
         }
 
         if (!approverRole.equals("CSVC")) { // Chỉ CSVC được xử lý phiếu thay phòng
-            return new ResponseFailure(HttpStatus.FORBIDDEN.value(), "Bạn không có quyền xử lý phiếu mượn phòng.");
+            throw new DataNotFoundException( "Bạn không có quyền xử lý phiếu mượn phòng.");
         }
 
         if (!ticket.getStatusTicket().getNameStatus().equals(StatusEnum.WAITING_FACILITIES_APPROVAL.getCode())) {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Phiếu này không ở trạng thái chờ CSVC xử lý.");
+            throw new CalendarException( "Phiếu này không ở trạng thái chờ CSVC xử lý.");
         }
 
         StatusEntity statusApproved = iStatusRepository.findStatusEntityByNameStatus(StatusEnum.APPROVED.getCode()); // Hoặc trạng thái "APPROVED" chung
         if (statusApproved == null) {
-            throw new RuntimeException("Không tìm thấy trạng thái 'DA_DUYET_GVU'.");
+            throw new DataNotFoundException("Không tìm thấy trạng thái 'DA_DUYET_GVU'.");
         }
         StatusEntity statusRejected = iStatusRepository.findStatusEntityByNameStatus(StatusEnum.REJECTED.getCode());
         if (statusRejected == null) {
-            throw new RuntimeException("Không tìm thấy trạng thái 'TU_CHOI_GVU'.");
+            throw new DataNotFoundException("Không tìm thấy trạng thái 'TU_CHOI_GVU'.");
         }
         StatusEntity statusThanhCong = iStatusRepository.findStatusEntityByNameStatus(StatusEnum.PROCESSED_SUCCESSFULLY.getCode());
         if (statusThanhCong == null) {
-            throw new RuntimeException("Không tìm thấy trạng thái 'HOAN_TAT'.");
+            throw new DataNotFoundException("Không tìm thấy trạng thái 'HOAN_TAT'.");
         }
 
         //Xử dụng để check phòng
         StatusEntity statusActive = iStatusRepository.findStatusEntityByNameStatus(StatusEnum.ACTIVE.getCode());
         if (statusActive == null) {
-            throw new RuntimeException("Không tìm thấy trạng thái 'statusActiveCalendarRentRoom' cho lịch.");
+            throw new DataNotFoundException("Không tìm thấy trạng thái 'statusActiveCalendarRentRoom' cho lịch.");
         }
 
         String notificationTitle = "Phản hồi yêu cầu thay phòng (ID: " + ticket.getId() + ")";
@@ -1641,14 +1690,20 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
                     }
                 }
             }
+            // loai tru cai phong hien tai ra va nhung phong co co so khac voi co so cu cua lich
+            RoomEntity roomCurrent = calendarForChange.getRoom();
+            FacilityEntity facilityCurrent = roomCurrent.getFacility();
+
+            suitableRooms.removeIf(roomIterator -> !roomIterator.getFacility().equals(facilityCurrent) || roomIterator.equals(roomCurrent));
 
             if (suitableRooms.isEmpty()) {
 
-                return new ResponseFailure(HttpStatus.NOT_FOUND.value(), "Không tìm thấy phòng trống phù hợp");
+                throw new DataConflictException( "Không tìm thấy phòng trống phù hợp");
             }
 
             // Sắp xếp và chọn phòng tốt nhất
             suitableRooms.sort((r1, r2) -> Long.compare(r2.getNumberOfComputerActive(), r1.getNumberOfComputerActive())); // Ưu tiên nhiều máy hơn
+
             selectedRoomForRent = suitableRooms.get(0);
             // --- KẾT THÚC LOGIC CHỌN PHÒNG ---
 
@@ -1660,7 +1715,7 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             // newRentedCalendar.setCreditClass(ltcForRent); // Nếu mượn cho LTC
 
             calendarForChange.setRoom(selectedRoomForRent);
-            calendarForChange.setNoteCalendar(ticket.getNoteTicket() + " (Thay phòng - YC ID: " + ticket.getId() + ")");
+            calendarForChange.setNoteCalendar("(Thay đổi phòng sang phòng : " +selectedRoomForRent.getNameRoom() );
             iCalendarRepository.save(calendarForChange);
 
             ticket.setStatusCSVC(statusApproved);
@@ -1677,14 +1732,85 @@ public class TicketRequestServiceImpl implements ITicketRequestService {
             ticket.setStatusTicket(statusThanhCong);
             notificationContent = "Yêu cầu thay phòng của bạn đã bị Nhân viên cơ sở vật chất từ chối. Lý do: " + approvalDto.getApproverNote();
         } else {
-            return new ResponseFailure(HttpStatus.BAD_REQUEST.value(), "Trạng thái duyệt không hợp lệ: " + approvalDto.getApprovalStatus());
+            throw new DataConflictException( "Trạng thái duyệt không hợp lệ: " + approvalDto.getApprovalStatus());
         }
 
 
         iTicketRequestRepository.save(ticket);
         createNotificationForUser(ticket.getUser(), notificationTitle, notificationContent, ticket, approver);
+        sendApprovalEmail(ticket, approver, approvalDto.getApproverNote());
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Xử lý Thay đổi phòng thành công. " + notificationContent);
     }
 
+    // === TẠO MỘT HÀM HELPER ĐỂ GỬI MAIL ===
+    private void sendApprovalEmail(TicketRequestEntity ticket, UserEntity approver, String approverNote) {
+        UserEntity requestUser = ticket.getUser();
+        // Gửi đến email cá nhân nếu có, nếu không thì gửi đến email trường
+//        String recipientEmail = (requestUser.getAccountEntity().getEmailOfPersonal() != null && !requestUser.getAccountEntity().getEmailOfPersonal().isEmpty())
+//                ? requestUser.getAccountEntity().getEmailOfPersonal()
+//                : requestUser.getAccountEntity().getEmail();
+        String recipientEmail = "caothaiiop1234@gmail.com";
+        Map<String, Object> emailProperties = new HashMap<>();
+        emailProperties.put("userName", requestUser.getFirstName() + " " + requestUser.getLastName());
+        emailProperties.put("ticketId", ticket.getId().toString());
+        emailProperties.put("ticketType", ticket.getTypeRequest().getContentTypeRequest());
+        boolean isApproved =false;
+        if (ticket.getStatusTK().getNameStatus().equals(StatusEnum.APPROVED.getCode()) ){
+            isApproved = true;
+        } else if (ticket.getStatusGVU().getNameStatus().equals(StatusEnum.APPROVED.getCode()) ) {
+            isApproved = true;
+        } else if (ticket.getStatusCSVC().getNameStatus().equals(StatusEnum.APPROVED.getCode())) {
+            isApproved = true;
+        }
+
+        emailProperties.put("isApproved", isApproved);
+        emailProperties.put("status", isApproved ? "ĐỒNG Ý" : "TỪ CHỐI");
+
+        String approverRole = (approver.getRole() != null) ? approver.getRole().getContentRole() : "Quản trị viên";
+        emailProperties.put("approverName", approver.getFirstName() + " " + approver.getLastName() + " (" + approverRole + ")");
+        emailProperties.put("approverNote", approverNote != null ? approverNote : "Không có ghi chú.");
+
+
+        // === LOGIC MỚI: THÊM DỮ LIỆU CHI TIẾT VÀO MAP ===
+        emailProperties.put("hasDetails", false); // Mặc định là không có chi tiết
+        emailProperties.put("hasOldDetails", false); // Mặc định là không có chi tiết cũ (dùng cho loại yêu cầu mượn phòng)
+
+        CalendarEntity oldCalendar = ticket.getCalendar(); // Lịch gốc
+
+        // 1. Xử lý thông tin gốc (nếu có)
+        if (oldCalendar != null) {
+            emailProperties.put("hasOldDetails", true);
+            emailProperties.put("old_week", formatWeek(oldCalendar.getWeekSemester()));
+            emailProperties.put("old_day", oldCalendar.getDay().toString());
+            emailProperties.put("old_lessonStart", oldCalendar.getPracticeCase().getNamePracticeCase());
+            emailProperties.put("old_lessonCount", oldCalendar.getAllCase().toString());
+            emailProperties.put("old_room", oldCalendar.getRoom().getNameRoom());
+            emailProperties.put("old_note", oldCalendar.getNoteCalendar());
+        }
+
+        // 2. Xử lý thông tin đề xuất (nếu có)
+        // Áp dụng cho cả Đổi lịch và Mượn phòng
+        if (ticket.getWeekSemester() != null) {
+            emailProperties.put("hasDetails", true); // Bật cờ để hiển thị khối chi tiết
+            emailProperties.put("new_week", formatWeek(ticket.getWeekSemester()));
+            emailProperties.put("new_day", ticket.getDay().toString());
+            emailProperties.put("new_lessonStart", ticket.getPracticeCase().getNamePracticeCase());
+            emailProperties.put("new_lessonCount", ticket.getAllCase().toString());
+            emailProperties.put("new_room", (ticket.getRoom() != null) ? ticket.getRoom().getNameRoom() : "(Chưa xếp)");
+            emailProperties.put("new_note", ticket.getNoteTicket());
+        }
+        // Gọi service để gửi mail
+        mailService.sendRequestResponseEmail(recipientEmail, emailProperties);
+    }
+
+
+    private final DateTimeFormatter mailDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    // Tạo hàm helper để định dạng tuần cho đẹp
+    private String formatWeek(WeekSemesterEntity week) {
+        if (week == null) return "";
+        String startDate = week.getDateBegin().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(mailDateFormatter);
+        String endDate = week.getDateEnd().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(mailDateFormatter);
+        return String.format("Tuần: %d [Từ %s Đến %s]", week.getWeekStudy(), startDate, endDate);
+    }
 
 }

@@ -6,6 +6,7 @@ import com.example.computerweb.models.enums.StatusEnum;
 import com.example.computerweb.repositories.*;
 import com.example.computerweb.repositories.custom.TicketRequestCustom;
 import com.example.computerweb.utils.DateUtils;
+import com.example.computerweb.utils.SecurityUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -74,6 +75,8 @@ public class TicketRequestCustomImpl implements TicketRequestCustom {
         sql.append("FROM PhieuYeuCau pyc ");
         sql.append("JOIN LoaiYC lyc ON pyc.LoaiYcID_FK = lyc.LoaiYcID ");
         sql.append("JOIN TrangThai st_phieu ON pyc.TrangThaiID_FK = st_phieu.TrangThaiID ");
+        // JOIN với NguoiDung để lấy thông tin chuyên ngành của người gửi
+        sql.append("JOIN NguoiDung nguoiGui ON nguoiGui.UserID = pyc.UserIdNguoiGui_FK ");
         // JOIN thêm với TrangThai cho các cột Duyet... nếu cần hiển thị chi tiết trạng thái từng bước
         // sql.append("LEFT JOIN TrangThai st_tk ON pyc.DuyetTK = st_tk.TrangThaiID ");
         // sql.append("LEFT JOIN TrangThai st_gvu ON pyc.DuyetGVU = st_gvu.TrangThaiID ");
@@ -89,16 +92,28 @@ public class TicketRequestCustomImpl implements TicketRequestCustom {
 
 
         if (roleMaQuyen.equals("GVU")) { // Giả sử "GVU" là MaQuyen
-            sql.append("WHERE pyc.TrangThaiID_FK = :statusWaitingRegistrar ");
+            sql.append("WHERE pyc.TrangThaiID_FK = ").append(statusWaitingRegistrarId);
             // GVU có thể muốn xem cả phiếu đã xử lý hoặc từ chối bởi GVU
             // sql.append("OR (pyc.MODIFIED_GVU = :currentUserId AND pyc.TrangThaiID_FK IN (:statusCompleted, :statusOverallRejected)) ");
             // Hoặc đơn giản là các phiếu đang chờ họ và các phiếu họ đã xử lý gần đây
 //            sql.append("OR (pyc.DuyetGVU IS NOT NULL )"); // Phiếu GVU đã chạm vào
         } else if (roleMaQuyen.equals("CSVC")) { // Giả sử "CSVC" là MaQuyen
-            sql.append("WHERE pyc.TrangThaiID_FK = :statusWaitingFacilities ");
+            sql.append("WHERE pyc.TrangThaiID_FK = ").append(statusWaitingFacilitiesId);;
 //            sql.append("OR (pyc.DuyetCSVC =  1 ) ");
         } else if (roleMaQuyen.equals("TK")) { // Giả sử "TK" là MaQuyen
+            String emailCurrentUser = SecurityUtils.getPrincipal();
+            UserEntity truongKhoa = iUserRepository.findUserEntityByAccountEmail(emailCurrentUser)
+                    .orElse(null); // .orElseThrow(() -> new AuthenticationException("Không tìm thấy thông tin Trưởng khoa."));
+
+            if (truongKhoa == null || truongKhoa.getMajor() == null) {
+                // Nếu TK không có chuyên ngành, không cho xem phiếu nào
+                return new ArrayList<>();
+            }
+            Long majorId = truongKhoa.getMajor().getId();
+
+            // Thêm điều kiện lọc theo chuyên ngành
             sql.append("WHERE pyc.TrangThaiID_FK = ").append(statusWaitingDeanId);
+            sql.append(" AND nguoiGui.ChuyenNganh_FK = ").append(majorId);
 //            sql.append("OR (pyc.DuyetTK IS NOT NULL   ) ");
         } else {
             // Vai trò không xác định hoặc không có quyền xem phiếu quản lý
@@ -114,17 +129,7 @@ public class TicketRequestCustomImpl implements TicketRequestCustom {
         // Long currentUserId = (currentUser != null) ? currentUser.getUserID() : -1L; // Giá trị không bao giờ khớp nếu không có user
 
 
-        if (roleMaQuyen.equals("GVU")) {
-            query.setParameter("statusWaitingRegistrar", statusWaitingRegistrarId);
-            // query.setParameter("currentUserIdParam", currentUserId); // Nếu dùng điều kiện MODIFIED_GVU
-        } else if (roleMaQuyen.equals("CSVC")) {
-            query.setParameter("statusWaitingFacilities", statusWaitingFacilitiesId);
-            // query.setParameter("currentUserIdParam", currentUserId);
-        }
-//        else if (roleMaQuyen.equals("TK")) {
-//            query.setParameter("statusWaitingDean", statusWaitingDeanId);
-//            // query.setParameter("currentUserIdParam", currentUserId);
-//        }
+
         // Xóa :currentUserIdParam nếu không dùng đến điều kiện đó
         // Hiện tại, để đơn giản, query chỉ lấy các phiếu đang chờ vai trò đó.
         // Bạn cần thêm logic lấy UserID hiện tại và truyền vào query nếu muốn mở rộng điều kiện WHERE

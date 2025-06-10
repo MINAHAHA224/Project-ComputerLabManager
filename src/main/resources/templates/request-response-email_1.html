@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PTIT - Phản hồi yêu cầu</title>
+</head>
+<body style="margin:0; padding:0; font-family:Arial, sans-serif; background-color:#f4f4f4;">
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse;">
+    <tr>
+        <td align="center" style="padding:20px; background-color:#800000; color:white;">
+            <img src="https://fit.ptithcm.edu.vn/wp-content/uploads/2022/05/Logo_PTIT_University-1920x1920.png" alt="PTIT Logo" width="100" style="display:block;">
+            <h2 style="margin:10px 0 0 0; font-size:24px; font-weight:bold;">HỌC VIỆN CÔNG NGHỆ BƯU CHÍNH VIỄN THÔNG</h2>
+
+            <p style="font-size:16px; margin-top:8px;">TRƯỜNG TRỌNG ĐIỂM QUỐC GIA VỀ KỸ THUẬT CÔNG NGHỆ</p>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#ffffff" style="padding:40px 30px 40px 30px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td style="color:#153643; font-size:20px; font-weight:bold;">
+                        Thông báo về Yêu cầu của bạn
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:20px 0 30px 0; color:#153643; font-size:16px; line-height:20px;">
+                        Chào <b th:text="${userName}">Tên Người dùng</b>,
+                        <p>Yêu cầu của bạn đã được xử lý với kết quả như sau:</p>
+                    </td>
+                </tr>
+                <tr th:if="${hasDetails}">
+                    <td style="padding-top: 20px;">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <!-- Thông tin Gốc -->
+                                <td width="48%" valign="top" th:if="${hasOldDetails}">
+                                    <h4 style="margin:0 0 10px 0;">Thông tin gốc / Trước thay đổi</h4>
+                                    <table border="1" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse; border:1px solid #e0e0e0; font-size: 14px;">
+                                        <tr th:if="${old_week}"><td bgcolor="#f7f7f7" width="35%">Tuần</td><td th:text="${old_week}"></td></tr>
+                                        <tr th:if="${old_day}"><td bgcolor="#f7f7f7">Thứ</td><td th:text="${old_day}"></td></tr>
+                                        <tr th:if="${old_lessonStart}"><td bgcolor="#f7f7f7">Tiết BĐ</td><td th:text="${old_lessonStart}"></td></tr>
+                                        <tr th:if="${old_lessonCount}"><td bgcolor="#f7f7f7">Số tiết</td><td th:text="${old_lessonCount}"></td></tr>
+                                        <tr th:if="${old_room}"><td bgcolor="#f7f7f7">Phòng</td><td th:text="${old_room}"></td></tr>
+                                        <tr th:if="${old_note}"><td bgcolor="#f7f7f7">Ghi chú</td><td th:text="${old_note}"></td></tr>
+                                    </table>
+                                </td>
+
+                                <!-- Khoảng cách giữa 2 bảng -->
+                                <td width="4%"></td>
+
+                                <!-- Thông tin Đề xuất -->
+                                <td width="48%" valign="top">
+                                    <h4 style="margin:0 0 10px 0;">Thông tin đề xuất / Sau thay đổi</h4>
+                                    <table border="1" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse; border:1px solid #e0e0e0; font-size: 14px;">
+                                        <tr th:if="${new_week}"><td bgcolor="#f7f7f7" width="35%">Tuần</td><td th:text="${new_week}"></td></tr>
+                                        <tr th:if="${new_day}"><td bgcolor="#f7f7f7">Thứ</td><td th:text="${new_day}"></td></tr>
+                                        <tr th:if="${new_lessonStart}"><td bgcolor="#f7f7f7">Tiết BĐ</td><td th:text="${new_lessonStart}"></td></tr>
+                                        <tr th:if="${new_lessonCount}"><td bgcolor="#f7f7f7">Số tiết</td><td th:text="${new_lessonCount}"></td></tr>
+                                        <tr th:if="${new_room}"><td bgcolor="#f7f7f7">Phòng</td><td th:text="${new_room}"></td></tr>
+                                        <tr th:if="${new_note}"><td bgcolor="#f7f7f7">Lý do/Ghi chú mới</td><td th:text="${new_note}"></td></tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- === KẾT THÚC BẢNG MỚI === -->
+                <tr>
+                    <td>
+                        <!-- Bảng chi tiết -->
+                        <table border="1" cellpadding="10" cellspacing="0" width="100%" style="border-collapse: collapse; border:1px solid #cccccc;">
+                            <tr>
+                                <td bgcolor="#eeeeee" style="width: 30%;"><b>ID Yêu cầu</b></td>
+                                <td th:text="${ticketId}">12</td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="#eeeeee"><b>Loại yêu cầu</b></td>
+                                <td th:text="${ticketType}">Thay đổi lịch</td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="#eeeeee"><b>Trạng thái</b></td>
+                                <td>
+                                    <span th:text="${status}" th:style="${isApproved} ? 'color:green; font-weight:bold;' : 'color:red; font-weight:bold;'">ĐỒNG Ý</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="#eeeeee"><b>Người xử lý</b></td>
+                                <td th:text="${approverName}">Nguyễn Văn A (Trưởng khoa)</td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="#eeeeee"><b>Ghi chú</b></td>
+                                <td th:text="${approverNote}">Tôi muốn nghỉ làm...</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:30px 0 0 0; color:#153643; font-size:14px; line-height:20px;">
+                        Để xem chi tiết, vui lòng đăng nhập vào hệ thống.
+                        <br/>
+                        Trân trọng,
+                        <br/>
+                        Phòng Quản lý.
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#800000" style="padding:30px 30px 30px 30px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+<!--                <tr>-->
+<!--                    <td width="75%" style="color:#ffffff; font-size:12px;">-->
+<!--                        © 2025 PTIT - Hệ thống Quản lý Lịch thực hành-->
+<!--                    </td>-->
+<!--            -->
+<!--                </tr>-->
+                <tr>
+                    <td style="color:#ffffff; font-size:12px; line-height:18px;">
+                        Phần mềm này được phát triển bởi <strong>Công ty Minahaha224</strong><br>
+                        Hệ thống Quản lý Lịch thực hành – hỗ trợ tối ưu cho công tác quản lý đào tạo tại PTIT.<br>
+                        Liên hệ: <a href="mailto:caothaiiop1234@gmail.com" style="color: #ffffff;">CaoDuyThai224@software.com</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

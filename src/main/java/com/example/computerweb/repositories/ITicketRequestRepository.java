@@ -13,7 +13,7 @@ import java.util.List;
 public interface ITicketRequestRepository extends JpaRepository<TicketRequestEntity , Long> , TicketRequestCustom {
     TicketRequestEntity getTicketRequestEntityById(Long id);
 
-    boolean existsByStatusTicketIn ( List<StatusEntity> status);
+    boolean existsByUserAndStatusTicketIn ( UserEntity user , List<StatusEntity> status);
     // for role GVU
     List<TicketRequestEntity> findAllByStatusCSVC (StatusEntity statusCSVC  );
 
