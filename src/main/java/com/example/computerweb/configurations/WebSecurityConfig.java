@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -81,7 +82,8 @@ public class WebSecurityConfig {
                 // do la check quyen
                     .authorizeHttpRequests(request -> {
                         request.requestMatchers(
-                                "/access/login" ,"/access/logout" , "/access/forgotPassword" , "/avatars/**"  ).permitAll();
+                                "/access/login" ,"/access/logout" , "/access/forgotPassword" , "/avatars/**" , "/calendarGetSemester/**"  ).permitAll();
+                    request.requestMatchers(HttpMethod.GET, "/calendarManagement/create").hasAnyRole("GVU", "GV" , "TK" , "CSVC");
                     request.requestMatchers("/creditClassManagement/schedules" , "/calendarManagement/getWeekUpdate/**").hasAnyRole("GVU", "TK", "GV");
                     request.requestMatchers(
                             "/calendarManagement/**" , "/userManagement/**" , "/creditClassManagement/**" ,"/creditClassManagement" , "/processRentRoom" ).hasRole("GVU");

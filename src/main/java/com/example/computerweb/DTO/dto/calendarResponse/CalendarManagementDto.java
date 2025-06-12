@@ -15,6 +15,7 @@ public class CalendarManagementDto implements Serializable {
 
     private String calendarId;
     private String creditClassId;
+    private String nameClassroom;
     private String credit;
     private String UserIdMp_FK;
     private String codeSubject;

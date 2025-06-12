@@ -55,7 +55,8 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "    ISNULL(ND1.Ho + ' ' + ND1.Ten, ND2.Ho + ' ' + ND2.Ten) AS GiangVien,\n" +
                     "    LTH.GhiChu,\n" +
                     "    DATEADD(DAY, (LTH.Thu - CASE WHEN DATEPART(WEEKDAY, TuanHK.NgayBatDau) = 1 THEN 7 ELSE DATEPART(WEEKDAY, TuanHK.NgayBatDau) - 1 END), TuanHK.NgayBatDau) AS NgayCuThe,\n" +
-                    "    TT.MaTrangThai \n" +
+                    "    TT.MaTrangThai, \n" +
+                    "    lp.MaLop \n" +
                     "FROM LichThucHanh LTH -- Thêm Alias LTH cho ngắn gọn\n" +
                     "LEFT JOIN TrangThai TT ON LTH.TrangThai_FK = TT.TrangThaiID \n" +
                     "LEFT JOIN LopTinChi LTC ON LTC.LopTinChiID = LTH.LopTinChiID_FK \n" +
@@ -66,8 +67,8 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "LEFT JOIN MonHoc MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
                     "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
                     "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +
-                    "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK " ;
-
+                    "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK\n " +
+                    "INNER JOIN Lop lp ON LTC.Lop_FK = lp.LopID " ;
 
         } else if (userCurrent.getRole().getNameRole().equals("GV")) {
             sql = "SELECT \n" +
@@ -87,7 +88,8 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "    ISNULL(ND1.Ho + ' ' + ND1.Ten, ND2.Ho + ' ' + ND2.Ten) AS GiangVien,\n" +
                     "    LTH.GhiChu,\n" +
                     "    DATEADD(DAY, (LTH.Thu - CASE WHEN DATEPART(WEEKDAY, TuanHK.NgayBatDau) = 1 THEN 7 ELSE DATEPART(WEEKDAY, TuanHK.NgayBatDau) - 1 END), TuanHK.NgayBatDau) AS NgayCuThe,\n" +
-                    "    TT.MaTrangThai \n" +
+                    "    TT.MaTrangThai, \n" +
+                    "    lp.MaLop \n" +
                     "FROM LichThucHanh LTH -- Thêm Alias LTH cho ngắn gọn\n" +
                     "LEFT JOIN TrangThai TT ON LTH.TrangThai_FK = TT.TrangThaiID \n" +
                     "LEFT JOIN LopTinChi LTC ON LTC.LopTinChiID = LTH.LopTinChiID_FK \n" +
@@ -98,6 +100,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
                     "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +
                     "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK\n" +
+                    "INNER JOIN Lop lp ON LTC.Lop_FK = lp.LopID\n " +
                     "WHERE ND1.UserID = "+idUser+" OR ND2.UserID = " + idUser ;
         }
 
@@ -108,7 +111,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
         List<Object[]> results = query.getResultList();
         if (!results.isEmpty() ){
             if(userCurrent.getRole().getNameRole().equals("GVU") ||
-                    userCurrent.getRole().getNameRole().equals("GV")){
+                    userCurrent.getRole().getNameRole().equals("GV") ||  userCurrent.getRole().getNameRole().equals("TK") ){
                 for (Object[] result : results) {
                     CalendarManagementDto data = new CalendarManagementDto();
                     data.setCalendarId( result[0].toString());
@@ -128,6 +131,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     data.setNote(result[14] == null ? "": result[14].toString());
                     data.setDate(DateUtils.convertToString((Date) result[15]) );
                     data.setStatusCalendar(result[16].toString());
+                    data.setNameClassroom( result[17].toString() );
                     datas.add(data);
                 }
                 return datas;
@@ -135,13 +139,13 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                 for (Object[] result : results) {
                     CalendarManagementDto data = new CalendarManagementDto();
                     data.setCalendarId( result[0].toString());
-                    data.setCreditClassId( String.valueOf(result[1]).equals("0") ? "" : String.valueOf(result[1]) );
-                    data.setUserIdMp_FK(String.valueOf(result[2]).equals("0") ? "" : String.valueOf(result[2]));
-                    data.setCodeSubject("");
-                    data.setCredit("");
-                    data.setNameSubject("");
-                    data.setGroup("");
-                    data.setCombination("");
+                    data.setCreditClassId( String.valueOf(result[1]).equals("0") ? "N/A" : String.valueOf(result[1]) );
+                    data.setUserIdMp_FK(String.valueOf(result[2]).equals("0") ? "N/A" : String.valueOf(result[2]));
+                    data.setCodeSubject("N/A");
+                    data.setCredit("N/A");
+                    data.setNameSubject("N/A");
+                    data.setGroup("N/A");
+                    data.setCombination("N/A");
 
                     data.setNameRoom( result[8].toString());
                     data.setCodeFacility( result[9].toString());

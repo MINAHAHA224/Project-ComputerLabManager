@@ -66,6 +66,8 @@ private final JwtTokenUtil jwtTokenUtil;
             final String tokenFromHeader = authHeader.substring(7);
             final String emailFromToken;
 
+
+
             try {
                 emailFromToken = this.jwtTokenUtil.extractEmailFromSubject(tokenFromHeader);
             } catch (ExpiredJwtException e) {
