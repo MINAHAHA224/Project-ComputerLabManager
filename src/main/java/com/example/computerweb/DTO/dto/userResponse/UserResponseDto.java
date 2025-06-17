@@ -19,6 +19,7 @@ public class UserResponseDto {
     private String major;
     private String dateOfBirth ;
     private String avatar;
+    private String khoa;
 
 
     private String informationCode;

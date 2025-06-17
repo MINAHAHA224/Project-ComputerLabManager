@@ -180,6 +180,9 @@ private final JwtTokenUtil jwtTokenUtil;
         if (requestURI.startsWith("/avatars")) {
             return true;
         }
+        if (requestURI.startsWith("/access/face-login")) {
+            return true;
+        }
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
                 Pair.of("/access/login", "POST"),
                 Pair.of("/access/forgotPassword", "POST")

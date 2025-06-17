@@ -2,6 +2,7 @@ package com.example.computerweb.repositories.custom.impl;
 
 import com.example.computerweb.DTO.dto.calendarResponse.CalendarManagementDto;
 import com.example.computerweb.models.entity.AccountEntity;
+import com.example.computerweb.models.entity.MajorEntity;
 import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.repositories.IAccountRepository;
 import com.example.computerweb.repositories.IUserRepository;
@@ -37,7 +38,7 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
         Long idUser = userCurrent.getId();
 
         String sql = null;
-        if (userCurrent.getRole().getNameRole().equals("GVU") || userCurrent.getRole().getNameRole().equals("CSVC")||  userCurrent.getRole().getNameRole().equals("TK")) {
+        if (userCurrent.getRole().getNameRole().equals("GVU") || userCurrent.getRole().getNameRole().equals("CSVC")) {
             sql = "SELECT \n" +
                     "    LTH.LichID, \n" +
                     "    ISNULL(LTC.LopTinChiID,'') AS LopTinChiID ,\n" +
@@ -102,6 +103,39 @@ public class CalendarRepositoryCustomImpl implements CalendarRepositoryCustom {
                     "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK\n" +
                     "INNER JOIN Lop lp ON LTC.Lop_FK = lp.LopID\n " +
                     "WHERE ND1.UserID = "+idUser+" OR ND2.UserID = " + idUser ;
+        }else if (userCurrent.getRole().getNameRole().equals("TK")) {
+            MajorEntity majorOfTk = userCurrent.getMajor();
+            sql = "SELECT \n" +
+                    "    LTH.LichID, \n" +
+                    "    ISNULL(LTC.LopTinChiID,'') AS LopTinChiID ,\n" +
+                    "    ISNULL(LTH.UserIdMp_FK,'') AS UserIdMp_FK ,  \n" +
+                    "    ISNULL(MH.MaMH,'')  AS MaMH , \n" +
+                    "\tISNULL(LTC.SoTC,'') AS SoTC ,\n" +
+                    "    ISNULL(MH.TenMH,'')  AS TenMH , \n" +
+                    "    ISNULL(LTC.Nhom,'')   AS Nhom ,\n" +
+                    "    ISNULL(LTH.ToHop,'')   AS ToHop , \n" +
+                    "    PTH.TenPhong, \n" +
+                    "    CS.MaCS, \n" +
+                    "    LTH.Thu,\n" +
+                    "    LTH.SoTiet, \n" +
+                    "    LTH.SoTietBD_FK,\n" +
+                    "    ISNULL(ND1.Ho + ' ' + ND1.Ten, ND2.Ho + ' ' + ND2.Ten) AS GiangVien,\n" +
+                    "    LTH.GhiChu,\n" +
+                    "    DATEADD(DAY, (LTH.Thu - CASE WHEN DATEPART(WEEKDAY, TuanHK.NgayBatDau) = 1 THEN 7 ELSE DATEPART(WEEKDAY, TuanHK.NgayBatDau) - 1 END), TuanHK.NgayBatDau) AS NgayCuThe,\n" +
+                    "    TT.MaTrangThai, \n" +
+                    "    lp.MaLop \n" +
+                    "FROM LichThucHanh LTH -- Thêm Alias LTH cho ngắn gọn\n" +
+                    "LEFT JOIN TrangThai TT ON LTH.TrangThai_FK = TT.TrangThaiID \n" +
+                    "LEFT JOIN LopTinChi LTC ON LTC.LopTinChiID = LTH.LopTinChiID_FK \n" +
+                    "LEFT JOIN PhongThucHanh PTH ON PTH.PhongID = LTH.PhongID_FK \n" +
+                    "LEFT JOIN TietThucHanh TTH ON TTH.TietID = LTH.SoTietBD_FK \n" +
+                    "LEFT JOIN CoSo CS ON CS.CoSoID = PTH.CoSo_Fk \n" +
+                    "LEFT JOIN MonHoc MH ON MH.MonHocID = LTC.MonHoc_FK\n" +
+                    "LEFT JOIN NguoiDung ND1 ON ND1.UserID = LTH.UserIdMp_FK\n" +
+                    "LEFT JOIN NguoiDung ND2 ON ND2.UserID = LTC.UserID_FK\n" +
+                    "LEFT JOIN TuanHoc_KiHoc TuanHK ON TuanHK.TuanHoc_KiHoc_Id = LTH.TuanHoc_KiHoc_Id_FK\n" +
+                    "INNER JOIN Lop lp ON LTC.Lop_FK = lp.LopID\n " +
+                    "WHERE ND2.ChuyenNganh_FK = " + majorOfTk.getId() ;
         }
 
 

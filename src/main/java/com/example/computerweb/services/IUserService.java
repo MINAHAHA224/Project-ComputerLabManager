@@ -46,4 +46,5 @@ public interface IUserService {
     ResponseEntity<String> handleCheckExistEmailAndSendMail ( String email) throws MessagingException, UnsupportedEncodingException;
 
     ResponseData<?> handleUploadAvatar (MultipartFile file);
+    ResponseData<?> handleAccessByFaceId (String userCode);
 }

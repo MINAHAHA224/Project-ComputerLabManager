@@ -77,6 +77,7 @@ public class TicketRequestCustomImpl implements TicketRequestCustom {
         sql.append("JOIN TrangThai st_phieu ON pyc.TrangThaiID_FK = st_phieu.TrangThaiID ");
         // JOIN với NguoiDung để lấy thông tin chuyên ngành của người gửi
         sql.append("JOIN NguoiDung nguoiGui ON nguoiGui.UserID = pyc.UserIdNguoiGui_FK ");
+        sql.append("JOIN ChuyenNganh CN ON nguoiGui.ChuyenNganh_FK = CN.ChuyenNganhID ");
         // JOIN thêm với TrangThai cho các cột Duyet... nếu cần hiển thị chi tiết trạng thái từng bước
         // sql.append("LEFT JOIN TrangThai st_tk ON pyc.DuyetTK = st_tk.TrangThaiID ");
         // sql.append("LEFT JOIN TrangThai st_gvu ON pyc.DuyetGVU = st_gvu.TrangThaiID ");
@@ -109,11 +110,11 @@ public class TicketRequestCustomImpl implements TicketRequestCustom {
                 // Nếu TK không có chuyên ngành, không cho xem phiếu nào
                 return new ArrayList<>();
             }
-            Long majorId = truongKhoa.getMajor().getId();
+            Long majorId = truongKhoa.getMajor().getKhoa().getId();
 
             // Thêm điều kiện lọc theo chuyên ngành
             sql.append("WHERE pyc.TrangThaiID_FK = ").append(statusWaitingDeanId);
-            sql.append(" AND nguoiGui.ChuyenNganh_FK = ").append(majorId);
+            sql.append(" AND CN.KhoaID_FK = ").append(majorId);
 //            sql.append("OR (pyc.DuyetTK IS NOT NULL   ) ");
         } else {
             // Vai trò không xác định hoặc không có quyền xem phiếu quản lý

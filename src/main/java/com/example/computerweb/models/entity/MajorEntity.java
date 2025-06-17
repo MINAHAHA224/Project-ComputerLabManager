@@ -27,4 +27,8 @@ public class MajorEntity {
 
     @OneToMany(mappedBy = "major")
     private List<UserEntity> userEntities;
+
+    @ManyToOne
+    @JoinColumn(name = "KhoaID_FK")
+    private KhoaEntity khoa;
 }

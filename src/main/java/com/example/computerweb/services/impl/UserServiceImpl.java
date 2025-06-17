@@ -5,6 +5,7 @@ import com.example.computerweb.DTO.dto.userResponse.UserResponseDto;
 import com.example.computerweb.DTO.dto.userResponse.UserCreateMgnDto;
 import com.example.computerweb.DTO.dto.userResponse.UserManagementDto;
 import com.example.computerweb.DTO.reponseBody.ResponseData;
+import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
 import com.example.computerweb.DTO.requestBody.userRequest.UserMngProfileRequestDto;
@@ -50,7 +51,7 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements IUserService {
+public  class UserServiceImpl implements IUserService {
     private final MailService mailService;
     private final IMajorRepository iMajorRepository;
     private final IUserRepository iuserRepository;
@@ -282,7 +283,7 @@ public class UserServiceImpl implements IUserService {
         userResponseDto.setEmail(account.getEmail());
         userResponseDto.setFirstName(userCurrent.getFirstName());
         userResponseDto.setLastName(userCurrent.getLastName());
-        userResponseDto.setMajor(userCurrent.getMajor() == null ? "" : userCurrent.getMajor().getCodeMajor());
+        userResponseDto.setMajor(userCurrent.getMajor() == null ? "N/A" : userCurrent.getMajor().getContentMajor());
 
         userResponseDto.setGender(userCurrent.getGender());
         userResponseDto.setDateOfBirth(DateUtils.convertToString(userCurrent.getDateOfBirth()));
@@ -294,6 +295,7 @@ public class UserServiceImpl implements IUserService {
         userResponseDto.setDistrict(userCurrent.getDistrict());
         userResponseDto.setWard(userCurrent.getWard());
         userResponseDto.setAvatar(userCurrent.getAvatar());
+        userResponseDto.setKhoa(userCurrent.getMajor() != null ? userCurrent.getMajor().getKhoa().getTenKhoa() : "N/A");
 
 
         return userResponseDto;
@@ -485,6 +487,27 @@ public class UserServiceImpl implements IUserService {
         Map<String, String> responseData = new HashMap<>();
         responseData.put("filePath", "/resources/images/avatars/" + newAvatarFileName);
         return new ResponseSuccess<>(HttpStatus.OK.value(), "Tải ảnh đại diện thành công.", responseData);
+    }
+
+    @Override
+    public ResponseData<?> handleAccessByFaceId(String userCode) {
+        AccountEntity acount = this.iAccountRepository.findAccountEntityByEmail(userCode).orElseThrow(
+                ()-> new AuthenticationException("Không tìm thấy người dùng")
+        );
+        UserEntity user = acount.getUser();
+        // Giả sử mật khẩu mặc định là ngày sinh dạng yyyy-MM-dd
+        String defaultPassword =  "123456";
+
+        UserLoginDto loginDto = new UserLoginDto(user.getAccountEntity().getEmail(), defaultPassword);
+
+        ResponseEntity<String> handleLogin = handleLogin(loginDto);
+        if (handleLogin.getStatusCode() == HttpStatus.OK) {
+            Map<String, String> token = new HashMap<>();
+            token.put("token", handleLogin.getBody());
+            return new ResponseSuccess<>(HttpStatus.OK.value(), "Đăng nhập bằng khuôn mặt thành công", token);
+        } else {
+            throw  new AuthenticationException( "Xác thực mô phỏng thất bại.");
+        }
     }
 
 

@@ -481,22 +481,45 @@ public ResponseData<?> handleUpdateCreditClassDetail(CreditClassRqUpdateDto cred
         );
         UserEntity currentUser = account.getUser();
         // Lấy tất cả các Lớp tín chỉ
-
-        List<CreditClassEntity> creditClasses = iCreditClassRepository.findAll();
-        List<CreditClassScheduleDto> result = new ArrayList<>();
-        // Nếu là GV, chỉ lấy các lớp tín chỉ do GV đó phụ trách
         boolean isGv = (currentUser.getRole().getNameRole().equals("GV"));
+      boolean isTk = (currentUser.getRole().getNameRole().equals("TK"));
+        // Lấy tất cả các lớp tín chỉ trước
+        List<CreditClassEntity> allCreditClasses = iCreditClassRepository.findAll();
+        List<CreditClassEntity> filteredCreditClasses;
 
-        if (isGv) {
-
-
-            creditClasses = this.iCreditClassRepository.findAllByUser(currentUser);
+        // === LOGIC PHÂN QUYỀN DỮ LIỆU MỚI ===
+        if (isTk) {
+            // Nếu là Trưởng khoa, lọc theo chuyên ngành của Trưởng khoa
+            final MajorEntity deanMajor = currentUser.getMajor();
+            if (deanMajor == null) {
+                // Trưởng khoa phải có chuyên ngành, nếu không thì trả về rỗng
+                return new ArrayList<>();
+            }
+            filteredCreditClasses = allCreditClasses.stream()
+                    .filter(cc -> cc.getUser() != null && cc.getUser().getMajor() != null &&
+                            cc.getUser().getMajor().getId().equals(deanMajor.getId()))
+                    .collect(Collectors.toList());
+        } else if (isGv) {
+            // Nếu là Giảng viên, lọc theo chính giảng viên đó
+            filteredCreditClasses = allCreditClasses.stream()
+                    .filter(cc -> cc.getUser() != null && cc.getUser().getId().equals(currentUser.getId()))
+                    .collect(Collectors.toList());
+        } else {
+            // Nếu là GVU hoặc vai trò quản lý khác, xem tất cả
+            filteredCreditClasses = allCreditClasses;
         }
+//        boolean isGv = (currentUser.getRole().getNameRole().equals("GV"));
+//        if (isGv) {
+//
+//
+//            creditClasses = this.iCreditClassRepository.findAllByUser(currentUser);
+//        }
 
-
+// === PHẦN CÒN LẠI GIỮ NGUYÊN: MAPPING DỮ LIỆU ===
+        List<CreditClassScheduleDto> result = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yy");
 
-        for (CreditClassEntity cc : creditClasses) {
+        for (CreditClassEntity cc : filteredCreditClasses) {
             CreditClassScheduleDto dto = new CreditClassScheduleDto();
             dto.setMaMh(cc.getSubject().getCodeSubject());
             dto.setTenMh(cc.getSubject().getNameSubject());

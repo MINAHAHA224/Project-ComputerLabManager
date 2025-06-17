@@ -82,7 +82,7 @@ public class WebSecurityConfig {
                 // do la check quyen
                     .authorizeHttpRequests(request -> {
                         request.requestMatchers(
-                                "/access/login" ,"/access/logout" , "/access/forgotPassword" , "/avatars/**" , "/calendarGetSemester/**"  ).permitAll();
+                                "/access/login" ,"/access/logout" ,"/access/face-login", "/access/forgotPassword" , "/avatars/**" , "/calendarGetSemester/**"  ).permitAll();
                     request.requestMatchers(HttpMethod.GET, "/calendarManagement/create").hasAnyRole("GVU", "GV" , "TK" , "CSVC");
                     request.requestMatchers("/creditClassManagement/schedules" , "/calendarManagement/getWeekUpdate/**").hasAnyRole("GVU", "TK", "GV");
                     request.requestMatchers(
@@ -97,9 +97,6 @@ public class WebSecurityConfig {
                             , "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**").permitAll();
                     request.anyRequest().authenticated();
                 });
-
-
-
         return http.build();
     }
 }

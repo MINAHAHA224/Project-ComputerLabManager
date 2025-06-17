@@ -5,6 +5,9 @@ import com.example.computerweb.DTO.reponseBody.ResponseData;
 import com.example.computerweb.DTO.reponseBody.ResponseFailure;
 import com.example.computerweb.DTO.reponseBody.ResponseSuccess;
 import com.example.computerweb.DTO.requestBody.accessRequest.UserLoginDto;
+import com.example.computerweb.exceptions.DataNotFoundException;
+import com.example.computerweb.models.entity.AccountEntity;
+import com.example.computerweb.models.entity.UserEntity;
 import com.example.computerweb.services.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,5 +80,15 @@ public class AccessController {
 
     }
     // navigation to next Page
+
+    // === API MỚI CHO ĐĂNG NHẬP BẰNG KHUÔN MẶT (MÔ PHỎNG) ===
+    @Operation(summary = "Face Login (Simulation)", description = "API for simulated face login")
+    @PostMapping("/access/face-login")
+    public ResponseData<?> faceLogin(@RequestParam String userCode) {
+        // Dùng lại service handleLogin với một DTO được tạo sẵn
+        // Tìm tài khoản dựa trên userCode để lấy email và mật khẩu (mặc định)
+        return this.iUserService.handleAccessByFaceId(userCode);
+
+    }
 
 }
