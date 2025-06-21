@@ -39,7 +39,9 @@ public class ReportServiceImpl implements IReportService {
     @Override
     public List<CalendarManagementDto> getCalendarReportData(ReportFilterRequest filter) {
         List<CalendarManagementDto> allData = calendarRepository.findAllCustom();
-
+        allData.forEach(item -> {
+            item.setStatusCalendar(item.getStatusCalendar().equals("ACTIVE") ? "Đang hoạt động" : "Dừng hoạt động");
+        });
         if (filter == null || (filter.getFromDate() == null && filter.getToDate() == null)) {
             return allData;
         }
@@ -50,6 +52,7 @@ public class ReportServiceImpl implements IReportService {
             LocalDate itemDate = LocalDate.parse(item.getDate(), dtf);
             boolean afterFromDate = filter.getFromDate() == null || !itemDate.isBefore(filter.getFromDate());
             boolean beforeToDate = filter.getToDate() == null || !itemDate.isAfter(filter.getToDate());
+
             return afterFromDate && beforeToDate;
         }).collect(Collectors.toList());
     }
@@ -59,7 +62,9 @@ public class ReportServiceImpl implements IReportService {
         String reportTitle = "BÁO CÁO LỊCH THỰC HÀNH";
         String[] headers = {"STT", "ID Lịch", "Môn học", "Giáo viên", "Phòng", "Ngày", "Thứ", "Tiết BĐ", "Số tiết", "Trạng thái"};
         List<CalendarManagementDto> data = getCalendarReportData(filter);
-
+        data.forEach(item -> {
+            item.setStatusCalendar(item.getStatusCalendar().equals("ACTIVE") ? "Đang hoạt động" : "Dừng hoạt động");
+        });
         return createStyledExcel(reportTitle, headers, data, (row, item, stt) -> {
             row.createCell(0).setCellValue(stt);
             row.createCell(1).setCellValue(item.getCalendarId());
@@ -70,7 +75,7 @@ public class ReportServiceImpl implements IReportService {
             row.createCell(6).setCellValue(item.getDay());
             row.createCell(7).setCellValue(item.getLessonBegin());
             row.createCell(8).setCellValue(item.getLesson());
-            row.createCell(9).setCellValue(item.getStatusCalendar());
+            row.createCell(9).setCellValue(item.getStatusCalendar() );
         });
     }
 
