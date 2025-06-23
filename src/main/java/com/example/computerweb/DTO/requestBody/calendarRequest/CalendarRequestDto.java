@@ -26,6 +26,8 @@ import java.util.List;
 @ToString
 @Validated
 public class CalendarRequestDto { // Đổi tên cho phù hợp nếu đây là DTO mới hoàn toàn
+
+    private String semesterYearAuto;
     @JsonProperty("creditClassId")
     @Schema(type = "Long",  example = "1")
     @NotNull(message = "Lớp tín chỉ không được để trống")

@@ -16,6 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 public class CalendarRequestNoAutoDto {
+
+    private String semesterYearManual;
     @JsonProperty("creditClassId")
     @Schema(type = "Long", example = "1")
     @NotNull(message = "Lớp tín chỉ không được để trống")

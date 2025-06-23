@@ -63,16 +63,6 @@ public class WebSecurityConfig {
                 // Error Code : 403 Forbidden of SpringSecurity
 
                 .csrf(AbstractHttpConfigurer::disable) // API dạng RESTful không dùng CSRF.
-
-                // --- THAY ĐỔI QUAN TRỌNG VỀ SESSION MANAGEMENT ---
-//                .sessionManagement(session -> session
-//                        .sessionCreationPolicy(IF_REQUIRED) // HOẶC ALWAYS, nhưng IF_REQUIRED thường tốt hơn
-//                        .sessionAuthenticationStrategy(new RegisterSessionAuthenticationStrategy(sessionRegistry())) // Đăng ký session mới với registry
-//                        .maximumSessions(1) // Chỉ cho phép 1 session đồng thời cho mỗi user
-//                        .maxSessionsPreventsLogin(false) // false: login mới sẽ đá session cũ. true: login mới bị chặn.
-//                        // .expiredUrl("/login?session-expired") // (Tùy chọn) Chuyển hướng khi session bị đá
-//                        .sessionRegistry(sessionRegistry()) // Cung cấp SessionRegistry
-//                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // --- KẾT THÚC THAY ĐỔI SESSION MANAGEMENT ---
