@@ -118,6 +118,7 @@ public class CalendarServiceImpl implements ICalendarService {
                 roomDetails.put("quantity", roomEntity.getNumberOfComputers().toString());
                 roomDetails.put("quantityActive", roomEntity.getNumberOfComputerActive().toString());
                 roomDetails.put("facility", roomEntity.getFacility().getNameFacility());
+                roomDetails.put("facilityId", roomEntity.getFacility().getId().toString());
                 arrayRoom.add(roomDetails);
             }
         } else {
